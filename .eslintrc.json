@@ -1,0 +1,292 @@
+{
+  "env": {
+    "browser": true,
+    "jest": true,
+    "node": true,
+    "es2021": true
+  },
+  "ignorePatterns": [
+    "node_modules/**/*.*",
+    "__fixtures__/*.js"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "src/**/*.js",
+        "src/**/*.jsx",
+        "test/**/*.js",
+        "test/**/*.mjs"
+      ]
+    }
+  ],
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "babel",
+    "react-refresh",
+    "jsx-a11y",
+    "eslint-plugin-vitest-globals"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "next/core-web-vitals"
+  ],
+  "rules": {
+    "newline-per-chained-call": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-key": "off",
+    "arrow-parens": [
+      "error",
+      "as-needed"
+    ],
+    "comma-dangle": [
+      "error",
+      "only-multiline"
+    ],
+    "consistent-return": "warn",
+    "default-param-last": "warn",
+    "eqeqeq": "off",
+    "max-len": "off",
+    "import/prefer-default-export": "off",
+    "indent": [
+      "error",
+      2,
+      {
+        "ignoredNodes": [
+          "TemplateLiteral"
+        ],
+        "SwitchCase": 1
+      }
+    ],
+    "jsx-a11y/label-has-for": [
+      "error",
+      {
+        "required": {
+          "some": [
+            "nesting",
+            "id"
+          ]
+        }
+      }
+    ],
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
+    "no-multi-spaces": [
+      "warn",
+      {
+        "ignoreEOLComments": true
+      }
+    ],
+    "no-param-reassign": [
+      "warn",
+      {
+        "props": false
+      }
+    ],
+    "no-restricted-globals": [
+      "error",
+      {
+        "name": "window",
+        "message": "Please use ~/src/Lib/getGlobal instead."
+      }
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "test/testHelpers",
+            "importNames": [
+              "default"
+            ],
+            "message": "Please use appRender rather than getRenderer in new tests."
+          },
+          {
+            "name": "@material-ui/core",
+            "importNames": [
+              "Grid"
+            ],
+            "message": "Please use makeStyles/useStyles or <Box display=\"flex\" style={{ gap: ##rem }} /> instead."
+          },
+          {
+            "name": "~/src/UI/Theme",
+            "importNames": [
+              "palettes"
+            ],
+            "message": "Please use useTheme or the theme => ({}) pattern in ThemeProvider instead."
+          }
+        ],
+        "patterns": [
+          {
+            "group": [
+              "~/src/UI/Shared/Form/SingleSelect"
+            ],
+            "message": "Please use ~/src/UI/Shared/Select instead."
+          },
+          {
+            "group": [
+              "~/src/UI/Shared/Form/SimpleSelect"
+            ],
+            "message": "Please use ~/src/UI/Shared/Select instead."
+          }
+        ]
+      }
+    ],
+    "no-restricted-properties": [
+      "error",
+      {
+        "property": "debugForce",
+        "message": "Do not use debugForce in production."
+      }
+    ],
+    "no-var": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        "varsIgnorePattern": "logger|ignore|_",
+        "argsIgnorePattern": "logger|ignore|_",
+        "args": "after-used",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "no-duplicate-imports": "error",
+    "object-curly-newline": [
+      "error",
+      {
+        "consistent": true
+      }
+    ],
+    "prefer-const": "error",
+    "prefer-destructuring": "off",
+    "operator-linebreak": [
+      "warn",
+      "before"
+    ],
+    "camelcase": "off",
+    "babel/camelcase": "off",
+    "new-cap": "off",
+    "babel/new-cap": "off",
+    "no-invalid-this": "off",
+    "no-nested-ternary": "error",
+    "babel/no-invalid-this": "error",
+    "no-unused-expressions": "off",
+    "babel/no-unused-expressions": "error",
+    "object-curly-spacing": "off",
+    "babel/object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "quotes": "off",
+    "babel/quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "semi": "off",
+    "babel/semi": [
+      "error",
+      "never",
+      {
+        "beforeStatementContinuationChars": "always"
+      }
+    ],
+    "template-curly-spacing": "off",
+    "react/destructuring-assignment": "off",
+    "react/forbid-prop-types": "warn",
+    "react/function-component-definition": [
+      "warn",
+      {
+        "namedComponents": "arrow-function",
+        "unnamedComponents": "arrow-function"
+      }
+    ],
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "extensions": [
+          ".jsx"
+        ]
+      }
+    ],
+    "react/jsx-no-duplicate-props": [
+      "error",
+      {
+        "ignoreCase": false
+      }
+    ],
+    "react/jsx-one-expression-per-line": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/prop-types": [
+      "warn",
+      {
+        "ignore": [
+          "aria-label",
+          "aria-labelledby",
+          "classes",
+          "className",
+          "data-testid",
+          "ignore",
+          "role",
+          "theme",
+          "width"
+        ],
+        "skipUndeclared": true
+      }
+    ],
+    "react/no-multi-comp": "off",
+    "react-refresh/only-export-components": [
+      "warn",
+      {
+        "allowConstantExport": true
+      }
+    ],
+    "react/require-default-props": [
+      "warn",
+      {
+        "functions": "defaultArguments"
+      }
+    ],
+    "react/sort-comp": [
+      "warn",
+      {
+        "order": [
+          "static-variables",
+          "static-methods",
+          "instance-variables",
+          "lifecycle",
+          "getters",
+          "setters",
+          "/^(handle|on).+$/",
+          "everything-else",
+          "render"
+        ]
+      }
+    ],
+    "react/state-in-constructor": "off",
+    "react/static-property-placement": "off"
+  },
+  "settings": {
+    "import/cache": {
+      "lifetime": 90
+    },
+    "import/resolver": {
+      "babel-module": {}
+    }
+  }
+}
