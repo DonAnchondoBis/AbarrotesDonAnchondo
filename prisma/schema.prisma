@@ -77,14 +77,12 @@ model Ticket {
 
 model TicketProduct {
   id              Int      @id @default(autoincrement())
-  tickId          Int
   quantityProduct Int
   productId       Int
   product         Product  @relation(fields: [productId], references: [id])
   ticketId        Int
-  ticket          Ticket   @relation(fields: [tickId], references: [id])
+  ticket          Ticket   @relation(fields: [ticketId], references: [id])
   createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 }
 
 model User {
