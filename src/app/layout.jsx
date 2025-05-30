@@ -1,16 +1,6 @@
-import { Geist, Geist_Mono } from 'next/font/google'
-import './globals.css'
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
-
+'use client'
+import ThemeRegistry from '~/app/UI/Theme'
+import NavBar from '~/app/Navbar'
 
 const metadata = {
   title: 'Create Next App',
@@ -24,10 +14,15 @@ const RootLayout = ({ children }) => {
       <head>
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
+        {/* TODO link para poner imagen */}
+        {/* <link rel="icon" type="image/svg+xml" href={logo_blue} /> */}
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
-      </body>
+      <ThemeRegistry>
+        <body>
+          <NavBar />
+          {children}
+        </body>
+      </ThemeRegistry>
     </html>
   )
 }
