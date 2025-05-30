@@ -1,0 +1,50 @@
+// TODO: Add authentication logic
+import { NextResponse } from 'next/server'
+import { StoreInfo } from '~/api/entities'
+// import { authenticateToken } from '~/app/api/Libs/auth'
+import ERROR from '~/Libs/error'
+import cleanerData from '~/app/api/Libs/cleanerData'
+import payloadFormatter from '~/app/api/Libs/Utils/payloadFormatter'
+import validatorFields from '~/app/api/Libs/validatorFields'
+import { EMPTY_OBJECT } from '~/app/Lib/Utils/constants'
+import prisma from '~/app/api/Libs/prisma'
+
+export const POST = async request => {
+  try{
+    //const hasPermission = authenticateToken(request)
+    const data = await request.json()
+    const isValid = validatorFields({ data, shape: StoreInfo.shape })
+    if( isValid){
+      const payload = await prisma.storeInfo.create({
+        data: {
+          ...data,
+        }
+      })
+      const response = cleanerData({ payload })
+      return NextResponse.json(response, { status: 201 })
+    }
+    return ERROR.FORBIDDEN()
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: error.status || 500 })
+  }
+}
+
+export const GET = async request => {
+  try{
+    // const hasPermission = authenticateToken(request)
+    // if(!hasPermission) return ERROR.FORBIDDEN()
+    const filter = Object.fromEntries(request?.nextUrl?.searchParams ?? '')
+    const payloads = await prisma.storeInfo.findMany({
+      where: {
+        ...(filter.length > 0 ? { filter } : EMPTY_OBJECT)
+      }
+    })
+    if(payloads){
+      const response = payloadFormatter(payloads.map(payload => cleanerData({ payload })))
+      return NextResponse.json(response, { status: 200 })
+    }
+    return ERROR.NOT_FOUND()
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: error.status || 500 })
+  }
+}
