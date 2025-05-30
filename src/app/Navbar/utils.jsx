@@ -3,7 +3,6 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import PaidIcon from '@mui/icons-material/Paid'
 import DescriptionIcon from '@mui/icons-material/Description'
-import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import SettingsIcon from '@mui/icons-material/Settings'
 
 export const SIDEBAR_OPTS = [
