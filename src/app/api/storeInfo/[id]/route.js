@@ -1,7 +1,6 @@
-// TODO: Add authentication logic
 import { NextResponse } from 'next/server'
 import { StoreInfo } from '~/api/entities'
-// import { authenticateToken } from '~/app/api/Libs/auth'
+import { authenticateToken } from '~/app/api/Libs/auth'
 import ERROR from '~/Libs/error'
 import cleanerData from '~/app/api/Libs/cleanerData'
 import validatorFields from '~/app/api/Libs/validatorFields'
@@ -9,8 +8,8 @@ import prisma from '~/app/api/Libs/prisma'
 
 export const GET = async (request, { params }) => {
   try{
-    // const hasPermission = authenticateToken(request)
-    // if(!hasPermission) return ERROR.FORBIDDEN()
+    const hasPermission = authenticateToken(request)
+    if(!hasPermission) return ERROR.FORBIDDEN()
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
     const payload = await prisma.storeInfo.findUnique({
@@ -30,13 +29,12 @@ export const GET = async (request, { params }) => {
 
 export const PUT = async (request, { params }) => {
   try {
-    // const hasPermission = authenticateToken(request)
+    const hasPermission = authenticateToken(request)
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
     const data = await request.json()
     const isValid = validatorFields({ data, shape: StoreInfo.shape })
-    // ADD hasPermission
-    if (isValid) {
+    if (hasPermission && isValid) {
       const payload = await prisma.storeInfo.update({
         where: {
           id: Number(id),
@@ -55,10 +53,10 @@ export const PUT = async (request, { params }) => {
 
 export const PATCH = async (request, { params }) => {
   try {
-    // const hasPermission = authenticateToken(request)
-    // if (!hasPermission) return ERROR.FORBIDDEN()
-    // if (!Number(id)) return ERROR.INVALID_FIELDS()
+    const hasPermission = authenticateToken(request)
+    if (!hasPermission) return ERROR.FORBIDDEN()
     const { id } = params
+    if (!Number(id)) return ERROR.INVALID_FIELDS()
     const data = await request.json()
     const payload = await prisma.storeInfo.update({
       where: {
@@ -78,8 +76,8 @@ export const PATCH = async (request, { params }) => {
 
 export const DELETE = async (request, { params }) => {
   try {
-    // const hasPermission = authenticateToken(request)
-    // if (!hasPermission) return ERROR.FORBIDDEN()
+    const hasPermission = authenticateToken(request)
+    if (!hasPermission) return ERROR.FORBIDDEN()
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
     const payload = await prisma.storeInfo.delete({
