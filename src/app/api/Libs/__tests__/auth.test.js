@@ -4,7 +4,7 @@ import { authenticateToken } from '~/app/api/Libs/auth'
 vi.mock('jsonwebtoken', () => {
   return {
     default: {
-      verify: () => ({ professorId: 1 })
+      verify: () => ({ userId: 1, role: 'admin' })
     }
   }
 })
@@ -14,9 +14,9 @@ describe('auth libs', () =>{
     {
       descr: 'Allowed Token',
       headers: new Headers({ 'authorization': 'token' }),
-      mockImplementation: { professorId: 1 },
+      mockImplementation: { userId: 1, role: 'admin' },
       isAllowed: true,
-      result: 1
+      result: { userId: 1, role: 'admin' }
     },
     {
       descr: 'Not Token',

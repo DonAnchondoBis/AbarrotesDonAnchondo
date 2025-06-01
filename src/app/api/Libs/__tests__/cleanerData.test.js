@@ -15,7 +15,6 @@ describe('cleanerData libs', () => {
         password: 'password',
         createdAt: 'createdAt',
         updatedAt: 'updatedAt',
-        active: 'active'
       },
       result: {
         entity: 'Entity',
@@ -28,7 +27,6 @@ describe('cleanerData libs', () => {
         password: 'password',
         createdAt: 'createdAt',
         updatedAt: 'updatedAt',
-        active: 'active',
         key1: 'key1',
         key2: 'key2',
       },
