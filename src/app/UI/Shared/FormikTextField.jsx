@@ -38,12 +38,12 @@ const FormikTextField = ({
                   edge="end"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <VisibilityOffIcon/> : <VisibilityIcon />}
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 </IconButton>
               </InputAdornment>
             )
           }
-        }: null}
+        } : null}
       />
       {errors[field?.name] ? <T color="error">{errors[field?.name]}</T> : null}
     </Stack>

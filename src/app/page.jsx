@@ -1,8 +1,14 @@
+import Link from 'next/link';
+
 const Home = () => {
   return (
-    <div >
-      Aqui deberia ir la UI
+    <div>
+      <h1>Aquí debería ir la UI</h1>
+      <Link href="/Login">
+        <button>Login</button>
+      </Link>
     </div>
-  )
-}
-export default Home
+  );
+};
+
+export default Home;
