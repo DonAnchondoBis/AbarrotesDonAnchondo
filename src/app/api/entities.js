@@ -9,3 +9,14 @@ export const StoreInfo = {
   ]
 }
 
+export const InventoryLog = {
+  name: 'inventoryLog',
+  shape: [
+    'productName',
+    'amount',
+    'description',
+    'expirationDate',
+    'type',
+    'userId'
+  ]
+}
