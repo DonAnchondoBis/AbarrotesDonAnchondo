@@ -26,3 +26,15 @@ export const User = {
     'role'
   ]
 }
+
+export const InventoryLog = {
+  name: 'inventoryLog',
+  shape: [
+    'productName',
+    'amount',
+    'description',
+    'expirationDate',
+    'type',
+    'userId'
+  ]
+}
