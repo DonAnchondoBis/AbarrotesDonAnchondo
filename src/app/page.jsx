@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from 'next/link'
 
 const Home = () => {
   return (
@@ -8,7 +8,7 @@ const Home = () => {
         <button>Login</button>
       </Link>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

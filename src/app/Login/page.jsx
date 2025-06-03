@@ -1,6 +1,5 @@
 'use client'
 
-
 import { Formik, Form, Field, useFormikContext } from 'formik'
 import TextField from '~/app/UI/Shared/FormikTextField'
 
@@ -20,11 +19,12 @@ const Container = styled('div')(({ theme }) => ({
   '@media (max-width: 768px)': {
     padding: '6rem 4rem',
   },
+
   [`& .${classes.form}`]: {
     backgroundColor: theme.palette.primary.main,
-    padding: '6rem 4rem',
+    padding: '4rem 2rem',
     borderRadius: '1rem',
-    width: '30vw',
+    width: '25vw',
     display: 'flex',
     flexDirection: 'column',
     gap: '3rem',
@@ -32,23 +32,40 @@ const Container = styled('div')(({ theme }) => ({
     justifyContent: 'center',
     minWidth: '400px'
   },
+
   [`& .${classes.button}`]: {
     border: `1px solid ${theme.palette.background.main}`,
     padding: '1ch 2rem',
     backgroundColor: theme.palette.contrast.main,
   },
+
   [`& .${classes.title}`]: {
     color: theme.palette.background.main,
     fontWeight: 'bold',
     fontStyle: 'italic',
-
   },
+
+  [`& .${classes.inputContainer}`]: {
+    width: '80%',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2rem',
+  },
+
   [`& .${classes.input}`]: {
     background: theme.palette.background.main,
     fontWeight: 'bold',
     fontStyle: 'italic',
-    borderRadius: '0.5rem',
+    borderRadius: '1ch',
+    margin: 'dense',
+    '& .MuiInputLabel-outlined': {
+      backgroundColor: theme.palette.background.main,
+      borderRadius: '1ch',
+      padding: '0 1rem',
+      marginLeft: '-4px',
+    }
   },
+
   [`& .${classes.buttonContainer}`]: {
     width: '100%',
     height: '100%',
@@ -56,7 +73,6 @@ const Container = styled('div')(({ theme }) => ({
     alignItems: 'center',
     justifyContent: 'center',
   }
-
 }))
 
 const Login = () => {
@@ -67,36 +83,26 @@ const Login = () => {
         <T variant="h3" className={classes.title}>
           Welcome
         </T>
-
-        {/* <TextField className={classes.input}
-          fullWidth
-          label="User"
-          variant="outlined"
-        />
-        <TextField className={classes.input}
-          fullWidth
-          label="Password"
-          type="password"
-          variant="outlined"
-        /> */}
-        <Field
-          name="user"
-          component={TextField}
-          className={classes.input}
-          placeholder="Username"
-          type="text"
-          label="User"
-          variant="outlined"
-        />
-        <Field
-          name="password"
-          component={TextField}
-          className={classes.input}
-          placeholder="Password"
-          type="password"
-          label="Password"
-          variant="outlined"
-        />
+        <div className={classes.inputContainer}>
+          <Field
+            className={classes.input}
+            name="user"
+            component={TextField}
+            placeholder="Username"
+            type="text"
+            label="User"
+            variant="outlined"
+          />
+          <Field
+            className={classes.input}
+            name="password"
+            component={TextField}
+            placeholder="Password"
+            type="password"
+            label="Password"
+            variant="outlined"
+          />
+        </div>
         <div className={classes.buttonContainer}>
           <Button className={classes.button}
             disabled={!isValid || !dirty}
@@ -120,11 +126,10 @@ const Wrapper = () => {
   }
 
   const handleSubmit = values => {
-    console.log('Form submitted with values:', values)
+    console.error('Form submitted with values:', values)
   }
 
   return (
-
     <Formik
       onSubmit={handleSubmit}
       initialValues={initialValues}
