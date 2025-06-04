@@ -47,7 +47,7 @@ const theme = createTheme({
           fontSize: '16px',
         },
         body: {
-          backgroundColor: '#FEF7E5', // O usa theme.palette.background.main si lo tienes definido
+          backgroundColor: '#FEF7E5',
         },
       },
     },
