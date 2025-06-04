@@ -3,6 +3,7 @@ import prisma from '~/app/api/Libs/prisma'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import ERROR from '~/Libs/error'
+import {environments as process} from "eslint-plugin-vitest-globals";
 
 export const POST = async request => {
     try {

@@ -1,13 +1,15 @@
 import {NextResponse} from 'next/server'
 import prisma from '~/app/api/Libs/prisma'
 import {authenticateToken} from '~/app/api/Libs/auth'
+import bcrypt from 'bcryptjs'
 import ERROR from '~/Libs/error'
 import cleanerData from '~/app/api/Libs/cleanerData'
 
 export const GET = async (request, {params}) => {
     try {
-        const hasPermission = authenticateToken(request)
-        if (!hasPermission) return ERROR.FORBIDDEN()
+        const {role} = authenticateToken(request)
+        if (role !== 'ADMIN') return ERROR.FORBIDDEN()
+
         const {id} = params
         if (!Number(id)) return ERROR.INVALID_FIELDS()
 
@@ -23,8 +25,8 @@ export const GET = async (request, {params}) => {
 
 export const PATCH = async (request, {params}) => {
     try {
-        const hasPermission = authenticateToken(request)
-        if (!hasPermission) return ERROR.FORBIDDEN()
+        const {role} = authenticateToken(request)
+        if (role !== 'ADMIN') return ERROR.FORBIDDEN()
 
         const {id} = params
         if (!Number(id)) return ERROR.INVALID_FIELDS()

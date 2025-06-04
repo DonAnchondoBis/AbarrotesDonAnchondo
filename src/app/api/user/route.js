@@ -9,12 +9,17 @@ import {authenticateToken} from '~/app/api/Libs/auth'
 
 export const POST = async request => {
     try {
+        const {role} = authenticateToken(request)
+        if (role !== 'ADMIN') return ERROR.FORBIDDEN()
+
         const data = await request.json()
         const isValid = validatorFields({data, shape: Object.keys(User.shape)})
         if (!isValid) return ERROR.INVALID_FIELDS()
 
         const existingUser = await prisma.user.findUnique({where: {username: data.username}})
-        if (existingUser) return NextResponse.json({error: 'Username already exists'}, {status: 409})
+        if (existingUser) {
+            return NextResponse.json({error: 'Username already exists'}, {status: 409})
+        }
 
         const hashedPassword = await bcrypt.hash(data.password, 10)
 
@@ -31,8 +36,8 @@ export const POST = async request => {
 
 export const GET = async request => {
     try {
-        const hasPermission = authenticateToken(request)
-        if (!hasPermission) return ERROR.FORBIDDEN()
+        const {role} = authenticateToken(request)
+        if (role !== 'ADMIN') return ERROR.FORBIDDEN()
 
         const users = await prisma.user.findMany()
         const response = users.map(u => cleanerData({payload: u}))
