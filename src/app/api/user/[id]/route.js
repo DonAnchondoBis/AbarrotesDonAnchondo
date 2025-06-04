@@ -50,8 +50,9 @@ export const PATCH = async (request, {params}) => {
 
 export const DELETE = async (request, {params}) => {
     try {
-        const hasPermission = authenticateToken(request)
-        if (!hasPermission) return ERROR.FORBIDDEN()
+        const {role} = authenticateToken(request)
+        if (role !== 'ADMIN') return ERROR.FORBIDDEN()
+
         const {id} = params
         if (!Number(id)) return ERROR.INVALID_FIELDS()
 
