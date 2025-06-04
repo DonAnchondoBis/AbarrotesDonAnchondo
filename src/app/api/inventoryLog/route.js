@@ -14,8 +14,36 @@ export const POST = async request => {
     const isValid = validatorFields({ data, shape: InventoryLog.shape })
     if(hasPermission && isValid){
         //The transaction is executed first, if it fails, it will not create the inventory log
-        const action = await prisma.lot
+        const target = await prisma.lot.findFirst({
+            select:{
+                id:true,
+                currentAmount: true
+            },
+            where:{
+                product:{
+                    name: data.productName
+                },
+                expirationDate: data.expirationDate
+            }
+        })
+        if(!target) return ERROR.NOT_FOUND('Lot not found')
+        
+        // Check if the new amount is less than 0
+        const newAmount = (data.type== "INCREASE" || data.type=="INCOME")?(target.currentAmount+data.amount):(target.currentAmount-data.amount)
 
+        if(newAmount<0) return ERROR.INVALID_FIELDS('New amount cannot be less than 0')
+
+        //The change is done in the lot first, if it fails, it will not create the inventory log
+        const action = await prisma.lot.update({
+            where: {
+                id: target.id
+            },
+            data: {
+                currentAmount: newAmount
+            }
+        })
+        
+        //If the action is succesful, the inventory log is created
         const payload = await prisma.inventoryLog.create({
             data
         })
@@ -35,7 +63,6 @@ export const GET = async request => {
         const hasPermission = true //authenticateToken(request)
         if(!hasPermission) return ERROR.FORBIDDEN()
         const filter = Object.fromEntries(request?.nextUrl?.searchParams ?? '')
-    console.log('filter', filter)
         const payloads = await prisma.inventoryLog.findMany({
             select: {
                 id: true,
