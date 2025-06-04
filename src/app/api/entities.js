@@ -10,6 +10,7 @@ export const StoreInfo = {
 }
 
 export const User = {
+  name: 'user',
   shape: {
     name: 'string',
     username: 'string',
