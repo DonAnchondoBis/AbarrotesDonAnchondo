@@ -12,7 +12,6 @@ export const StoreInfo = {
 export const Ticket = {
   name: 'tickets',
   shape: [
-    'userId',
     'products',
     'total'
   ]

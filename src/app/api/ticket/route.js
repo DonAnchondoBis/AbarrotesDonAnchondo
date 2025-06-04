@@ -5,7 +5,6 @@ import { authenticateToken } from '~/app/api/Libs/auth'
 import ERROR from '~/Libs/error'
 import cleanerData from '~/app/api/Libs/cleanerData'
 import validatorFields from '~/app/api/Libs/validatorFields'
-import { EMPTY_OBJECT } from '~/app/Lib/Utils/constants'
 import prisma from '~/app/api/Libs/prisma'
 
 //Post method for a ticket
@@ -41,8 +40,8 @@ export const POST = async request => {
 export const GET = async request => {
   try{
     const { role } = authenticateToken(request)
-    if(role != 'ADMIN' || role != 'CASHIER') return ERROR.FORBIDDEN()
-    const filter = Object.fromEntries(request.nextUrl.searchParams.entries())
+    if(role != 'ADMIN' && role != 'CASHIER') return ERROR.FORBIDDEN()
+    const filter = Object.fromEntries(request?.nextUrl?.searchParams ?? '')
     const payloads = await prisma.ticket.findMany({
       where: {
         ...(filter)
