@@ -1,12 +1,12 @@
 export const StoreInfo = {
-    name: 'storeInfo',
-    shape: [
-        'name',
-        'address',
-        'phone',
-        'dollarValue',
-        'yenValue',
-    ]
+  name: 'storeInfo',
+  shape: [
+    'name',
+    'address',
+    'phone',
+    'dollarValue',
+    'yenValue',
+  ]
 }
 
 export const User = {
