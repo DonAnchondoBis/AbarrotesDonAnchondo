@@ -5,7 +5,8 @@ import Link from 'next/link'
 import classNames from 'clsx'
 import { FaBars } from 'react-icons/fa'
 import { AiOutlineClose } from 'react-icons/ai'
-// import Image from 'next/image'
+import Image from 'next/image'
+import { brownLogo } from '~/app/UI/Images'
 
 import { IconButton, Stack, Typography as T } from '@mui/material'
 import { styled } from '@mui/material/styles'
@@ -75,7 +76,12 @@ const Navbar = () => {
     <NavbarContainer className={classes.navbar}>
       <div className={classes.navbar}>
         <Link href="/">
-          AQUI VA EL LOGO
+          <Image
+            src={brownLogo}
+            alt="logo"
+            width={40}
+            height={40}
+          />
         </Link>
         <IconButton onClick={() => setSidebarOpen(true)}>
           <FaBars className={classes.barsIcon} />
