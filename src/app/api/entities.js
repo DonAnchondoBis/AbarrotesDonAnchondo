@@ -10,13 +10,13 @@ export const StoreInfo = {
 }
 
 export const User = {
-    shape: {
-        name: 'string',
-        username: 'string',
-        password: 'string',
-        role: 'string',
-        active: 'boolean'
-    }
+  shape: {
+    name: 'string',
+    username: 'string',
+    password: 'string',
+    role: 'string',
+    active: 'boolean'
+  }
 }
 
 
