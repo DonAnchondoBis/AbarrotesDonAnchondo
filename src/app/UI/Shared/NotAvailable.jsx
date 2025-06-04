@@ -58,18 +58,18 @@ const NotAvailable = () => {
       <div className={classes.mainContainer}>
         <div className={classes.textContainer}>
           <T variant="h3" color='primary.main'>
-            Ocurrión un error
+            An error occurred
           </T>
           <T variant="h6" color='primary.main'>
-            Lo que buscas no está disponible en este momento. Por favor, haz clic en el botón de abajo para continuar.
+            What you are looking for is not available at this moment. Please click the button below to continue.
           </T>
           <div className={classes.buttonContainer}>
             <Button
               className={classes.button}
               variant='contained'
-              onClick={() => router.replace('/registro')}
+              onClick={() => router.replace('/')}
             >
-              Aquí
+              Here
             </Button>
           </div>
         </div>
@@ -85,7 +85,6 @@ const NotAvailable = () => {
       </div>
     </NotAvailableContainer>
   )
-
 }
 
 export default NotAvailable
