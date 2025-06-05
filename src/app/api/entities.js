@@ -9,6 +9,15 @@ export const StoreInfo = {
   ]
 }
 
+export const User = {
+  name: 'user',
+  shape: [
+    'name',
+    'username',
+    'password',
+    'role'
+  ]
+}
 export const InventoryLog = {
   name: 'inventoryLog',
   shape: [

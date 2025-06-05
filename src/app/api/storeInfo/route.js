@@ -5,16 +5,15 @@ import { authenticateToken } from '~/app/api/Libs/auth'
 import ERROR from '~/Libs/error'
 import cleanerData from '~/app/api/Libs/cleanerData'
 import validatorFields from '~/app/api/Libs/validatorFields'
-import { EMPTY_OBJECT } from '~/app/Lib/Utils/constants'
 import prisma from '~/app/api/Libs/prisma'
 
 export const POST = async request => {
-  try{
-    const { role = null, userId } = authenticateToken(request) ?? {}
-    if(role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
+  try {
+    const { role, userId } = authenticateToken(request) ?? {}
+    if (role !== 'ADMIN' || !userId) return ERROR.FORBIDDEN()
     const data = await request.json()
     const isValid = validatorFields({ data, shape: StoreInfo.shape })
-    if(isValid){
+    if (isValid){
       const payload = await prisma.storeInfo.create({
         data
       })
@@ -23,17 +22,16 @@ export const POST = async request => {
     }
     return ERROR.FORBIDDEN()
   } catch (error) {
-    console.error('Error in POST /api/storeInfo:', error)
     return NextResponse.json({ error: error.message }, { status: error.status || 500 })
   }
 }
 
 export const GET = async request => {
-  try{
+  try {
     const { role, userId } = authenticateToken(request) ?? {}
-    if(role !== 'ADMIN' || !userId) return ERROR.FORBIDDEN()
+    if (role !== 'ADMIN' || !userId) return ERROR.FORBIDDEN()
     const payloads = await prisma.storeInfo.findMany()
-    if(payloads.length > 0){
+    if (payloads.length > 0){
       const response = payloads.map(payload => cleanerData({ payload }))
       return NextResponse.json(response, { status: 200 })
     }
