@@ -10,7 +10,7 @@ import { authenticateToken } from '~/app/api/Libs/auth'
 export const POST = async request => {
   try {
     const { role, userId } = authenticateToken(request) ?? {}
-    if (role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
+    if (role !== 'ADMIN' || !userId) return ERROR.FORBIDDEN()
 
     const data = await request.json()
     const isValid = validatorFields({ data, shape: User.shape })
@@ -36,7 +36,7 @@ export const POST = async request => {
 export const GET = async request => {
   try {
     const { role, userId } = authenticateToken(request) ?? {}
-    if (role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
+    if (role !== 'ADMIN' || !userId) return ERROR.FORBIDDEN()
 
     const payloads = await prisma.user.findMany()
     if (payloads.length === 0) return ERROR.NOT_FOUND()
