@@ -22,7 +22,6 @@ export const POST = async request => {
     }
     return ERROR.FORBIDDEN()
   } catch (error) {
-    console.error('Error in POST /api/storeInfo:', error)
     return NextResponse.json({ error: error.message }, { status: error.status || 500 })
   }
 }

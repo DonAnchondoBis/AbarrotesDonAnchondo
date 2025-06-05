@@ -8,11 +8,11 @@ import validatorFields from '~/app/api/Libs/validatorFields'
 import prisma from '~/app/api/Libs/prisma'
 
 export const POST = async request => {
-  try{
+  try {
     const hasPermission = authenticateToken(request)
     const data = await request.json()
     const isValid = validatorFields({ data, shape: InventoryLog.shape })
-    if(hasPermission && isValid){
+    if (hasPermission && isValid){
       //The transaction is executed first, if it fails, it will not create the inventory log
       const target = await prisma.lot.findFirst({
         select:{
@@ -26,12 +26,12 @@ export const POST = async request => {
           expirationDate: data.expirationDate
         }
       })
-      if(!target) return ERROR.NOT_FOUND()
+      if (!target) return ERROR.NOT_FOUND()
         
       // Check if the new amount is less than 0
       const newAmount = (data.type== 'INCREASE' || data.type=='INCOME')?(target.currentAmount+data.amount):(target.currentAmount-data.amount)
 
-      if(newAmount<0) return ERROR.INVALID_FIELDS()
+      if (newAmount<0) return ERROR.INVALID_FIELDS()
 
       //The change is done in the lot first, if it fails, it will not create the inventory log
       await prisma.lot.update({
@@ -59,9 +59,9 @@ export const POST = async request => {
 }
 
 export const GET = async request => {
-  try{
+  try {
     const hasPermission = true //authenticateToken(request)
-    if(!hasPermission) return ERROR.FORBIDDEN()
+    if (!hasPermission) return ERROR.FORBIDDEN()
     const filter = Object.fromEntries(request?.nextUrl?.searchParams ?? '')
     const payloads = await prisma.inventoryLog.findMany({
       select: {
@@ -81,7 +81,7 @@ export const GET = async request => {
         ...(filter)
       }
     })
-    if(payloads.length > 0){
+    if (payloads.length > 0){
       const processedPayloads = payloads.map(payload => {
         return {
           ...payload,
