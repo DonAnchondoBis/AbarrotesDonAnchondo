@@ -7,8 +7,8 @@ import cleanerData from '~/app/api/Libs/cleanerData'
 
 export const GET = async (request, { params }) => {
   try {
-    const { role } = authenticateToken(request)
-    if (role !== 'ADMIN') return ERROR.FORBIDDEN()
+    const auth = authenticateToken(request)
+    if (!auth || auth.role !== 'ADMIN') return ERROR.FORBIDDEN()
 
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
@@ -19,7 +19,7 @@ export const GET = async (request, { params }) => {
     const response = cleanerData({ payload: user })
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error.message }, { status: error.status || 500 })
   }
 }
 
@@ -44,7 +44,7 @@ export const PATCH = async (request, { params }) => {
     const response = cleanerData({ payload: updated })
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error.message }, { status: error.status || 500 })
   }
 }
 
@@ -63,6 +63,6 @@ export const DELETE = async (request, { params }) => {
     const response = cleanerData({ payload: deleted })
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error.message }, { status: error.status || 500 })
   }
 }
