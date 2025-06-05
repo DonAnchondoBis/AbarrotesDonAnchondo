@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '~/app/api/Libs/prisma'
 import { authenticateToken } from '~/app/api/Libs/auth'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import ERROR from '~/Libs/error'
 import cleanerData from '~/app/api/Libs/cleanerData'
 import validatorFields from '~/app/api/Libs/validatorFields'
@@ -72,7 +72,7 @@ export const PATCH = async (request, { params }) => {
         ...(data?.password ? { password: await bcrypt.hash(data.password, 12) } : EMPTY_OBJECT)
       }
     })
-
+    if (!payload) return ERROR.NOT_FOUND()
     const response = cleanerData({ payload })
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
@@ -91,7 +91,7 @@ export const DELETE = async (request, { params }) => {
     const payload = await prisma.user.delete({
       where: { id: Number(id) }
     })
-
+    if (!payload) return ERROR.NOT_FOUND()
     const response = cleanerData({ payload })
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
