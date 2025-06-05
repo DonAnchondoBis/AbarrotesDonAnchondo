@@ -5,12 +5,11 @@ import { authenticateToken } from '~/app/api/Libs/auth'
 import ERROR from '~/Libs/error'
 import cleanerData from '~/app/api/Libs/cleanerData'
 import validatorFields from '~/app/api/Libs/validatorFields'
-import { EMPTY_OBJECT } from '~/app/Lib/Utils/constants'
 import prisma from '~/app/api/Libs/prisma'
 
 export const POST = async request => {
   try{
-    const { role = null, userId } = authenticateToken(request) ?? {}
+    const { role, userId } = authenticateToken(request) ?? {}
     if(role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
     const data = await request.json()
     const isValid = validatorFields({ data, shape: StoreInfo.shape })
