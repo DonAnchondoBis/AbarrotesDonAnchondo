@@ -33,7 +33,7 @@ model Lot {
 
 model Product {
   id             Int             @id @default(autoincrement())
-  name           String          @unique 
+  name           String          @unique
   unit           Unit
   price          Float
   SKU            String          @unique
