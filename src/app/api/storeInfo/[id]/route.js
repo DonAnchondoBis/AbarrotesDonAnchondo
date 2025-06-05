@@ -7,9 +7,9 @@ import validatorFields from '~/app/api/Libs/validatorFields'
 import prisma from '~/app/api/Libs/prisma'
 
 export const GET = async (request, { params }) => {
-  try{
+  try {
     const { role, userId } = authenticateToken(request) ?? {}
-    if(role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
+    if (role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
     const payload = await prisma.storeInfo.findUnique({
@@ -17,7 +17,7 @@ export const GET = async (request, { params }) => {
         id: Number(id),
       }
     })
-    if(payload){
+    if (payload){
       const response = cleanerData({ payload })
       return NextResponse.json(response, { status: 200 })
     }
@@ -30,7 +30,7 @@ export const GET = async (request, { params }) => {
 export const PUT = async (request, { params }) => {
   try {
     const { role, userId } = authenticateToken(request) ?? {}
-    if(role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
+    if (role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
     const data = await request.json()
@@ -55,7 +55,7 @@ export const PUT = async (request, { params }) => {
 export const PATCH = async (request, { params }) => {
   try {
     const { role, userId } = authenticateToken(request) ?? {}
-    if(role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
+    if (role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
     const data = await request.json()
@@ -78,7 +78,7 @@ export const PATCH = async (request, { params }) => {
 export const DELETE = async (request, { params }) => {
   try {
     const { role, userId } = authenticateToken(request) ?? {}
-    if(role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
+    if (role !== 'ADMIN' && !userId) return ERROR.FORBIDDEN()
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
     const payload = await prisma.storeInfo.delete({

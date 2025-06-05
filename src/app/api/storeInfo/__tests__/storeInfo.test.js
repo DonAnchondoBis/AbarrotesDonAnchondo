@@ -71,15 +71,15 @@ describe('API Club - GET', () => {
       expectedResponse: { error: 'Error fetching clubs' }
     }
   ])('$descr', async ({ expectedStatus, expectedResponse, mockImplementation, isNotAllowed, isEmpty }) =>{
-    if(mockImplementation){
+    if (mockImplementation){
       const prisma = await import('~/app/api/Libs/prisma')
       vi.spyOn(prisma.default.storeInfo, 'findMany').mockRejectedValueOnce(mockImplementation)
     }
-    if(isNotAllowed){
+    if (isNotAllowed){
       const authenticateToken = await import ('~/app/api/Libs/auth')
       vi.spyOn( authenticateToken, 'authenticateToken').mockReturnValueOnce(null)
     }
-    if(isEmpty){
+    if (isEmpty){
       const prisma = await import('~/app/api/Libs/prisma')
       vi.spyOn(prisma.default.storeInfo, 'findMany').mockReturnValueOnce([])
     }
@@ -150,7 +150,7 @@ describe('API Club - POST', () => {
       const prisma = await import('~/app/api/Libs/prisma')
       vi.spyOn(prisma.default.storeInfo, 'create').mockRejectedValueOnce(mockImplementation)
     }
-    if(isNotAllowed){
+    if (isNotAllowed){
       const authenticateToken = await import ('~/app/api/Libs/auth')
       vi.spyOn( authenticateToken, 'authenticateToken').mockReturnValueOnce(null)
     }

@@ -96,7 +96,7 @@ describe('API User Login - POST', () => {
       const prisma = await import('~/app/api/Libs/prisma')
       vi.spyOn(prisma.default.user, 'findUnique').mockRejectedValueOnce(mockImplementation)
     }
-    if(isEmpty){
+    if (isEmpty){
       const prisma = await import('~/app/api/Libs/prisma')
       vi.spyOn(prisma.default.user, 'findUnique').mockReturnValueOnce(null)
     }
