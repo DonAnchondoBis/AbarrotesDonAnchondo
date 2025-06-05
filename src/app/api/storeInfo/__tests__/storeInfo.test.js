@@ -32,7 +32,7 @@ vi.mock('~/app/api/Libs/prisma', () => {
 })
 
 vi.mock('~/app/api/Libs/auth', () => {
-  return { authenticateToken: () => (1) }
+  return { authenticateToken: () => ({ role: 'ADMIN', userId: 1 }) }
 })
 
 
