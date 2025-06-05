@@ -27,6 +27,39 @@ export const POST = async request => {
           total: data.total,
         }
       })
+      // Lots update and delete operation to sell
+      await Promise.all(data.products.map(async product => {
+        let saleAmount = product.quantity
+        const lots = await prisma.lot.findMany({
+          where: {
+            productId: product.productId,
+            currentAmount: {
+              gt: 0
+            }
+          },
+          orderBy: {
+            createdAt: 'asc'
+          }
+        })
+        for (const lot of lots) {
+          if (saleAmount <= 0) break
+          if (lot.currentAmount > saleAmount){
+            await prisma.lot.update({
+              where: { id: lot.id },
+              data: { currentAmount: lot.currentAmount - saleAmount }
+            })
+            saleAmount = 0
+            break
+          }
+          if ((lot.currentAmount <= saleAmount)){
+            saleAmount -= lot.currentAmount
+            await prisma.lot.update({ 
+              where: { id: lot.id },
+              data: { currentAmount: 0 }
+            })
+          }
+        }
+      }))
       const response = cleanerData({ payload })
       return NextResponse.json(response, { status: 201 })
     }
