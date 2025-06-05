@@ -16,6 +16,13 @@ vi.mock('~/app/api/Libs/prisma', () => {
           updatedAt: 'updatedAt'
         }),
       },
+      lot: {
+        findMany: () => ([
+          { id: 1, productId: 1, currentAmount: 10, createdAt: 'createdAt' },
+          { id: 2, productId: 1, currentAmount: 5, createdAt: 'createdAt' }
+        ]),
+        update: ({ where, data }) => ({ ...where, ...data }),
+      }
     },
   }
 })
