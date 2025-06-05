@@ -10,6 +10,7 @@ datasource db {
 model InventoryLog {
   id            Int               @id @default(autoincrement())
   productName   String
+  productName   String
   amount        Int
   description   String
   expirationDate String
@@ -33,7 +34,7 @@ model Lot {
 
 model Product {
   id             Int             @id @default(autoincrement())
-  name           String          @unique 
+  name           String          @unique
   unit           Unit
   price          Float
   SKU            String          @unique
