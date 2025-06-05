@@ -7,7 +7,7 @@ const isValidRole = ({ role, roleRequired }) => {
   return false
 }
 
-export const usePermmitted = ({ roleRequired = 'ADMIN' }) => {
+const usePermmitted = ({ roleRequired = 'ADMIN' }) => {
   const { token } = useToken()
   const { userId, role } = useData()
 
