@@ -48,7 +48,11 @@ jobs:
           ref: ${{ matrix.branch }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
       - name: Install dependencies
-        run: npm install
+        run:
+          rm -rf package-lock.json node_modules
+          npm install
+          npm install @rollup/rollup-linux-x64-gnu --no-save || true
+
       - name: Run tests with coverage
         run: npm run test
       - name: Sanitize branch name
