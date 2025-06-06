@@ -16,3 +16,13 @@ export const Ticket = {
     'total'
   ]
 }
+
+export const User = {
+  name: 'user',
+  shape: [
+    'name',
+    'username',
+    'password',
+    'role'
+  ]
+}

@@ -39,6 +39,7 @@
     "next/core-web-vitals"
   ],
   "rules": {
+    "keyword-spacing": ["error", { "before": true, "after": true }],
     "newline-per-chained-call": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-key": "off",

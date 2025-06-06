@@ -10,7 +10,7 @@ import { brownLogo } from '~/app/UI/Images'
 
 import { IconButton, Stack, Typography as T } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { SIDEBAR_OPTS } from './utils'
+import { useSideBarOpts } from './utils'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 
 const displayName = 'Nav'
@@ -71,6 +71,7 @@ const NavbarContainer = styled('div')(({ theme }) => ({
 const Navbar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const showSidebar = () => setSidebarOpen(!sidebarOpen)
+  const sidebarOpts = useSideBarOpts()
 
   return (
     <NavbarContainer className={classes.navbar}>
@@ -98,7 +99,7 @@ const Navbar = () => {
             </IconButton>
           </Stack>
           <Stack spacing={2}>
-            {SIDEBAR_OPTS.map(({ Icon, status, title, path }, index) => {
+            {sidebarOpts.map(({ Icon, status, title, path }, index) => {
               if (status === 'available') {
                 return (
                   <Link href={path} key={`${title}-${index}`} className={classes.link}>
