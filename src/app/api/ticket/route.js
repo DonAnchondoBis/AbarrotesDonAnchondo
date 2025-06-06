@@ -9,12 +9,12 @@ import prisma from '~/app/api/Libs/prisma'
 
 //Post method for a ticket
 export const POST = async request => {
-  try{
+  try {
     const { userId, role } = authenticateToken(request)
     const data = await request.json()
     const isValid = validatorFields({ data, shape: Ticket.shape })
 
-    if(userId && isValid && (role == 'ADMIN' || role == 'CASHIER')){
+    if (userId && isValid && (role == 'ADMIN' || role == 'CASHIER')){
       const payload = await prisma.ticket.create({
         data: {
           products: {
@@ -53,7 +53,7 @@ export const POST = async request => {
           }
           if (lot.currentAmount <= saleAmount) {
             saleAmount -= lot.currentAmount
-            await prisma.lot.update({ 
+            await prisma.lot.update({
               where: { id: lot.id },
               data: { currentAmount: 0 }
             })
@@ -71,16 +71,16 @@ export const POST = async request => {
 
 // Get method for tickets
 export const GET = async request => {
-  try{
+  try {
     const { role } = authenticateToken(request)
-    if(role != 'ADMIN' && role != 'CASHIER') return ERROR.FORBIDDEN()
+    if (role != 'ADMIN' && role != 'CASHIER') return ERROR.FORBIDDEN()
     const filter = Object.fromEntries(request?.nextUrl?.searchParams ?? '')
     const payloads = await prisma.ticket.findMany({
       where: {
         ...(filter)
       }
     })
-    if(payloads.length > 0){
+    if (payloads.length > 0){
       const response = payloads.map(payload => cleanerData({ payload }))
       return NextResponse.json(response, { status: 200 })
     }
