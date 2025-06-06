@@ -1,18 +1,24 @@
 'use client'
+import { useState } from 'react'
+
+import Loading from '~/app/UI/Shared/Loading'
 
 import { Formik, Form, Field, useFormikContext } from 'formik'
 import TextField from '~/app/UI/Shared/FormikTextField'
 
 import { styled } from '@mui/material/styles'
-import { Button, Typography as T } from '@mui/material'
+import { Button, Typography as T, Snackbar, Alert } from '@mui/material'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import { getUserLoginValidationSchema } from './utils'
+
+import apiFetch from '~/app/Lib/apiFetch'
+import { useToken } from '~/app/store/useToken'
 
 const displayName = 'Login'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
-  padding: '15rem',
+  padding: '8rem',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -37,8 +43,12 @@ const Container = styled('div')(({ theme }) => ({
     border: `1px solid ${theme.palette.background.main}`,
     padding: '1ch 2rem',
     backgroundColor: theme.palette.contrast.main,
+    '&.Mui-disabled, &:disabled': {
+      background: theme.palette.gray.inactive,
+      color: theme.palette.background.muted,
+      border: `1px solid ${theme.palette.background.muted}`,
+    }
   },
-
   [`& .${classes.title}`]: {
     color: theme.palette.background.main,
     fontWeight: 'bold',
@@ -75,7 +85,10 @@ const Container = styled('div')(({ theme }) => ({
   }
 }))
 
-const Login = () => {
+const Login = ({
+  setSnackbarMessage,
+  snackbarMessage
+}) => {
   const { isValid, dirty } = useFormikContext()
   return (
     <Container>
@@ -86,11 +99,11 @@ const Login = () => {
         <div className={classes.inputContainer}>
           <Field
             className={classes.input}
-            name="user"
+            name="username"
             component={TextField}
             placeholder="Username"
             type="text"
-            label="User"
+            label="username"
             variant="outlined"
           />
           <Field
@@ -113,21 +126,55 @@ const Login = () => {
           </Button>
         </div>
       </div>
+      <Snackbar
+        open={Boolean(snackbarMessage)}
+        autoHideDuration={5000}
+        onClose={() => setSnackbarMessage(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
+          severity={snackbarMessage?.severity}
+        >
+          {snackbarMessage?.message}
+        </Alert>
+      </Snackbar>
     </Container>
   )
 }
 
-const Wrapper = () => {
+const Wrapper = ({
+  setPage
+}) => {
+  const { setToken } = useToken()
+  const [snackbarMessage, setSnackbarMessage] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const validationSchema = getUserLoginValidationSchema()
   const initialValues = {
-    user: '',
+    username: '',
     password: ''
   }
 
-  const handleSubmit = values => {
-    console.error('Form submitted with values:', values)
+  const handleSubmit = async values => {
+    setIsLoading(true)
+    const response = await apiFetch({
+      payload: values,
+      url: '/api/user/login',
+      method: 'POST',
+    })
+    if (response.error) {
+      setSnackbarMessage({
+        message: 'Error al registrar',
+        severity: 'error'
+      })
+    } else {
+      setToken(response)
+      setPage('Dashboard')
+    }
+    setIsLoading(false)
   }
+
+  if (isLoading) return <Loading />
 
   return (
     <Formik
@@ -135,7 +182,11 @@ const Wrapper = () => {
       initialValues={initialValues}
       validationSchema={validationSchema}>
       <Form>
-        <Login />
+        <Login
+          setSnackbarMessage={setSnackbarMessage}
+          snackbarMessage={snackbarMessage}
+          setPage={setPage}
+        />
       </Form>
     </Formik>
   )
