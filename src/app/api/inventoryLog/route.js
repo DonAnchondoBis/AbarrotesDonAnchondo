@@ -9,10 +9,11 @@ import prisma from '~/app/api/Libs/prisma'
 
 export const POST = async request => {
   try {
-    const hasPermission = authenticateToken(request)
+    const { role , userId } = authenticateToken(request)
     const data = await request.json()
     const isValid = validatorFields({ data, shape: InventoryLog.shape })
-    if (hasPermission && isValid){
+    const validRoles = ['ADMIN', 'WAREHOUSE']
+    if (userId && validRoles.includes(role) && isValid){
       //The transaction is executed first, if it fails, it will not create the inventory log
       const target = await prisma.lot.findFirst({
         select:{
@@ -60,8 +61,9 @@ export const POST = async request => {
 
 export const GET = async request => {
   try {
-    const hasPermission = true //authenticateToken(request)
-    if (!hasPermission) return ERROR.FORBIDDEN()
+    const { role , userId } = authenticateToken(request)
+    const validRoles = ['ADMIN', 'WAREHOUSE']
+    if (!userId || !validRoles.includes(role)) return ERROR.FORBIDDEN()
     const filter = Object.fromEntries(request?.nextUrl?.searchParams ?? '')
     const payloads = await prisma.inventoryLog.findMany({
       select: {
