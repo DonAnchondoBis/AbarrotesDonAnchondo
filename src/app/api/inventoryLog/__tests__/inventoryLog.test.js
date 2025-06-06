@@ -43,7 +43,7 @@ vi.mock('~/app/api/Libs/prisma', () => {
       },
       lot: {
         findFirst: vi.fn(({ where }) => 
-          where.product.name === 'Arroz' 
+          where.product.name === 'Arroz' && where.expirationDate === '2025-12-31'
             ? { id: 1, currentAmount: 20 } 
             : null
         ),
@@ -125,7 +125,7 @@ describe('API InventoryLog - GET', () => {
 describe('API InventoryLog - POST', () => {
   it.each([
     {
-      descr: 'Successful inventory increment',
+      descr: 'Successful inventory increase',
       request: {
         productName: 'Arroz',
         amount: 10,
@@ -142,6 +142,48 @@ describe('API InventoryLog - POST', () => {
         description: 'Nuevo ingreso',
         expirationDate: '2025-12-31',
         type: 'INCREASE',
+        userId: 1
+      }
+    },
+    {
+      descr: 'Successful inventory income',
+      request: {
+        productName: 'Arroz',
+        amount: 10,
+        description: 'Ingreso inicial',
+        expirationDate: '2025-12-31',
+        type: 'INCOME',
+        userId: 1
+      },
+      expectedStatus: 201,
+      expectedResponse: {
+        id: 3,
+        productName: 'Arroz',
+        amount: 10,
+        description: 'Ingreso inicial',
+        expirationDate: '2025-12-31',
+        type: 'INCOME',
+        userId: 1
+      }
+    },
+    {
+      descr: 'Successful inventory decrease',
+      request: {
+        productName: 'Arroz',
+        amount: 5,
+        description: 'Retiro',
+        expirationDate: '2025-12-31',
+        type: 'DECREASE',
+        userId: 1
+      },
+      expectedStatus: 201,
+      expectedResponse: {
+        id: 3,
+        productName: 'Arroz',
+        amount: 5,
+        description: 'Retiro',
+        expirationDate: '2025-12-31',
+        type: 'DECREASE',
         userId: 1
       }
     },
@@ -186,6 +228,28 @@ describe('API InventoryLog - POST', () => {
       expectedResponse: { error: 'Not allowed' }
     },
     {
+      descr: 'Error has warehouse role (should succeed)',
+      request: {
+        productName: 'Arroz',
+        amount: 10,
+        description: 'Nuevo ingreso',
+        expirationDate: '2025-12-31',
+        type: 'INCREASE',
+        userId: 1
+      },
+      warehouseRole: true,
+      expectedStatus: 201,
+      expectedResponse: {
+        id: 3,
+        productName: 'Arroz',
+        amount: 10,
+        description: 'Nuevo ingreso',
+        expirationDate: '2025-12-31',
+        type: 'INCREASE',
+        userId: 1
+      }
+    },
+    {
       descr: 'Error invalid input data',
       request: {
         productName: 'Arroz',
@@ -210,7 +274,7 @@ describe('API InventoryLog - POST', () => {
       expectedStatus: 500,
       expectedResponse: { error: 'Database error' }
     }
-  ])('$descr', async ({ request, expectedStatus, expectedResponse, mockImplementation, isNotAllowed }) => {
+  ])('$descr', async ({ request, expectedStatus, expectedResponse, mockImplementation, isNotAllowed, warehouseRole }) => {
     if (mockImplementation) {
       const prisma = await import('~/app/api/Libs/prisma')
       vi.spyOn(prisma.default.lot, 'findFirst').mockRejectedValueOnce(mockImplementation)
@@ -219,11 +283,14 @@ describe('API InventoryLog - POST', () => {
       const auth = await import('~/app/api/Libs/auth')
       vi.spyOn(auth, 'authenticateToken').mockReturnValueOnce(null)
     }
+    if (warehouseRole) {
+      const auth = await import('~/app/api/Libs/auth')
+      vi.spyOn(auth, 'authenticateToken').mockReturnValueOnce({ role: 'WAREHOUSE', userId: 1 })
+    }
 
     // Mock calculación de nuevo amount basado en el tipo
     if (request && request.productName === 'Arroz' && request.type === 'DECREASE' && request.amount > 20) {
       const prisma = await import('~/app/api/Libs/prisma')
-      // Este caso simula que el amount a decrementar es mayor que el disponible
       vi.spyOn(prisma.default.lot, 'findFirst').mockReturnValueOnce({ id: 1, currentAmount: 20 })
     }
 
@@ -231,6 +298,7 @@ describe('API InventoryLog - POST', () => {
       json: async () => request,
       nextUrl: { searchParams: new URLSearchParams() }
     }
+    
     const response = await POST(mockRequest)
     const jsonResponse = await response.json()
     expect(response.status).toBe(expectedStatus)
