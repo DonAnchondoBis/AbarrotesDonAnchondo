@@ -38,3 +38,21 @@ export const InventoryLog = {
     'userId'
   ]
 }
+
+export const Supplier = {
+  name: 'supplier',
+  shape: [
+    'name',
+    'phone',
+    'email'
+  ]
+}
+
+export const Lots = {
+  name: 'lots',
+  shape: [
+    'productId',
+    'initialAmount',
+    'expirationDate'
+  ]
+}
