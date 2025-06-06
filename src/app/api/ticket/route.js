@@ -1,4 +1,3 @@
-// TODO: Add authentication logic
 import { NextResponse } from 'next/server'
 import { Ticket } from '~/api/entities'
 import { authenticateToken } from '~/app/api/Libs/auth'

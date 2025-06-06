@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server'
-//import { Ticket } from '~/api/entities'
 import { authenticateToken } from '~/app/api/Libs/auth'
 import ERROR from '~/Libs/error'
 import cleanerData from '~/app/api/Libs/cleanerData'
-//import validatorFields from '~/app/api/Libs/validatorFields'
 import prisma from '~/app/api/Libs/prisma'
 
 export const GET = async (request, { params }) => {
