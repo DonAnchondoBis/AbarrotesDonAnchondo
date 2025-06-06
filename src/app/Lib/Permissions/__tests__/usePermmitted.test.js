@@ -10,7 +10,7 @@ vi.mock('~/app/store/useData', () => ({
 }))
 
 // Import after mocks
-import usePermmitted from '../utils'
+import usePermitted from '../utils'
 import { useToken } from '~/app/store/useToken'
 import { useData } from '~/app/store/useData'
 
@@ -52,7 +52,7 @@ describe('isValidRole', () => {
   })
 })
 
-describe('usePermmitted', () => {
+describe('usePermitted', () => {
   it.each([
     {
       descr: 'Returns true when token exists, userId exists, and role is ADMIN',
@@ -98,7 +98,7 @@ describe('usePermmitted', () => {
     useToken.mockReturnValue({ token })
     useData.mockReturnValue({ userId, role })
 
-    const result = usePermmitted({ roleRequired })
+    const result = usePermitted({ roleRequired })
     expect(result).toBe(expected)
   })
 })

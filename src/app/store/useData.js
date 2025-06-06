@@ -6,8 +6,8 @@ export const useData = create(
     set => ({
       role: null,
       userId: null,
-      setParticipant: role => set({ role }),
-      setProfessorId: userId => set({ userId }),
+      setRole: role => set({ role }),
+      setUserId: userId => set({ userId }),
     }),
     {
       name: '__ANCHONDO__DATA',

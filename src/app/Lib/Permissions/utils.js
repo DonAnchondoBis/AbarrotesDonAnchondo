@@ -7,7 +7,7 @@ const isValidRole = ({ role, roleRequired }) => {
   return false
 }
 
-const usePermmitted = ({ roleRequired = 'ADMIN' }) => {
+const usePermitted = ({ roleRequired = 'ADMIN' }) => {
   const { token } = useToken()
   const { userId, role } = useData()
 
@@ -16,4 +16,4 @@ const usePermmitted = ({ roleRequired = 'ADMIN' }) => {
   return false
 }
 
-export default usePermmitted
+export default usePermitted

@@ -1,4 +1,4 @@
-export const apiFetch = async ({
+const apiFetch = async ({
   payload,
   method = 'GET',
   url,
@@ -18,3 +18,5 @@ export const apiFetch = async ({
   const response = await fetch(url, options)
   return await response.json()
 }
+
+export default apiFetch

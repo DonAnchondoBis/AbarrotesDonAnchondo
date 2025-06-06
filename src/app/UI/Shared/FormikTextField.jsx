@@ -1,4 +1,5 @@
 'use client'
+
 import { useState } from 'react'
 import {
   Stack,
@@ -10,7 +11,6 @@ import {
 import { useFormikContext } from 'formik'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-
 
 const FormikTextField = ({
   variant = 'standard',
@@ -38,12 +38,12 @@ const FormikTextField = ({
                   edge="end"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <VisibilityOffIcon/> : <VisibilityIcon />}
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 </IconButton>
               </InputAdornment>
             )
           }
-        }: null}
+        } : null}
       />
       {errors[field?.name] ? <T color="error">{errors[field?.name]}</T> : null}
     </Stack>
