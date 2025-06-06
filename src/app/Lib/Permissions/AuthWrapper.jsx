@@ -1,11 +1,11 @@
-import usePermmitted from '~/app/Permissions/utils'
+import usePermitted from '~/app/Permissions/utils'
 
-const AuthWrapper = ({ chilldren, Fallback }) => {
-  const permitted = usePermmitted()
+const AuthWrapper = ({ children, Fallback }) => {
+  const permitted = usePermitted()
   if (permitted) {
     return (
       <>
-        {chilldren}
+        {children}
       </>
     )
   }

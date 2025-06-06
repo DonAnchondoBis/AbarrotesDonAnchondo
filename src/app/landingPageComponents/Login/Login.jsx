@@ -164,7 +164,7 @@ const Wrapper = ({
     })
     if (response.error) {
       setSnackbarMessage({
-        message: 'Error al registrar',
+        message: 'Login Error',
         severity: 'error'
       })
     } else {
