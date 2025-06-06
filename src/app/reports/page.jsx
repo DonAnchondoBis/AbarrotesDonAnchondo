@@ -64,7 +64,7 @@ const PublicTable = ({
         </Tabs>
         <OutlinedInput
           className={classes.searchInput}
-          placeholder="Buscar por nombre"
+          placeholder="Search by name"
           size="small"
           value={search}
           onChange={handleSearchChange}
