@@ -78,7 +78,7 @@ const SaleDay = ({ search }) => {
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Products per page"
+        labelRowsPerPage="Sales per page"
       />
     </StyledTableContainer>
   )
