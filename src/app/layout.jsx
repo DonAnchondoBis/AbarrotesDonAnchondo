@@ -2,6 +2,7 @@
 import ThemeRegistry from '~/app/UI/Theme'
 import NavBar from '~/app/Navbar'
 import { favIcon } from '~/app/UI/Images'
+import usePermitted from '~/app/Lib/Permissions/utils'
 
 const metadata = {
   title: 'Abarrotes Don Anchondo',
@@ -10,6 +11,7 @@ const metadata = {
 
 
 const RootLayout = ({ children }) => {
+  const isLogged = usePermitted({ roleRequired: 'WAREHOUSE' })
   return (
     <html lang="en">
       <head>
@@ -19,7 +21,7 @@ const RootLayout = ({ children }) => {
       </head>
       <ThemeRegistry>
         <body>
-          <NavBar />
+          {isLogged && <NavBar />}
           {children}
         </body>
       </ThemeRegistry>
