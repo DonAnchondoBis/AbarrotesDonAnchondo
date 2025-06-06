@@ -2,172 +2,238 @@
 import { describe, it, expect, vi } from 'vitest'
 import { GET, POST } from '~/app/api/inventoryLog/route'
 
-vi.mock('~/app/api/Libs/prisma', () => ({
-  default: {
-    lot: {
-      findFirst: vi.fn(),
-      update: vi.fn(),
+vi.mock('~/app/api/Libs/prisma', () => {
+  return {
+    default: {
+      inventoryLog: {
+        findMany: vi.fn(() => ([
+          {
+            id: 1,
+            productName: 'Arroz',
+            amount: 10,
+            description: 'Ingreso inicial',
+            expirationDate: '2025-12-31',
+            type: 'INCOME',
+            user: {
+              name: 'Admin'
+            },
+            createdAt: 'createdAt',
+            updatedAt: 'updatedAt'
+          },
+          {
+            id: 2,
+            productName: 'Frijol',
+            amount: 5,
+            description: 'Retiro por daños',
+            expirationDate: '2025-10-15',
+            type: 'DECREASE',
+            user: {
+              name: 'Warehouse'
+            },
+            createdAt: 'createdAt',
+            updatedAt: 'updatedAt'
+          }
+        ])),
+        create: vi.fn(({ data }) => ({
+          id: 3,
+          ...data,
+          createdAt: 'createdAt',
+          updatedAt: 'updatedAt'
+        }))
+      },
+      lot: {
+        findFirst: vi.fn(({ where }) => 
+          where.product.name === 'Arroz' 
+            ? { id: 1, currentAmount: 20 } 
+            : null
+        ),
+        update: vi.fn(() => ({ id: 1, currentAmount: 30 }))
+      }
+    }
+  }
+})
+
+vi.mock('~/app/api/Libs/auth', () => {
+  return { authenticateToken: () => ({ role: 'ADMIN', userId: 1 }) }
+})
+
+vi.mock('~/app/api/Libs/validatorFields', () => {
+  return {
+    default: ({ data }) => {
+      // Validar que los campos requeridos estén presentes
+      const requiredFields = ['productName', 'amount', 'description', 'expirationDate', 'type', 'userId']
+      return requiredFields.every(field => data && data[field] !== undefined)
+    }
+  }
+})
+
+describe('API InventoryLog - GET', () => {
+  it.each([
+    {
+      descr: 'Successful response',
+      expectedStatus: 200,
+      expectedResponse: [
+        {
+          id: 1,
+          productName: 'Arroz',
+          amount: 10,
+          description: 'Ingreso inicial',
+          expirationDate: '2025-12-31',
+          type: 'INCOME',
+          user: 'Admin'
+        },
+        {
+          id: 2,
+          productName: 'Frijol',
+          amount: 5,
+          description: 'Retiro por daños',
+          expirationDate: '2025-10-15',
+          type: 'DECREASE',
+          user: 'Warehouse'
+        }
+      ]
     },
-    inventoryLog: {
-      create: vi.fn(),
-      findMany: vi.fn(),
+    {
+      descr: 'Error has not data',
+      isEmpty: true,
+      expectedStatus: 404,
+      expectedResponse: { error: 'Not found' }
     },
-  },
-}))
-
-vi.mock('~/app/api/Libs/auth', () => ({
-  authenticateToken: vi.fn().mockReturnValue(1),
-}))
-
-vi.mock('~/app/api/Libs/cleanerData', () => ({
-  default: ({ payload }) => payload,
-}))
-
-vi.mock('~/app/api/Libs/validatorFields', () => ({
-  default: ({ data, shape }) => !!data && !!shape,
-}))
-
-describe('Inventory API - POST', () => {
-  it('should create inventory log and update lot successfully', async () => {
-    const prisma = await import('~/app/api/Libs/prisma')
-
-    prisma.default.lot.findFirst.mockResolvedValue({
-      id: 1,
-      currentAmount: 10,
-    })
-
-    prisma.default.lot.update.mockResolvedValue({ id: 1, currentAmount: 15 })
-
-    prisma.default.inventoryLog.create.mockResolvedValue({
-      id: 123,
-      productName: 'Test Product',
-      amount: 5,
-      type: 'INCREASE',
-    })
-
-    const mockRequest = {
-      json: async () => ({
-        productName: 'Test Product',
-        expirationDate: '2025-12-31',
-        amount: 5,
-        type: 'INCREASE',
-      }),
+    {
+      descr: 'Error fetching inventory logs',
+      mockImplementation: new Error('Error fetching inventory logs'),
+      expectedStatus: 500,
+      expectedResponse: { error: 'Error fetching inventory logs' }
+    }
+  ])('$descr', async ({ expectedStatus, expectedResponse, mockImplementation, isEmpty }) => {
+    if (mockImplementation) {
+      const prisma = await import('~/app/api/Libs/prisma')
+      vi.spyOn(prisma.default.inventoryLog, 'findMany').mockRejectedValueOnce(mockImplementation)
+    }
+    if (isEmpty) {
+      const prisma = await import('~/app/api/Libs/prisma')
+      vi.spyOn(prisma.default.inventoryLog, 'findMany').mockReturnValueOnce([])
     }
 
-    const response = await POST(mockRequest)
-    const json = await response.json()
-
-    expect(response.status).toBe(201)
-    expect(json.id).toBe(123)
-  })
-
-  it('should return 404 if target lot not found', async () => {
-    const prisma = await import('~/app/api/Libs/prisma')
-    prisma.default.lot.findFirst.mockResolvedValue(null)
-
-    const mockRequest = {
-      json: async () => ({
-        productName: 'Missing Product',
-        expirationDate: '2025-12-31',
-        amount: 5,
-        type: 'INCREASE',
-      }),
-    }
-
-    const response = await POST(mockRequest)
-    const json = await response.json()
-
-    expect(response.status).toBe(404)
-    expect(json.error).toBeDefined()
-  })
-
-  it('should return 403 if not authenticated', async () => {
-    const auth = await import('~/app/api/Libs/auth')
-    auth.authenticateToken.mockReturnValueOnce(null)
-
-    const mockRequest = {
-      json: async () => ({
-        productName: 'Unauthorized Product',
-        expirationDate: '2025-12-31',
-        amount: 5,
-        type: 'INCREASE',
-      }),
-    }
-
-    const response = await POST(mockRequest)
-    const json = await response.json()
-
-    expect(response.status).toBe(403)
-    expect(json.error).toBeDefined()
-  })
-
-  it('should return 400 if amount goes below zero', async () => {
-    const prisma = await import('~/app/api/Libs/prisma')
-    prisma.default.lot.findFirst.mockResolvedValue({
-      id: 1,
-      currentAmount: 3,
-    })
-
-    const mockRequest = {
-      json: async () => ({
-        productName: 'Negative Product',
-        expirationDate: '2025-12-31',
-        amount: 5,
-        type: 'OUTCOME',
-      }),
-    }
-
-    const response = await POST(mockRequest)
-    const json = await response.json()
-
-    expect(response.status).toBe(400)
-    expect(json.error).toBeDefined()
+    const response = await GET()
+    const jsonResponse = await response.json()
+    expect(response.status).toBe(expectedStatus)
+    expect(jsonResponse).toEqual(expectedResponse)
   })
 })
 
-describe('Inventory API - GET', () => {
-  it('should return inventory logs successfully', async () => {
-    const prisma = await import('~/app/api/Libs/prisma')
-    prisma.default.inventoryLog.findMany.mockResolvedValue([
-      {
-        id: 1,
-        productName: 'Prod 1',
+describe('API InventoryLog - POST', () => {
+  it.each([
+    {
+      descr: 'Successful inventory increment',
+      request: {
+        productName: 'Arroz',
         amount: 10,
-        description: 'desc',
+        description: 'Nuevo ingreso',
         expirationDate: '2025-12-31',
-        type: 'INCOME',
-        user: { name: 'User1' },
+        type: 'INCREASE',
+        userId: 1
       },
-    ])
-
-    const mockRequest = {
-      nextUrl: {
-        searchParams: new URLSearchParams(),
+      expectedStatus: 201,
+      expectedResponse: {
+        id: 3,
+        productName: 'Arroz',
+        amount: 10,
+        description: 'Nuevo ingreso',
+        expirationDate: '2025-12-31',
+        type: 'INCREASE',
+        userId: 1
+      }
+    },
+    {
+      descr: 'Error not found product',
+      request: {
+        productName: 'ProductoInexistente',
+        amount: 5,
+        description: 'Producto que no existe',
+        expirationDate: '2025-12-31',
+        type: 'INCREASE',
+        userId: 1
       },
+      expectedStatus: 404,
+      expectedResponse: { error: 'Not found' }
+    },
+    {
+      descr: 'Error negative amount after operation',
+      request: {
+        productName: 'Arroz',
+        amount: 30,
+        description: 'Cantidad excede existencia',
+        expirationDate: '2025-12-31',
+        type: 'DECREASE',
+        userId: 1
+      },
+      expectedStatus: 400,
+      expectedResponse: { error: 'Invalid fields' }
+    },
+    {
+      descr: 'Error has not permission',
+      request: {
+        productName: 'Arroz',
+        amount: 10,
+        description: 'Nuevo ingreso',
+        expirationDate: '2025-12-31',
+        type: 'INCREASE',
+        userId: 1
+      },
+      isNotAllowed: true,
+      expectedStatus: 403,
+      expectedResponse: { error: 'Not allowed' }
+    },
+    {
+      descr: 'Error invalid input data',
+      request: {
+        productName: 'Arroz',
+        description: 'Falta campo amount',
+        expirationDate: '2025-12-31',
+        type: 'INCREASE'
+      },
+      expectedStatus: 403,
+      expectedResponse: { error: 'Not allowed' }
+    },
+    {
+      descr: 'Error in database operation',
+      request: {
+        productName: 'Arroz',
+        amount: 10,
+        description: 'Nuevo ingreso',
+        expirationDate: '2025-12-31',
+        type: 'INCREASE',
+        userId: 1
+      },
+      mockImplementation: new Error('Database error'),
+      expectedStatus: 500,
+      expectedResponse: { error: 'Database error' }
+    }
+  ])('$descr', async ({ request, expectedStatus, expectedResponse, mockImplementation, isNotAllowed }) => {
+    if (mockImplementation) {
+      const prisma = await import('~/app/api/Libs/prisma')
+      vi.spyOn(prisma.default.lot, 'findFirst').mockRejectedValueOnce(mockImplementation)
+    }
+    if (isNotAllowed) {
+      const auth = await import('~/app/api/Libs/auth')
+      vi.spyOn(auth, 'authenticateToken').mockReturnValueOnce(null)
     }
 
-    const response = await GET(mockRequest)
-    const json = await response.json()
-
-    expect(response.status).toBe(200)
-    expect(json.length).toBe(1)
-    expect(json[0].productName).toBe('Prod 1')
-  })
-
-  it('should return 404 if no logs found', async () => {
-    const prisma = await import('~/app/api/Libs/prisma')
-    prisma.default.inventoryLog.findMany.mockResolvedValue([])
-
-    const mockRequest = {
-      nextUrl: {
-        searchParams: new URLSearchParams(),
-      },
+    // Mock calculación de nuevo amount basado en el tipo
+    if (request && request.productName === 'Arroz' && request.type === 'DECREASE' && request.amount > 20) {
+      const prisma = await import('~/app/api/Libs/prisma')
+      // Este caso simula que el amount a decrementar es mayor que el disponible
+      vi.spyOn(prisma.default.lot, 'findFirst').mockReturnValueOnce({ id: 1, currentAmount: 20 })
     }
 
-    const response = await GET(mockRequest)
-    const json = await response.json()
-
-    expect(response.status).toBe(404)
-    expect(json.error).toBeDefined()
+    const mockRequest = {
+      json: async () => request,
+      nextUrl: { searchParams: new URLSearchParams() }
+    }
+    const response = await POST(mockRequest)
+    const jsonResponse = await response.json()
+    expect(response.status).toBe(expectedStatus)
+    expect(jsonResponse).toEqual(expectedResponse)
   })
 })
