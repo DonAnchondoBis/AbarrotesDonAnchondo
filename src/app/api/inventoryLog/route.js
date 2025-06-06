@@ -9,7 +9,7 @@ import prisma from '~/app/api/Libs/prisma'
 
 export const POST = async request => {
   try {
-    const { role , userId } = authenticateToken(request)
+    const { role , userId } = authenticateToken(request) ?? {}
     const data = await request.json()
     const isValid = validatorFields({ data, shape: InventoryLog.shape })
     const validRoles = ['ADMIN', 'WAREHOUSE']
@@ -61,7 +61,7 @@ export const POST = async request => {
 
 export const GET = async request => {
   try {
-    const { role , userId } = authenticateToken(request)
+    const { role , userId } = authenticateToken(request) ?? {}
     const validRoles = ['ADMIN', 'WAREHOUSE']
     if (!userId || !validRoles.includes(role)) return ERROR.FORBIDDEN()
     const filter = Object.fromEntries(request?.nextUrl?.searchParams ?? '')
