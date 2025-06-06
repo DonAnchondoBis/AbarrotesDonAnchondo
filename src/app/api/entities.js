@@ -9,6 +9,14 @@ export const StoreInfo = {
   ]
 }
 
+export const Ticket = {
+  name: 'tickets',
+  shape: [
+    'products',
+    'total'
+  ]
+}
+
 export const User = {
   name: 'user',
   shape: [
