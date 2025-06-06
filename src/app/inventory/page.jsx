@@ -13,9 +13,6 @@ import EditProductModal from './components/EditProductModal';
 import DeleteProductModal from './components/DeleteProductModal';
 import WasteModal from './components/WasteModal';
 import AdjustmentModal from './components/AdjustmentModal';
-import { Typography as T, Button, TextField, Tabs, Tab } from '@mui/material'
-import { styled } from '@mui/material/styles'
-import getClassPrefixer from '~/app/UI/classPrefixer'
 
 export default function InventoryPage() {
   const [rows, setRows] = useState([]);
@@ -65,36 +62,38 @@ export default function InventoryPage() {
   return (
     <Box sx={{ bgcolor: '#FEF7E5', minHeight: '100vh', p: 3 }}>
       <Container maxWidth="lg">
-        <Typography variant="h4" sx={{ mb: 3, color: '#1F1F1F' }}>
-          Inventory
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h6" sx={{ color: '#1F1F1F', fontWeight: 'bold' }}>
+            Inventory
+          </Typography>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Paper
-            component="form"
-            sx={{
-              display: 'flex', alignItems: 'center', width: 300,
-              p: '2px 8px', bgcolor: '#B19A7B', color: '#fff'
-            }}
-          >
-            <InputBase placeholder="Search product" sx={{ ml: 1, flex: 1, color: 'white' }} />
-            <IconButton type="submit" sx={{ p: '10px', color: 'white' }}>
-              <SearchIcon />
-            </IconButton>
-          </Paper>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Paper
+              component="form"
+              sx={{
+                display: 'flex', alignItems: 'center', width: 320, height: 48,
+                p: '2px 8px', bgcolor: '#B19A7B', color: '#fff', borderRadius: '24px', boxShadow: 3
+              }}
+            >
+              <InputBase placeholder="Search product" sx={{ ml: 1, flex: 1, color: 'white' }} />
+              <IconButton type="submit" sx={{ p: '10px', color: 'white' }}>
+                <SearchIcon />
+              </IconButton>
+            </Paper>
 
-          <Button
-            variant="contained"
-            sx={{ bgcolor: '#84c27c', textTransform: 'none' }}
-            onClick={() => { setSelectedRow(null); setEditOpen(true); }}
-          >
-            + Add Product
-          </Button>
+            <Button
+              variant="contained"
+              sx={{ width: 300, height: 48, bgcolor: '#84c27c', textTransform: 'none', borderRadius: '24px', boxShadow: 3 }}
+              onClick={() => { setSelectedRow(null); setEditOpen(true); }}
+            >
+              + Add Product
+            </Button>
+          </Box>
         </Box>
 
         <TableContainer
           component={Paper}
-          sx={{ mt: 4, backgroundColor: '#D4B08C', border: '2px solid #7A5C40' }}
+          sx={{ mt: 2, backgroundColor: '#D4B08C', border: '2px solid #7A5C40', borderRadius: '8px' }}
         >
           <Table>
             <TableHead>
