@@ -327,7 +327,7 @@ const PointOfSale = () => {
               <DeleteIcon />
             </ButtonDelete>
             <ButtonSale variant="contained" onClick={() => alert('Sale completed!')}>
-              Sale
+              Sale Products
             </ButtonSale>
           </ContainerButtons>
         </SalesContent>
