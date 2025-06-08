@@ -150,14 +150,14 @@ const TotalSection = styled('div')(({ theme }) => ({
   boxShadow: `0 2px 4px ${theme => theme.palette.text.main}`,
 }))
 
-const ContainerButtons = styled('div')({
+const ContainerButtons = styled('div')(({ theme }) => ({
   display: 'grid',
   gridGap: '1rem',
   gridTemplateColumns: '1fr 5fr',
   justifyContent: 'space-between',
   padding: '1rem',
   borderTop: `1px solid ${theme.palette.primary.main}`,
-})
+}))
 
 const ButtonDelete = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.red.main,
