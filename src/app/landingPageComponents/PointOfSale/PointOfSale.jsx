@@ -156,7 +156,7 @@ const ContainerButtons = styled('div')({
   gridTemplateColumns: '1fr 5fr',
   justifyContent: 'space-between',
   padding: '1rem',
-  borderTop: `1px solid ${theme => theme.palette.primary.main}`,
+  borderTop: `1px solid ${theme.palette.primary.main}`,
 })
 
 const ButtonDelete = styled(IconButton)(({ theme }) => ({
