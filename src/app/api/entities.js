@@ -34,3 +34,13 @@ export const Lots = {
   name: 'lots',
   shape: ['productId', 'initialAmount', 'expirationDate'],
 }
+
+export const Product = {
+  name: 'product',
+  shape: [
+    'name',
+    'unit',
+    'price',
+    'SKU'
+  ]
+}
