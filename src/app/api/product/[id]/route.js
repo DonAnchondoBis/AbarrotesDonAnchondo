@@ -8,9 +8,9 @@ import prisma from '~/app/api/Libs/prisma'
 
 export const PUT = async (request, { params }) => {
   try {
-    const { role = null } = authenticateToken(request) ?? {}
-    
-    if (!['ADMIN', 'WAREHOUSE'].includes(role)) return ERROR.FORBIDDEN()
+    const { role = null, userId } = authenticateToken(request) ?? {}
+
+    if (!['ADMIN', 'WAREHOUSE'].includes(role) || !userId) return ERROR.FORBIDDEN()
 
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
@@ -37,8 +37,8 @@ export const PUT = async (request, { params }) => {
 
 export const PATCH = async (request, { params }) => {
   try {
-    const { role = null } = authenticateToken(request) ?? {}
-    if (!['ADMIN', 'WAREHOUSE'].includes(role)) return ERROR.FORBIDDEN()
+    const { role = null, userId } = authenticateToken(request) ?? {}
+    if (!['ADMIN', 'WAREHOUSE'].includes(role) || !userId) return ERROR.FORBIDDEN()
 
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
@@ -59,8 +59,8 @@ export const PATCH = async (request, { params }) => {
 
 export const DELETE = async (request, { params }) => {
   try {
-    const { role = null } = authenticateToken(request) ?? {}
-    if (!['ADMIN', 'WAREHOUSE'].includes(role)) return ERROR.FORBIDDEN()
+    const { role = null, userId } = authenticateToken(request) ?? {}
+    if (!['ADMIN', 'WAREHOUSE'].includes(role) || !userId) return ERROR.FORBIDDEN()
 
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()

@@ -8,9 +8,9 @@ import prisma from '~/app/api/Libs/prisma'
 
 export const GET = async request => {
   try {
-    const { role = null } = authenticateToken(request) ?? {}
-    
-    if (!['ADMIN', 'WAREHOUSE', 'CASHIER'].includes(role)) return ERROR.FORBIDDEN()
+    const { role = null, userId } = authenticateToken(request) ?? {}
+
+    if (!['ADMIN', 'WAREHOUSE', 'CASHIER'].includes(role) || !userId) return ERROR.FORBIDDEN()
 
     const products = await prisma.product.findMany({
       where: { active: true }
@@ -25,8 +25,8 @@ export const GET = async request => {
 
 export const POST = async request => {
   try {
-    const { role = null } = authenticateToken(request) ?? {}
-    if (!['ADMIN', 'WAREHOUSE'].includes(role)) return ERROR.FORBIDDEN()
+    const { role = null, userId } = authenticateToken(request) ?? {}
+    if (!['ADMIN', 'WAREHOUSE'].includes(role) || !userId) return ERROR.FORBIDDEN()
     const data = await request.json()
     const isValid = validatorFields({ data, shape: Product.shape })
     if (isValid){
