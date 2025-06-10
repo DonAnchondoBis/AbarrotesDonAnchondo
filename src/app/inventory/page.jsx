@@ -1,18 +1,25 @@
-// page.jsx
 'use client';
 
 import React, { useState } from 'react';
 import {
   Box, Button, Container, InputBase, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Typography, IconButton, Menu, MenuItem
+  TableContainer, TableHead, TableRow, Typography, IconButton, Menu, MenuItem,
+  TablePagination
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { styled } from '@mui/material/styles';
 
 import EditProductModal from './components/EditProductModal';
 import DeleteProductModal from './components/DeleteProductModal';
 import WasteModal from './components/WasteModal';
 import AdjustmentModal from './components/AdjustmentModal';
+
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  width: '100%',
+  border: `solid 3px ${theme.palette.primary.main}`,
+  borderRadius: '1rem',
+}));
 
 export default function InventoryPage() {
   const [rows, setRows] = useState([]);
@@ -23,6 +30,9 @@ export default function InventoryPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [wasteOpen, setWasteOpen] = useState(false);
   const [adjustOpen, setAdjustOpen] = useState(false);
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleMenuClick = (event, index) => {
     setAnchorEl(event.currentTarget);
@@ -59,6 +69,18 @@ export default function InventoryPage() {
     setAdjustOpen(false);
   };
 
+  const handleChangePage = (_, newPage) => setPage(newPage);
+
+  const handleChangeRowsPerPage = event => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const paginatedRows = rows.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
   return (
     <Box sx={{ bgcolor: '#FEF7E5', minHeight: '100vh', p: 3 }}>
       <Container maxWidth="lg">
@@ -68,11 +90,19 @@ export default function InventoryPage() {
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            {/* Search Bar */}
             <Paper
               component="form"
               sx={{
-                display: 'flex', alignItems: 'center', width: 320, height: 48,
-                p: '2px 8px', bgcolor: '#B19A7B', color: '#fff', borderRadius: '24px', boxShadow: 3
+                display: 'flex',
+                alignItems: 'center',
+                height: 48,
+                p: '0.5rem',
+                bgcolor: '#B19A7B',
+                color: '#fff',
+                borderRadius: '24px',
+                boxShadow: 3,
+                width: 'auto'
               }}
             >
               <InputBase placeholder="Search product" sx={{ ml: 1, flex: 1, color: 'white' }} />
@@ -81,41 +111,58 @@ export default function InventoryPage() {
               </IconButton>
             </Paper>
 
+            {/* Botón + Add Product */}
             <Button
               variant="contained"
-              sx={{ width: 300, height: 48, bgcolor: '#84c27c', textTransform: 'none', borderRadius: '24px', boxShadow: 3 }}
-              onClick={() => { setSelectedRow(null); setEditOpen(true); }}
+              sx={{
+                bgcolor: '#84c27c',
+                textTransform: 'none',
+                borderRadius: '24px',
+                boxShadow: 3,
+                p: '0.5rem',
+                minWidth: 'auto'
+              }}
+              onClick={() => {
+                setSelectedRow(null);
+                setEditOpen(true);
+              }}
             >
               + Add Product
             </Button>
           </Box>
         </Box>
 
-        <TableContainer
-          component={Paper}
-          sx={{ mt: 2, backgroundColor: '#D4B08C', border: '2px solid #7A5C40', borderRadius: '8px' }}
-        >
+        <StyledTableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><strong>SKU</strong></TableCell>
-                <TableCell><strong>Product</strong></TableCell>
-                <TableCell><strong>Unit</strong></TableCell>
-                <TableCell><strong>Stock</strong></TableCell>
-                <TableCell><strong>Price</strong></TableCell>
-                <TableCell align="right">...</TableCell>
+                <TableCell align="center">
+                  <Typography color="primary.main" fontWeight="bold">SKU</Typography>
+                </TableCell>
+                <TableCell align="center">
+                  <Typography color="primary.main" fontWeight="bold">Product</Typography>
+                </TableCell>
+                <TableCell align="center">
+                  <Typography color="primary.main" fontWeight="bold">Unit</Typography>
+                </TableCell>
+                <TableCell align="center">
+                  <Typography color="primary.main" fontWeight="bold">Stock</Typography>
+                </TableCell>
+                <TableCell align="center">
+                  <Typography color="primary.main" fontWeight="bold">Price</Typography>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row, index) => (
+              {paginatedRows.map((row, index) => (
                 <TableRow key={index}>
-                  <TableCell>{row.sku}</TableCell>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.unit}</TableCell>
-                  <TableCell>{row.stock}</TableCell>
-                  <TableCell>{row.price}</TableCell>
-                  <TableCell align="right">
-                    <IconButton onClick={(e) => handleMenuClick(e, index)}>
+                  <TableCell align="center">{row.sku}</TableCell>
+                  <TableCell align="center">{row.name}</TableCell>
+                  <TableCell align="center">{row.unit}</TableCell>
+                  <TableCell align="center">{row.stock}</TableCell>
+                  <TableCell align="center">
+                    {row.price}
+                    <IconButton onClick={(e) => handleMenuClick(e, index)} sx={{ ml: 1 }}>
                       <MoreVertIcon sx={{ color: '#7A5C40' }} />
                     </IconButton>
                   </TableCell>
@@ -123,7 +170,17 @@ export default function InventoryPage() {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Products per page"
+          />
+        </StyledTableContainer>
 
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
           <MenuItem onClick={() => { setEditOpen(true); handleMenuClose(); }}>Edit</MenuItem>

@@ -1,3 +1,4 @@
+// WasteModal.jsx
 import React, { useState } from 'react';
 import {
   Box,
@@ -14,7 +15,7 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  bgcolor: '#f7efd8',
+  bgcolor: '#FEF7E5',
   borderRadius: 2,
   boxShadow: 24,
   p: 4,
@@ -22,34 +23,67 @@ const modalStyle = {
 };
 
 export default function WasteModal({ open, onClose, onRegister }) {
-  const [quantity, setQuantity] = useState('');
+  const [form, setForm] = useState({ product: '', quantity: '', expiration: '', reason: '' });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = () => {
-    if (quantity) {
-      onRegister(quantity);
-      setQuantity('');
-      onClose();
-    }
+    onRegister(form);
+    onClose();
   };
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={modalStyle}>
-        <Box display="flex" justifyContent="space-between" mb={2}>
-          <Typography variant="h6">Register Waste</Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6" sx={{ color: '#B19A7B' }}>Register Waste</Typography>
           <IconButton onClick={onClose}>
-            <CloseIcon />
+            <CloseIcon sx={{ color: '#7A5C40' }} />
           </IconButton>
         </Box>
 
         <TextField
           fullWidth
-          label="Quantity wasted"
-          type="number"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
+          label="Product"
+          name="product"
+          value={form.product}
+          onChange={handleChange}
           margin="dense"
-          sx={{ bgcolor: '#f5e7ce', borderRadius: 1 }}
+          sx={{ bgcolor: '#F5E7CE', borderRadius: 1, input: { color: '#1F1F1F' }, label: { color: '#7A5C40' } }}
+        />
+        <TextField
+          fullWidth
+          label="Quantity"
+          name="quantity"
+          value={form.quantity}
+          onChange={handleChange}
+          margin="dense"
+          type="number"
+          sx={{ bgcolor: '#F5E7CE', borderRadius: 1, input: { color: '#1F1F1F' }, label: { color: '#7A5C40' } }}
+        />
+        <TextField
+          fullWidth
+          label="Expiration Date"
+          name="expiration"
+          value={form.expiration}
+          onChange={handleChange}
+          margin="dense"
+          type="date"
+          InputLabelProps={{ shrink: true }}
+          sx={{ bgcolor: '#F5E7CE', borderRadius: 1, input: { color: '#1F1F1F' }, label: { color: '#7A5C40' } }}
+        />
+        <TextField
+          fullWidth
+          label="Reason"
+          name="reason"
+          value={form.reason}
+          onChange={handleChange}
+          margin="dense"
+          multiline
+          rows={2}
+          sx={{ bgcolor: '#F5E7CE', borderRadius: 1, input: { color: '#1F1F1F' }, label: { color: '#7A5C40' } }}
         />
 
         <Button
@@ -57,13 +91,14 @@ export default function WasteModal({ open, onClose, onRegister }) {
           onClick={handleSubmit}
           sx={{
             mt: 2,
-            bgcolor: '#a1866f',
+            bgcolor: '#B19A7B',
             color: 'white',
+            textTransform: 'none',
             borderRadius: '20px',
-            textTransform: 'none'
+            '&:hover': { bgcolor: '#A18A6A' }
           }}
         >
-          Register
+          Save
         </Button>
       </Box>
     </Modal>

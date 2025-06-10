@@ -1,3 +1,4 @@
+// EditProductModal.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -14,7 +15,7 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  bgcolor: '#f7efd8',
+  bgcolor: '#FEF7E5', // Background color
   borderRadius: 2,
   boxShadow: 24,
   p: 4,
@@ -22,7 +23,7 @@ const modalStyle = {
 };
 
 export default function EditProductModal({ open, onClose, product, onSave }) {
-  const [formData, setFormData] = useState(product || {
+  const [formData, setFormData] = useState({
     name: '',
     sku: '',
     unit: '',
@@ -31,20 +32,18 @@ export default function EditProductModal({ open, onClose, product, onSave }) {
   });
 
   useEffect(() => {
-    setFormData(product || {
-      name: '',
-      sku: '',
-      unit: '',
-      stock: '',
-      price: ''
-    });
+    if (product) {
+      setFormData(product);
+    } else {
+      setFormData({ name: '', sku: '', unit: '', stock: '', price: '' });
+    }
   }, [product]);
 
   const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value
-    }));
+    });
   };
 
   const handleSubmit = () => {
@@ -55,75 +54,44 @@ export default function EditProductModal({ open, onClose, product, onSave }) {
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={modalStyle}>
-        <Box display="flex" justifyContent="space-between" mb={2}>
-          <Typography variant="h6" color="error">
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6" sx={{ color: '#B19A7B' }}>
             {product ? 'Edit Product' : 'Add Product'}
           </Typography>
           <IconButton onClick={onClose}>
-            <CloseIcon />
+            <CloseIcon sx={{ color: '#7A5C40' }} />
           </IconButton>
         </Box>
 
-        <TextField
-          fullWidth
-          label="Name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          margin="dense"
-          sx={{ bgcolor: '#f5e7ce', borderRadius: 1 }}
-        />
-
-        <TextField
-          fullWidth
-          label="SKU"
-          name="sku"
-          value={formData.sku}
-          onChange={handleChange}
-          margin="dense"
-          sx={{ bgcolor: '#f5e7ce', borderRadius: 1 }}
-        />
-
-        <TextField
-          fullWidth
-          label="Unit of Measure"
-          name="unit"
-          value={formData.unit}
-          onChange={handleChange}
-          margin="dense"
-          sx={{ bgcolor: '#f5e7ce', borderRadius: 1 }}
-        />
-
-        <TextField
-          fullWidth
-          label="Stock"
-          name="stock"
-          type="number"
-          value={formData.stock}
-          onChange={handleChange}
-          margin="dense"
-          sx={{ bgcolor: '#f5e7ce', borderRadius: 1 }}
-        />
-
-        <TextField
-          fullWidth
-          label="Price"
-          name="price"
-          value={formData.price}
-          onChange={handleChange}
-          margin="dense"
-          sx={{ bgcolor: '#f5e7ce', borderRadius: 1 }}
-        />
+        {['name', 'sku', 'unit', 'stock', 'price'].map((field) => (
+          <TextField
+            key={field}
+            fullWidth
+            label={field.charAt(0).toUpperCase() + field.slice(1)}
+            name={field}
+            type={field === 'stock' || field === 'price' ? 'number' : 'text'}
+            value={formData[field] ?? ''}
+            onChange={handleChange}
+            margin="dense"
+            sx={{
+              bgcolor: '#F5E7CE',
+              borderRadius: 1,
+              input: { color: '#1F1F1F' },
+              label: { color: '#7A5C40' }
+            }}
+          />
+        ))}
 
         <Button
           fullWidth
           onClick={handleSubmit}
           sx={{
             mt: 2,
-            bgcolor: '#a1866f',
+            bgcolor: '#B19A7B',
             color: 'white',
             textTransform: 'none',
-            borderRadius: '20px'
+            borderRadius: '20px',
+            '&:hover': { bgcolor: '#A18A6A' }
           }}
         >
           Save

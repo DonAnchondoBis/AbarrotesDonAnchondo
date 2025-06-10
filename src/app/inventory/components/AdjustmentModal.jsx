@@ -1,3 +1,4 @@
+// AdjustmentModal.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -14,48 +15,50 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  bgcolor: '#f7efd8',
+  bgcolor: '#FEF7E5',
   borderRadius: 2,
   boxShadow: 24,
   p: 4,
   width: 400,
 };
 
-export default function AdjustmentModal({ open, onClose, onAdjust, product }) {
-  const [newStock, setNewStock] = useState('');
+export default function AdjustmentModal({ open, onClose, product, onAdjust }) {
+  const [stock, setStock] = useState('');
 
   useEffect(() => {
     if (product?.stock !== undefined) {
-      setNewStock(product.stock);
+      setStock(product.stock);
     }
   }, [product]);
 
   const handleSubmit = () => {
-    if (newStock !== '') {
-      onAdjust(newStock);
-      setNewStock('');
-      onClose();
-    }
+    onAdjust(stock);
+    onClose();
   };
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={modalStyle}>
-        <Box display="flex" justifyContent="space-between" mb={2}>
-          <Typography variant="h6">Inventory Adjustment</Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6" sx={{ color: '#B19A7B' }}>Adjust Inventory</Typography>
           <IconButton onClick={onClose}>
-            <CloseIcon />
+            <CloseIcon sx={{ color: '#7A5C40' }} />
           </IconButton>
         </Box>
 
         <TextField
           fullWidth
-          label="New Stock Level"
+          label="New Stock Quantity"
           type="number"
-          value={newStock}
-          onChange={(e) => setNewStock(e.target.value)}
+          value={stock}
+          onChange={(e) => setStock(e.target.value)}
           margin="dense"
-          sx={{ bgcolor: '#f5e7ce', borderRadius: 1 }}
+          sx={{
+            bgcolor: '#F5E7CE',
+            borderRadius: 1,
+            input: { color: '#1F1F1F' },
+            label: { color: '#7A5C40' }
+          }}
         />
 
         <Button
@@ -63,13 +66,14 @@ export default function AdjustmentModal({ open, onClose, onAdjust, product }) {
           onClick={handleSubmit}
           sx={{
             mt: 2,
-            bgcolor: '#a1866f',
+            bgcolor: '#B19A7B',
             color: 'white',
             textTransform: 'none',
-            borderRadius: '20px'
+            borderRadius: '20px',
+            '&:hover': { bgcolor: '#A18A6A' }
           }}
         >
-          Adjust
+          Confirm
         </Button>
       </Box>
     </Modal>
