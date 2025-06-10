@@ -36,10 +36,6 @@ describe('API Verify - GET', () => {
     const res = await GET(req)
     const data = await res.json()
     expect(res.status).toBe(expectedStatus)
-    if (expectedResponse instanceof Object && expectedResponse.asymmetricMatch) {
-      expect(data).toEqual(expectedResponse)
-    } else {
-      expect(data).toEqual(expectedResponse)
-    }
+    expect(data).toEqual(expectedResponse)
   })
 })
