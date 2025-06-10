@@ -6,6 +6,10 @@ vi.mock('~/app/api/Libs/auth', () => ({
   authenticateToken: vi.fn()
 }))
 
+afterEach(() => {
+  vi.resetAllMocks()
+})
+
 describe('API Verify - GET', () => {
   it('should return userId and role when token is valid', async () => {
     authenticateToken.mockReturnValue({ userId: 1, role: 'ADMIN' })
