@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { GET } from '~/app/api/verify/route'
 import { authenticateToken } from '~/app/api/Libs/auth'
 
@@ -11,30 +11,35 @@ afterEach(() => {
 })
 
 describe('API Verify - GET', () => {
-  it('should return userId and role when token is valid', async () => {
-    authenticateToken.mockReturnValue({ userId: 1, role: 'ADMIN' })
+  it.each([
+    {
+      descr: 'should return userId and role when token is valid',
+      mock: () => authenticateToken.mockReturnValue({ userId: 1, role: 'ADMIN' }),
+      expectedStatus: 200,
+      expectedResponse: { userId: 1, role: 'ADMIN' }
+    },
+    {
+      descr: 'should return forbidden when token is invalid',
+      mock: () => authenticateToken.mockReturnValue({}),
+      expectedStatus: 403,
+      expectedResponse: expect.objectContaining({ error: expect.any(String) })
+    },
+    {
+      descr: 'should return error if authenticateToken throws',
+      mock: () => authenticateToken.mockImplementation(() => { throw new Error('Token error') }),
+      expectedStatus: 401,
+      expectedResponse: { error: 'Token error' }
+    }
+  ])('$descr', async ({ mock, expectedStatus, expectedResponse }) => {
+    mock()
     const req = {}
     const res = await GET(req)
     const data = await res.json()
-    expect(res.status).toBe(200)
-    expect(data).toEqual({ userId: 1, role: 'ADMIN' })
-  })
-
-  it('should return forbidden when token is invalid', async () => {
-    authenticateToken.mockReturnValue({})
-    const req = {}
-    const res = await GET(req)
-    const data = await res.json()
-    expect(res.status).toBe(403)
-    expect(data).toHaveProperty('error')
-  })
-
-  it('should return error if authenticateToken throws', async () => {
-    authenticateToken.mockImplementation(() => { throw new Error('Token error') })
-    const req = {}
-    const res = await GET(req)
-    const data = await res.json()
-    expect(res.status).toBe(401)
-    expect(data).toEqual({ error: 'Token error' })
+    expect(res.status).toBe(expectedStatus)
+    if (expectedResponse instanceof Object && expectedResponse.asymmetricMatch) {
+      expect(data).toEqual(expectedResponse)
+    } else {
+      expect(data).toEqual(expectedResponse)
+    }
   })
 })
