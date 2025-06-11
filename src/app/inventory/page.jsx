@@ -70,7 +70,6 @@ export default function InventoryPage() {
   };
 
   const handleChangePage = (_, newPage) => setPage(newPage);
-
   const handleChangeRowsPerPage = event => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -93,20 +92,21 @@ export default function InventoryPage() {
             {/* Search Bar */}
             <Paper
               component="form"
+              onSubmit={(e) => e.preventDefault()}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                height: 48,
-                p: '0.5rem',
+                width: 400,
+                height: 40,
+                px: 3,
                 bgcolor: '#B19A7B',
-                color: '#fff',
-                borderRadius: '24px',
-                boxShadow: 3,
-                width: 'auto'
+                color: 'white',
+                borderRadius: '999px',
+                boxShadow: 3
               }}
             >
-              <InputBase placeholder="Search product" sx={{ ml: 1, flex: 1, color: 'white' }} />
-              <IconButton type="submit" sx={{ p: '10px', color: 'white' }}>
+              <InputBase placeholder="Search product" sx={{ flex: 1, color: 'white' }} />
+              <IconButton type="submit" sx={{ p: 1, color: 'white' }}>
                 <SearchIcon />
               </IconButton>
             </Paper>
@@ -115,12 +115,18 @@ export default function InventoryPage() {
             <Button
               variant="contained"
               sx={{
+                width: 150,
+                height: 40,
+                minHeight: 40,
+                px: 3,
+                py: 0,
                 bgcolor: '#84c27c',
+                color: 'white',
                 textTransform: 'none',
-                borderRadius: '24px',
+                borderRadius: '999px',
                 boxShadow: 3,
-                p: '0.5rem',
-                minWidth: 'auto'
+                fontWeight: 'bold',
+                lineHeight: 1
               }}
               onClick={() => {
                 setSelectedRow(null);
