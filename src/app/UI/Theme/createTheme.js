@@ -1,25 +1,25 @@
-// import '@fontsource-variable/fira-code'
-// import '@fontsource/ubuntu'
+import '@fontsource-variable/fira-code'
+import '@fontsource/ubuntu'
 import { createTheme, responsiveFontSizes } from '@mui/material/styles'
 import colors from './colors'
 
 const theme = createTheme({
   typography: {
-    // fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu',
     h1: {
       fontWeight: 'bold',
-      // fontFamily: 'Fira Code Variable',
+      fontFamily: 'Fira Code Variable',
     },
     h2: {
       fontWeight: 'bold',
-      // fontFamily: 'Fira Code Variable',
+      fontFamily: 'Fira Code Variable',
     },
     h3: {
       fontWeight: 'bold',
-      // fontFamily: 'Fira Code Variable',
+      fontFamily: 'Fira Code Variable',
     },
     h4: {
-      // fontFamily: 'Fira Code Variable',
+      fontFamily: 'Fira Code Variable',
     },
     body1: {
       fontSize: '1rem',
