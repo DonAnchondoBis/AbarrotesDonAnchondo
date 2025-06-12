@@ -23,19 +23,15 @@ const Container = styled('div')(({ theme }) => ({
   justifyContent: 'center',
   gap: '1.5rem',
   boxSizing: 'border-box',
-
   '& a': {
     textDecoration: 'none',
   },
-
   '@media (min-width: 481px) and (max-width: 768px)': {
     padding: '1.5rem',
   },
-
   '@media (max-width: 480px)': {
     padding: '1rem',
   },
-
   [`& .${classes.btnContainer}`]: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, 16rem)',
@@ -43,18 +39,15 @@ const Container = styled('div')(({ theme }) => ({
     gap: '4rem',
     alignItems: 'center',
     justifyContent: 'center',
-
     '@media (min-width: 481px) and (max-width: 768px)': {
       gridTemplateColumns: 'repeat(auto-fit, 12rem)',
       gap: '1rem',
     },
-
     '@media (max-width: 480px)': {
       gridTemplateColumns: 'repeat(auto-fit, 10rem)',
       gap: '2rem',
     },
   },
-
   [`& .${classes.btn}`]: {
     backgroundColor: theme.palette.contrast.main,
     border: `6px solid ${theme.palette.primary.main}`,
@@ -68,30 +61,24 @@ const Container = styled('div')(({ theme }) => ({
     '&:hover': {
       backgroundColor: theme.palette.contrast.dark
     },
-
     '@media (min-width: 481px) and (max-width: 768px)': {
       width: '12rem',
     },
-
     '@media (max-width: 480px)': {
       width: '10rem',
     },
   },
-
   [`& .${classes.icon}`]: {
     color: theme.palette.background.main,
     fontSize: '10rem',
     marginBottom: '0.5rem',
-
     '@media (min-width: 481px) and (max-width: 768px)': {
       fontSize: '8rem',
     },
-
     '@media (max-width: 480px)': {
       fontSize: '5rem',
     },
   },
-
   [`& .${classes.text}`]: {
     color: theme.palette.background.main,
     textAlign: 'center',
