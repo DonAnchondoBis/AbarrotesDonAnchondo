@@ -10,7 +10,6 @@ import PaidIcon from '@mui/icons-material/Paid'
 import DescriptionIcon from '@mui/icons-material/Description'
 import SettingsIcon from '@mui/icons-material/Settings'
 
-
 const displayName = 'Dasboard'
 const classes = getClassPrefixer(displayName)
 
@@ -18,6 +17,7 @@ const Container = styled('div')(({ theme }) => ({
   display: 'flex',
   flex: '2',
   padding: '12rem',
+  //minHeight: '90vh',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',

@@ -8,27 +8,27 @@ datasource db {
 }
 
 model InventoryLog {
-  id            Int               @id @default(autoincrement())
-  productName   String
-  amount        Int
-  description   String
+  id             Int              @id @default(autoincrement())
+  productName    String
+  amount         Int
+  description    String
   expirationDate String
-  type          InventoryLogType
-  userId        Int
-  user          User              @relation(fields: [userId], references: [id])
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  type           InventoryLogType
+  userId         Int
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  user           User             @relation(fields: [userId], references: [id])
 }
 
 model Lot {
-  id            Int      @id @default(autoincrement())
-  productId     Int
-  product       Product  @relation(fields: [productId], references: [id])
-  initialAmount Int
-  currentAmount Int
+  id             Int      @id @default(autoincrement())
+  productId      Int
+  initialAmount  Int
+  currentAmount  Int
   expirationDate String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  product        Product  @relation(fields: [productId], references: [id])
 }
 
 model Product {
@@ -45,14 +45,14 @@ model Product {
 }
 
 model StoreInfo {
-  id         Int      @id @default(autoincrement())
-  name       String
-  address    String
-  phone      String
+  id          Int      @id @default(autoincrement())
+  name        String
+  address     String
+  phone       String
   dollarValue Float
-  yenValue   Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  yenValue    Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Supplier {
@@ -67,21 +67,21 @@ model Supplier {
 
 model Ticket {
   id        Int             @id @default(autoincrement())
-  products  TicketProduct[]
   total     Float
   userId    Int
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
+  products  TicketProduct[]
 }
 
 model TicketProduct {
   id              Int      @id @default(autoincrement())
   quantityProduct Int
   productId       Int
-  product         Product  @relation(fields: [productId], references: [id])
   ticketId        Int
-  ticket          Ticket   @relation(fields: [ticketId], references: [id])
   createdAt       DateTime @default(now())
+  product         Product  @relation(fields: [productId], references: [id])
+  ticket          Ticket   @relation(fields: [ticketId], references: [id])
 }
 
 model User {
@@ -90,10 +90,10 @@ model User {
   username     String         @unique
   password     String
   role         Role
-  inventoryLog InventoryLog[]
   active       Boolean        @default(true)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
+  inventoryLog InventoryLog[]
 }
 
 enum InventoryLogType {
