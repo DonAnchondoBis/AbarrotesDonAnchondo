@@ -9,9 +9,9 @@ import InventoryIcon from '@mui/icons-material/Inventory'
 import PaidIcon from '@mui/icons-material/Paid'
 import DescriptionIcon from '@mui/icons-material/Description'
 import SettingsIcon from '@mui/icons-material/Settings'
+import usePermitted from '~/app/Lib/Permissions/utils'
 
-
-const displayName = 'Dasboard'
+const displayName = 'Dashboard'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
@@ -98,47 +98,59 @@ const Container = styled('div')(({ theme }) => ({
   }
 }))
 
-const Dasboard = () => {
+const Dashboard = () => {
   return (
     <Container>
       <div className={classes.btnContainer}>
-        <Link href="/point-of-sale">
-          <IconButton className={classes.btn}>
-            <ShoppingCartIcon className={classes.icon} />
-            <T variant="h4" className={classes.text}>Point Of Sale</T>
-          </IconButton>
-        </Link>
 
-        <Link href="/inventory">
-          <IconButton className={classes.btn}>
-            <InventoryIcon className={classes.icon} />
-            <T variant="h4" className={classes.text}>Inventory</T>
-          </IconButton>
-        </Link>
+        {usePermitted({ roleRequired: 'CASHIER' }) && (
+          <Link href="/point-of-sale">
+            <IconButton className={classes.btn}>
+              <ShoppingCartIcon className={classes.icon} />
+              <T variant="h4" className={classes.text}>Point Of Sale</T>
+            </IconButton>
+          </Link>
+        )}
 
-        <Link href="/payments">
-          <IconButton className={classes.btn}>
-            <PaidIcon className={classes.icon} />
-            <T variant="h4" className={classes.text}>Payments</T>
-          </IconButton>
-        </Link>
+        {usePermitted({ roleRequired: 'WAREHOUSE' }) && (
+          <Link href="/inventory">
+            <IconButton className={classes.btn}>
+              <InventoryIcon className={classes.icon} />
+              <T variant="h4" className={classes.text}>Inventory</T>
+            </IconButton>
+          </Link>
+        )}
 
-        <Link href="/reports">
-          <IconButton className={classes.btn}>
-            <DescriptionIcon className={classes.icon} />
-            <T variant="h4" className={classes.text}>Reports</T>
-          </IconButton>
-        </Link>
+        {usePermitted({ roleRequired: 'WAREHOUSE' }) && (
+          <Link href="/payments">
+            <IconButton className={classes.btn}>
+              <PaidIcon className={classes.icon} />
+              <T variant="h4" className={classes.text}>Payments</T>
+            </IconButton>
+          </Link>
+        )}
 
-        <Link href="/settings">
-          <IconButton className={classes.btn}>
-            <SettingsIcon className={classes.icon} />
-            <T variant="h4" className={classes.text}>Settings</T>
-          </IconButton>
-        </Link>
+        {usePermitted({ roleRequired: 'ADMIN' }) && (
+          <Link href="/reports">
+            <IconButton className={classes.btn}>
+              <DescriptionIcon className={classes.icon} />
+              <T variant="h4" className={classes.text}>Reports</T>
+            </IconButton>
+          </Link>
+        )}
+
+        {usePermitted({ roleRequired: 'ADMIN' }) && (
+          <Link href="/settings">
+            <IconButton className={classes.btn}>
+              <SettingsIcon className={classes.icon} />
+              <T variant="h4" className={classes.text}>Settings</T>
+            </IconButton>
+          </Link>
+        )}
+
       </div>
     </Container>
   )
 }
 
-export default Dasboard
+export default Dashboard
