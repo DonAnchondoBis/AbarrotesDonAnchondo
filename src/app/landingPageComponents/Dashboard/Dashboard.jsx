@@ -102,7 +102,6 @@ const Dashboard = () => {
   return (
     <Container>
       <div className={classes.btnContainer}>
-
         {usePermitted({ roleRequired: 'CASHIER' }) && (
           <Link href="/point-of-sale">
             <IconButton className={classes.btn}>
@@ -111,7 +110,6 @@ const Dashboard = () => {
             </IconButton>
           </Link>
         )}
-
         {usePermitted({ roleRequired: 'WAREHOUSE' }) && (
           <Link href="/inventory">
             <IconButton className={classes.btn}>
@@ -120,7 +118,6 @@ const Dashboard = () => {
             </IconButton>
           </Link>
         )}
-
         {usePermitted({ roleRequired: 'WAREHOUSE' }) && (
           <Link href="/payments">
             <IconButton className={classes.btn}>
@@ -129,7 +126,6 @@ const Dashboard = () => {
             </IconButton>
           </Link>
         )}
-
         {usePermitted({ roleRequired: 'ADMIN' }) && (
           <Link href="/reports">
             <IconButton className={classes.btn}>
@@ -138,7 +134,6 @@ const Dashboard = () => {
             </IconButton>
           </Link>
         )}
-
         {usePermitted({ roleRequired: 'ADMIN' }) && (
           <Link href="/settings">
             <IconButton className={classes.btn}>
@@ -147,7 +142,6 @@ const Dashboard = () => {
             </IconButton>
           </Link>
         )}
-
       </div>
     </Container>
   )
