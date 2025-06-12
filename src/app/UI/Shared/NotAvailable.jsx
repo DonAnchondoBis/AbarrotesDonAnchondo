@@ -40,14 +40,7 @@ const NotAvailableContainer = styled('div')(({ theme }) => ({
   [`& .${classes.button}`]: {
     padding: '1ch',
     background: theme.palette.primary.main,
-    color: theme.palette.contrast.main,
-    '&:hover': {
-      background: theme.palette.primary.strong,
-    },
-    '&.Mui-disabled': {
-      background: theme.palette.action.disabledBackground,
-      color: theme.palette.action.disabled,
-    }
+    color: theme.palette.background.main,
   },
 }))
 
