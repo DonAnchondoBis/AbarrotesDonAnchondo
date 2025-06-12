@@ -21,6 +21,9 @@ import apiFetch from '~/app/Lib/apiFetch'
 import { useToken } from '~/app/store/useToken'
 import Loading from '~/app/UI/Shared/Loading'
 
+import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
+import NotAvailable from '~/app/UI/Shared/NotAvailable'
+
 const displayName = 'ReportsPage'
 const classes = getClassPrefixer(displayName)
 const Container = styled('div')(({ theme }) => ({
@@ -201,19 +204,21 @@ const Wrapper = () => {
   }, [token])
 
   return (
-    <ReportsPage
-      selectedCategory={selectedCategory}
-      handleCategoryChange={handleCategoryChange}
-      search={search}
-      handleSearchChange={handleSearchChange}
-      shrinkage={shrinkage}
-      isLoading={isLoading}
-      error={error}
-      selectedDateShrinkage={selectedDateShrinkage}
-      handleDateChangeShrinkage={handleDateChangeShrinkage}
-      selectedDateSalesday={selectedDateSalesday}
-      handleDateChangeSalesday={handleDateChangeSalesday}
-    />
+    <AuthWrapper Fallback={NotAvailable} roleRequired='ADMIN'>
+      <ReportsPage
+        selectedCategory={selectedCategory}
+        handleCategoryChange={handleCategoryChange}
+        search={search}
+        handleSearchChange={handleSearchChange}
+        shrinkage={shrinkage}
+        isLoading={isLoading}
+        error={error}
+        selectedDateShrinkage={selectedDateShrinkage}
+        handleDateChangeShrinkage={handleDateChangeShrinkage}
+        selectedDateSalesday={selectedDateSalesday}
+        handleDateChangeSalesday={handleDateChangeSalesday}
+      />
+    </AuthWrapper>
   )
 }
 
