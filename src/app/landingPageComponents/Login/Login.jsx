@@ -66,8 +66,14 @@ const Container = styled('div')(({ theme }) => ({
     background: theme.palette.background.main,
     fontWeight: 'bold',
     fontStyle: 'italic',
-    borderRadius: '1ch',
+    borderRadius: '2rem',
     margin: 'dense',
+
+    '& .MuiOutlinedInput-notchedOutline': {
+      border: `1px solid ${theme.palette.primary.muted}`,
+      borderRadius: '2rem',
+    },
+
     '& .MuiInputLabel-outlined': {
       backgroundColor: theme.palette.background.main,
       borderRadius: '1ch',
@@ -75,6 +81,7 @@ const Container = styled('div')(({ theme }) => ({
       marginLeft: '-4px',
     }
   },
+
 
   [`& .${classes.buttonContainer}`]: {
     width: '100%',
