@@ -8,27 +8,27 @@ datasource db {
 }
 
 model InventoryLog {
-  id            Int               @id @default(autoincrement())
-  productName   String
-  amount        Int
-  description   String
+  id             Int              @id @default(autoincrement())
+  productName    String
+  amount         Int
+  description    String
   expirationDate String
-  type          InventoryLogType
-  userId        Int
-  user          User              @relation(fields: [userId], references: [id])
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  type           InventoryLogType
+  userId         Int
+  user           User             @relation(fields: [userId], references: [id])
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 }
 
 model Lot {
-  id            Int      @id @default(autoincrement())
-  productId     Int
-  product       Product  @relation(fields: [productId], references: [id])
-  initialAmount Int
-  currentAmount Int
+  id             Int      @id @default(autoincrement())
+  productId      Int
+  product        Product  @relation(fields: [productId], references: [id])
+  initialAmount  Int
+  currentAmount  Int
   expirationDate String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Product {
@@ -45,14 +45,14 @@ model Product {
 }
 
 model StoreInfo {
-  id         Int      @id @default(autoincrement())
-  name       String
-  address    String
-  phone      String
+  id          Int      @id @default(autoincrement())
+  name        String
+  address     String
+  phone       String
   dollarValue Float
-  yenValue   Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  yenValue    Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Supplier {
