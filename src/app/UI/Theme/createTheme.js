@@ -35,9 +35,9 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: '4px',
-          paddingBlock: '2rem',
-          paddingInline: '1rem',
+          borderRadius: '2rem',
+          paddingBlock: '0.5ch',
+          paddingInline: '2rem',
         },
       },
     },
