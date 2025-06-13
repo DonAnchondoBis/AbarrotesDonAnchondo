@@ -38,19 +38,26 @@ const Container = styled('div')(({ theme }) => ({
   },
   [`& .${classes.containerTools}`]: {
     display: 'flex',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     flexDirection: 'row',
     width: '100%',
     marginBottom: '1ch',
     justifyContent: 'space-between',
+    '@media  (max-width: 768px)': {
+      flexDirection: 'column',
+    },
   },
   [`& .${classes.tableContainer}`]: {
     width: '100%',
   },
+  [`& .${classes.tabs}`]: {
+    width: '100%',
+  },
   [`& .${classes.searchInput}`]: {
-    minWidth: '250px',
+    minWidth: '150px',
     marginLeft: '1rem',
     backgroundColor: theme.palette.contrast.main,
+    borderRadius: '2rem',
     '& input::placeholder': {
       color: theme.palette.background.main,
       opacity: 0.7
@@ -61,6 +68,10 @@ const Container = styled('div')(({ theme }) => ({
   },
   [`& .${classes.dateInput}`]: {
     minWidth: '200px',
+    minHeight: '40px',
+    '@media  (max-width: 768px)': {
+      marginTop: '1rem',
+    },
     backgroundColor: theme.palette.contrast.main,
     '& .MuiInputBase-input': {
       color: theme.palette.background.main,
@@ -93,8 +104,8 @@ const ReportsPage = ({
           onChange={handleCategoryChange}
           indicatorColor="primary"
           textColor="primary"
-          allowScrollButtonsMobile
           variant="scrollable"
+          className={classes.tabs}
         >
           <Tab label="Inventory" value="inventory" />
           <Tab label="Shrinkage" value="shrinkage" />
