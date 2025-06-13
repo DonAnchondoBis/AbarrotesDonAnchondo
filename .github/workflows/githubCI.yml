@@ -1,0 +1,101 @@
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  #EsLint
+  lint-project:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm install
+      - name: Run eslint
+        run: npm run lint
+
+  #BUILD
+  build-project:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: lint-project
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+  #VITEST
+  test-vitest:
+    name: Test with Coverage
+    runs-on: ubuntu-latest
+    needs: build-project
+    strategy:
+      matrix:
+        branch:
+          - ${{ github.head_ref }}
+          - "develop"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ matrix.branch }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests with coverage
+        run: npm run test
+      - name: Sanitize branch name
+        id: sanitize
+        run: echo "BRANCH_NAME=${{ matrix.branch }}" | sed 's/\//-/g' >> $GITHUB_ENV
+      - name: "Upload Coverage"
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ env.BRANCH_NAME }}
+          path: coverage
+
+  # Coverage
+  report-coverage:
+    needs: test-vitest
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/production'
+    steps:
+      - name: Sanitize branch name
+        id: sanitize
+        run: echo "BRANCH_NAME=${GITHUB_HEAD_REF}" | sed 's/\//-/g' >> $GITHUB_ENV
+      - name: "Download Coverage for Current Branch"
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-${{ env.BRANCH_NAME }}
+          path: coverage
+      - name: "Download Coverage for Develop Branch"
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-develop
+          path: coverage-develop
+      - name: 'Report Coverage'
+        if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          github-token: ${{ secrets.ACCOUNT_TOKEN }}
+          json-summary-compare-path: coverage-develop/coverage-summary.json
+
+  # Deploy
+  deploy-project:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build-project
+    if: github.ref == 'refs/heads/production'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+      - name: Deploy to Vercel
+        run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --yes

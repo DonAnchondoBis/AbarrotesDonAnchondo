@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model InventoryLog {
+  id             Int              @id @default(autoincrement())
+  productName    String
+  amount         Int
+  description    String
+  expirationDate String
+  type           InventoryLogType
+  userId         Int
+  user           User             @relation(fields: [userId], references: [id])
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Lot {
+  id             Int      @id @default(autoincrement())
+  productId      Int
+  product        Product  @relation(fields: [productId], references: [id])
+  initialAmount  Int
+  currentAmount  Int
+  expirationDate String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Product {
+  id             Int             @id @default(autoincrement())
+  name           String          @unique
+  unit           Unit
+  price          Float
+  SKU            String          @unique
+  active         Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  lots           Lot[]
+  ticketProducts TicketProduct[]
+}
+
+model StoreInfo {
+  id          Int      @id @default(autoincrement())
+  name        String
+  address     String
+  phone       String
+  dollarValue Float
+  yenValue    Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Supplier {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String
+  email     String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ticket {
+  id        Int             @id @default(autoincrement())
+  products  TicketProduct[]
+  total     Float
+  userId    Int
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model TicketProduct {
+  id              Int      @id @default(autoincrement())
+  quantityProduct Int
+  productId       Int
+  product         Product  @relation(fields: [productId], references: [id])
+  ticketId        Int
+  ticket          Ticket   @relation(fields: [ticketId], references: [id])
+  createdAt       DateTime @default(now())
+}
+
+model User {
+  id           Int            @id @default(autoincrement())
+  name         String
+  username     String         @unique
+  password     String
+  role         Role
+  inventoryLog InventoryLog[]
+  active       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+enum InventoryLogType {
+  INCREASE
+  DECREASE
+  INCOME
+  SHRINKAGE
+}
+
+enum Role {
+  ADMIN
+  CASHIER
+  WAREHOUSE
+}
+
+enum Unit {
+  KG
+  PIECE
+}
