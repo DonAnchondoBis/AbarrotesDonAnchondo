@@ -36,7 +36,13 @@ const Container = styled('div')(({ theme }) => ({
     gap: '3rem',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: '400px'
+    minWidth: '400px',
+    '@media (min-width: 481px) and (max-width: 768px)': {
+      minWidth: '350px',
+    },
+    '@media (max-width: 480px)': {
+      minWidth: '300px',
+    },
   },
 
   [`& .${classes.button}`]: {
@@ -64,13 +70,9 @@ const Container = styled('div')(({ theme }) => ({
 
   [`& .${classes.input}`]: {
     background: theme.palette.background.main,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-    borderRadius: '1ch',
-    margin: 'dense',
     '& .MuiInputLabel-outlined': {
       backgroundColor: theme.palette.background.main,
-      borderRadius: '1ch',
+      borderRadius: '2rem',
       padding: '0 1rem',
       marginLeft: '-4px',
     }
