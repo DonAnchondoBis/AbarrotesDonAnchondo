@@ -64,7 +64,7 @@ jobs:
   report-coverage:
     needs: test-vitest
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/production'
+    if: github.ref != 'refs/heads/production' && github.ref != 'refs/heads/develop'
     steps:
       - name: Sanitize branch name
         id: sanitize
