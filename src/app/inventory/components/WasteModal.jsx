@@ -1,14 +1,17 @@
-// WasteModal.jsx
-import React, { useState } from 'react';
+'use client'
+
+import React, { useEffect } from 'react';
 import {
   Box,
   Button,
   IconButton,
   Modal,
   TextField,
-  Typography
+  Typography,
+  Grid
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useFormik } from 'formik';
 
 const modalStyle = {
   position: 'absolute',
@@ -19,87 +22,107 @@ const modalStyle = {
   borderRadius: 2,
   boxShadow: 24,
   p: 4,
-  width: 400,
+  width: 360,
 };
 
 export default function WasteModal({ open, onClose, onRegister }) {
-  const [form, setForm] = useState({ product: '', quantity: '', expiration: '', reason: '' });
+  const formik = useFormik({
+    initialValues: {
+      product: '',
+      quantity: '',
+      expiration: '',
+      reason: ''
+    },
+    onSubmit: (values) => {
+      onRegister(values);
+      onClose();
+    }
+  });
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = () => {
-    onRegister(form);
-    onClose();
-  };
+  useEffect(() => {
+    formik.resetForm();
+  }, [open]);
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={modalStyle}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6" sx={{ color: '#B19A7B' }}>Register Waste</Typography>
-          <IconButton onClick={onClose}>
-            <CloseIcon sx={{ color: '#7A5C40' }} />
-          </IconButton>
+      <Box component="form" onSubmit={formik.handleSubmit} sx={modalStyle}>
+        <Box mb={2}>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6" sx={{ color: '#8B0002', fontWeight: 'bold' }}>
+              Register Waste
+            </Typography>
+            <IconButton
+              onClick={onClose}
+              sx={{
+                bgcolor: '#FEF7E5',
+                border: '1px solid #B19A7B',
+                width: 24,
+                height: 24,
+                p: 0,
+                '&:hover': {
+                  bgcolor: '#f1e3cb'
+                }
+              }}
+            >
+              <CloseIcon sx={{ color: '#7A5C40', fontSize: 16 }} />
+            </IconButton>
+          </Box>
+          <Box mt={1} mb={2} sx={{ width: '100%', height: '1px', backgroundColor: '#D8CBB3' }} />
         </Box>
 
-        <TextField
-          fullWidth
-          label="Product"
-          name="product"
-          value={form.product}
-          onChange={handleChange}
-          margin="dense"
-          sx={{ bgcolor: '#F5E7CE', borderRadius: 1, input: { color: '#1F1F1F' }, label: { color: '#7A5C40' } }}
-        />
-        <TextField
-          fullWidth
-          label="Quantity"
-          name="quantity"
-          value={form.quantity}
-          onChange={handleChange}
-          margin="dense"
-          type="number"
-          sx={{ bgcolor: '#F5E7CE', borderRadius: 1, input: { color: '#1F1F1F' }, label: { color: '#7A5C40' } }}
-        />
-        <TextField
-          fullWidth
-          label="Expiration Date"
-          name="expiration"
-          value={form.expiration}
-          onChange={handleChange}
-          margin="dense"
-          type="date"
-          InputLabelProps={{ shrink: true }}
-          sx={{ bgcolor: '#F5E7CE', borderRadius: 1, input: { color: '#1F1F1F' }, label: { color: '#7A5C40' } }}
-        />
-        <TextField
-          fullWidth
-          label="Reason"
-          name="reason"
-          value={form.reason}
-          onChange={handleChange}
-          margin="dense"
-          multiline
-          rows={2}
-          sx={{ bgcolor: '#F5E7CE', borderRadius: 1, input: { color: '#1F1F1F' }, label: { color: '#7A5C40' } }}
-        />
+        {[
+          { name: 'product', label: 'Product:' },
+          { name: 'quantity', label: 'Quantity:' },
+          { name: 'expiration', label: 'Expiration Date:', type: 'date' },
+          { name: 'reason', label: 'Reason:', multiline: true }
+        ].map(({ name, label, type, multiline }) => (
+          <Grid container spacing={2} alignItems="center" key={name} sx={{ mb: 1 }}>
+            <Grid item xs={4}>
+              <Typography sx={{ color: '#7A5C40', fontSize: 14 }}>{label}</Typography>
+            </Grid>
+            <Grid item xs={8}>
+              <TextField
+                fullWidth
+                name={name}
+                type={type || 'text'}
+                multiline={multiline || false}
+                rows={multiline ? 2 : undefined}
+                value={formik.values[name]}
+                onChange={formik.handleChange}
+                InputProps={{
+                  sx: {
+                    borderRadius: '10px',
+                    backgroundColor: '#FEF7E5',
+                    height: !multiline ? 32 : undefined,
+                    '& fieldset': { borderColor: '#B19A7B' },
+                    '&:hover fieldset': { borderColor: '#B19A7B' },
+                    '&.Mui-focused fieldset': { borderColor: '#7A5C40' },
+                    input: { color: '#1F1F1F', fontSize: 14 }
+                  }
+                }}
+                InputLabelProps={type === 'date' ? { shrink: true } : {}}
+              />
+            </Grid>
+          </Grid>
+        ))}
 
-        <Button
-          fullWidth
-          onClick={handleSubmit}
-          sx={{
-            mt: 2,
-            bgcolor: '#B19A7B',
-            color: 'white',
-            textTransform: 'none',
-            borderRadius: '20px',
-            '&:hover': { bgcolor: '#A18A6A' }
-          }}
-        >
-          Save
-        </Button>
+        <Box display="flex" justifyContent="flex-end" mt={3}>
+          <Button
+            type="submit"
+            sx={{
+              px: 4,
+              py: 1,
+              bgcolor: '#5A7D2A',
+              color: 'white',
+              textTransform: 'none',
+              borderRadius: '20px',
+              fontWeight: 'bold',
+              '&:hover': { bgcolor: '#4C681F' }
+            }}
+          >
+            Save
+          </Button>
+        </Box>
       </Box>
     </Modal>
   );

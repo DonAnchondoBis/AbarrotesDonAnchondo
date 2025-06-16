@@ -2,10 +2,27 @@
 
 import React, { useState } from 'react';
 import {
-  Box, Button, Container, InputBase, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Typography, IconButton, Menu, MenuItem,
-  TablePagination
+  Box,
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  TablePagination,
+  Paper,
+  OutlinedInput,
+  InputAdornment,
+  Button,
+  Tabs,
+  Tab
 } from '@mui/material';
+
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material/styles';
@@ -17,8 +34,22 @@ import AdjustmentModal from './components/AdjustmentModal';
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   width: '100%',
-  border: `solid 3px ${theme.palette.primary.main}`,
+  border: `3px solid ${theme.palette.primary.main}`,
   borderRadius: '1rem',
+}));
+
+const StyledInput = styled(OutlinedInput)(({ theme }) => ({
+  minWidth: '250px',
+  marginLeft: '1rem',
+  backgroundColor: theme.palette.contrast.main,
+  height: '48px',
+  '& input::placeholder': {
+    color: theme.palette.background.main,
+    opacity: 0.7
+  },
+  '& .MuiInputBase-input': {
+    color: theme.palette.background.main,
+  }
 }));
 
 export default function InventoryPage() {
@@ -30,18 +61,17 @@ export default function InventoryPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [wasteOpen, setWasteOpen] = useState(false);
   const [adjustOpen, setAdjustOpen] = useState(false);
+  const [search, setSearch] = useState('');
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const handleSearchChange = (event) => setSearch(event.target.value);
   const handleMenuClick = (event, index) => {
     setAnchorEl(event.currentTarget);
     setSelectedRow(index);
   };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  const handleMenuClose = () => setAnchorEl(null);
 
   const handleEditSave = (updatedProduct) => {
     const updatedRows = [...rows];
@@ -81,52 +111,45 @@ export default function InventoryPage() {
   );
 
   return (
-    <Box sx={{ bgcolor: '#FEF7E5', minHeight: '100vh', p: 3 }}>
+    <Box sx={{ bgcolor: '#FEF7E5', minHeight: '100vh', py: 4 }}>
       <Container maxWidth="lg">
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3
+        }}>
           <Typography variant="h6" sx={{ color: '#1F1F1F', fontWeight: 'bold' }}>
             Inventory
           </Typography>
 
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            {/* Search Bar */}
-            <Paper
-              component="form"
-              onSubmit={(e) => e.preventDefault()}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                width: 400,
-                height: 40,
-                px: 3,
-                bgcolor: '#B19A7B',
-                color: 'white',
-                borderRadius: '999px',
-                boxShadow: 3
-              }}
-            >
-              <InputBase placeholder="Search product" sx={{ flex: 1, color: 'white' }} />
-              <IconButton type="submit" sx={{ p: 1, color: 'white' }}>
-                <SearchIcon />
-              </IconButton>
-            </Paper>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <StyledInput
+              placeholder="Search by name"
+              size="small"
+              value={search}
+              onChange={handleSearchChange}
+              startAdornment={
+                <InputAdornment position="start">
+                  <SearchIcon color="background" />
+                </InputAdornment>
+              }
+            />
 
-            {/* Botón + Add Product */}
             <Button
               variant="contained"
+              size="medium"
               sx={{
-                width: 150,
-                height: 40,
-                minHeight: 40,
-                px: 3,
-                py: 0,
-                bgcolor: '#84c27c',
+                height: '48px',
+                width: '250px',
+                bgcolor: '#5A7D2A',
                 color: 'white',
-                textTransform: 'none',
-                borderRadius: '999px',
                 boxShadow: 3,
+                textTransform: 'none',
                 fontWeight: 'bold',
-                lineHeight: 1
+                '&:hover': {
+                  bgcolor: '#4C681F'
+                }
               }}
               onClick={() => {
                 setSelectedRow(null);
@@ -142,21 +165,11 @@ export default function InventoryPage() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell align="center">
-                  <Typography color="primary.main" fontWeight="bold">SKU</Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography color="primary.main" fontWeight="bold">Product</Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography color="primary.main" fontWeight="bold">Unit</Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography color="primary.main" fontWeight="bold">Stock</Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography color="primary.main" fontWeight="bold">Price</Typography>
-                </TableCell>
+                {['SKU', 'Product', 'Unit', 'Stock', 'Price'].map((header) => (
+                  <TableCell key={header} align="center">
+                    <Typography color="primary.main" fontWeight="bold">{header}</Typography>
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -176,6 +189,7 @@ export default function InventoryPage() {
               ))}
             </TableBody>
           </Table>
+
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
