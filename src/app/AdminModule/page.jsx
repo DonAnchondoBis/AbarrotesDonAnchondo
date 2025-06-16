@@ -1,5 +1,4 @@
 'use client'
-
 import {
   Tabs,
   Tab,
@@ -112,7 +111,7 @@ const CompetitorPublicTable = ({
         {selectedCategory === 'User' && (
           <>
             <Button onClick={handleOpenAdd} className={classes.addButton} sx={{ alignSelf: 'center', marginLeft: 'auto' }}>
-            Add User
+              Add User
             </Button>
             <OutlinedInput
               className={classes.searchInput}
@@ -165,4 +164,3 @@ const Wrapper = () => {
 }
 
 export default Wrapper
-
