@@ -1,4 +1,5 @@
 'use client'
+
 import {
   Tabs,
   Tab,
@@ -15,10 +16,9 @@ import DataTable from '~/app/AdminModule/componets/DataTable'
 import UsersTable from '~/app/AdminModule/componets/UsersTable'
 import AddUserModal from './componets/AddUserModal'
 
-
 const displayName = 'Competitors'
 const classes = getClassPrefixer(displayName)
-const Container = styled('div')(() => ({
+const Container = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   padding: '2rem 8rem',
@@ -30,16 +30,49 @@ const Container = styled('div')(() => ({
   },
   [`& .${classes.containerTools}`]: {
     display: 'flex',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     flexDirection: 'row',
     width: '100%',
     marginBottom: '1ch',
     justifyContent: 'space-between',
+    '@media (max-width: 768px)': {
+      flexDirection: 'column',
+    },
   },
   [`& .${classes.tableContainer}`]: {
     width: '100%',
   },
-}))
+  [`& .${classes.tabs}`]: {
+    width: '100%',
+  },
+  [`& .${classes.searchInput}`]: {
+    minWidth: '150px',
+    height: '3rem',
+    marginLeft: '1rem',
+    backgroundColor: theme.palette.contrast.main,
+    borderRadius: '2rem',
+    '& input::placeholder': {
+      color: theme.palette.background.main,
+      opacity: 0.7
+    },
+    '& .MuiInputBase-input': {
+      color: theme.palette.background.main,
+    }
+  },
+  [`& .${classes.addButton}`]: {
+    backgroundColor: theme.palette.contrast.main,
+    borderRadius: '2rem',
+    color: theme.palette.background.main,
+    height: '3rem',
+    textTransform: 'none',
+    padding: '6px 16px',
+    '&:hover': {
+      backgroundColor: theme.palette.contrast.main,
+      opacity: 0.9,
+    }
+  },
+}));
+
 
 const CompetitorPublicTable = ({
   selectedCategory,
@@ -47,18 +80,22 @@ const CompetitorPublicTable = ({
   search,
   handleSearchChange,
 }) => {
-      const [addOpen, setAddOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false)
 
-        const handleOpenAdd = () => {
-          setAddOpen(true);
-        };
-      
-        const handleCloseAdd = () => {
-          setAddOpen(false);
-        };
-         const handleConfirmAdd = () => {
-          handleAddDelete();
-        };
+  const handleOpenAdd = () => {
+    setAddOpen(true)
+  }
+
+  const handleCloseAdd = () => {
+    setAddOpen(false)
+  }
+
+  const handleConfirmAdd = (newUser) => {
+    console.log('Nuevo usuario:', newUser)
+    // Aquí puedes agregar el usuario a tu lista (con estado o petición al backend)
+    handleCloseAdd()
+  }
+
   return (
     <Container>
       <div className={classes.containerTools}>
@@ -71,36 +108,41 @@ const CompetitorPublicTable = ({
           <Tab label="Users" value="User" />
           <Tab label="Data" value="Data" />
         </Tabs>
-        <Button>Add User</Button>
-        <OutlinedInput
-          className={classes.searchInput}
-          placeholder="Buscar por nombre"
-          size="small"
-          value={search}
-          onChange={handleSearchChange}
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          }
-        />
-        
+
+        {selectedCategory === 'User' && (
+          <>
+            <Button onClick={handleOpenAdd} className={classes.addButton} sx={{ alignSelf: 'center', marginLeft: 'auto' }}>
+            Add User
+            </Button>
+            <OutlinedInput
+              className={classes.searchInput}
+              placeholder="Buscar por nombre"
+              size="small"
+              value={search}
+              onChange={handleSearchChange}
+              startAdornment={
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              }
+            />
+          </>
+        )}
       </div>
+
       <div className={classes.tableContainer}>
         {selectedCategory !== 'User' ? (
-          <DataTable
-          />
+          <DataTable />
         ) : (
-          <UsersTable
-          />
+          <UsersTable search={search} />
         )}
       </div>
 
       <AddUserModal
-              open={addOpen}
-              onClose={handleCloseAdd}
-              onConfirm={handleConfirmAdd}
-        />
+        open={addOpen}
+        onClose={handleCloseAdd}
+        onConfirm={handleConfirmAdd}
+      />
     </Container>
   )
 }
@@ -110,7 +152,7 @@ const Wrapper = () => {
   const [search, setSearch] = useState('')
 
   const handleCategoryChange = (_, newValue) => setSelectedCategory(newValue)
-  const handleSearchChange = event => setSearch(event.target.value)
+  const handleSearchChange = (event) => setSearch(event.target.value)
 
   return (
     <CompetitorPublicTable
@@ -123,3 +165,4 @@ const Wrapper = () => {
 }
 
 export default Wrapper
+

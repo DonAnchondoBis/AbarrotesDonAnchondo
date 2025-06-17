@@ -11,34 +11,32 @@ import EditUserModal from './EditUserModal';
 
 
 
-const UsersTable = () => {
+const UsersTable = ({ search }) => {
   const [users, setUsers] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
-
   const handleClick = (event, user) => {
     setAnchorEl(event.currentTarget);
     setSelectedUser(user);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleClose = () => setAnchorEl(null);
+
   const handleOpenEdit = () => {
     handleClose();
-    setEditOpen(true);  
+    setEditOpen(true);
   };
   const handleCloseEdit = () => {
     setEditOpen(false);
     setSelectedUser(null);
-  }
+  };
   const handleConfirmEdit = () => {
-    handleCloseDelete();
-  }
-  
+    handleCloseEdit();
+  };
+
   const handleOpenDelete = () => {
     handleClose();
     setDeleteOpen(true);
@@ -48,14 +46,11 @@ const UsersTable = () => {
     setDeleteOpen(false);
     setSelectedUser(null);
   };
-   const handleConfirmDelete = () => {
-    console.log('Usuario eliminado:', selectedUser);
+
+  const handleConfirmDelete = () => {
     setUsers(prev => prev.filter(u => u.id !== selectedUser.id));
     handleCloseDelete();
   };
-
-
-
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -67,9 +62,13 @@ const UsersTable = () => {
         console.error('Error al obtener usuarios:', error);
       }
     };
-
     fetchUsers();
   }, []);
+
+  // 🔔 **Filtrado según el search input**
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <TableContainer component={Paper}>
@@ -84,7 +83,7 @@ const UsersTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.id}</TableCell>
               <TableCell>{user.name}</TableCell>
@@ -100,14 +99,11 @@ const UsersTable = () => {
         </TableBody>
       </Table>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem onClick={handleOpenEdit}>Editar</MenuItem>
         <MenuItem onClick={handleOpenDelete}>Eliminar</MenuItem>
       </Menu>
+
       <DeleteUserModal
         open={deleteOpen}
         onClose={handleCloseDelete}
@@ -125,4 +121,3 @@ const UsersTable = () => {
 };
 
 export default UsersTable;
-
