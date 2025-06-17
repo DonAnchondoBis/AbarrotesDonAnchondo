@@ -5,6 +5,9 @@ import {
   OutlinedInput,
   InputAdornment,
   Button,
+  Modal,
+  Snackbar,
+  Alert
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import SearchIcon from '@mui/icons-material/Search'
@@ -12,8 +15,8 @@ import getClassPrefixer from '~/app/UI/classPrefixer'
 
 import LotsTable from './LotsTable'
 import SuppliersTable from './SuppliersTable'
-import ModalLots from './ModalLots'
-import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
+import ModalAddLot from '~/app/purchasing/ModalAddLot'
+import ModalAddSupplier from '~/app/purchasing/ModalAddSupplier'
 import NotAvailable from '~/app/UI/Shared/NotAvailable'
 
 import { useState, useEffect } from 'react'
@@ -21,8 +24,9 @@ import { useState, useEffect } from 'react'
 import apiFetch from '~/app/Lib/apiFetch'
 import { useToken } from '~/app/store/useToken'
 import Loading from '~/app/UI/Shared/Loading'
+import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
 
-const displayName = 'Competitors'
+const displayName = 'purchasingPage'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
@@ -42,51 +46,47 @@ const Container = styled('div')(({ theme }) => ({
     width: '100%',
     marginBottom: '1ch',
     justifyContent: 'space-between',
+    '@media (max-width: 768px)': {
+      flexDirection: 'column',
+      justifyContent:  'flex-start',
+    },
   },
   [`& .${classes.inputGroup}`]: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     gap: '1rem',
+    '@media (max-width: 768px)': {
+      marginTop: '1rem',
+    },
   },
   [`& .${classes.searchInput}`]: {
-    minWidth: '200px',
-    padding: '0 1rem',
-    borderRadius: '2rem',
+    minWidth: '150px',
+    marginLeft: '1rem',
     backgroundColor: theme.palette.contrast.main,
+    borderRadius: '2rem',
     '& input::placeholder': {
       color: theme.palette.background.main,
-      opacity: 0.7,
+      opacity: 0.7
     },
     '& .MuiInputBase-input': {
       color: theme.palette.background.main,
-    },
+    }
   },
-[`& .${classes.button}`]: {
-  border: `1.5px solid ${theme.palette.success.main}`, // borde verde
-  padding: '0 1rem',
-  height: '40px',
-  boxSizing: 'border-box',
-  '&.Mui-disabled, &:disabled': {
-    background: theme.palette.grey[300],
-    color: theme.palette.text.disabled,
-    border: `1.5px solid ${theme.palette.grey[400]}`,
-  },
-},
-   [`& .${classes.buttonContainer}`]: {
+
+  [`& .${classes.buttonContainer}`]: {
     display: 'flex',
     justifyContent: 'flex-end',
     width: '100%',
     marginTop: '1rem',
     color: theme.palette.background.main,
-    height: '40px'
   },
   [`& .${classes.tableContainer}`]: {
     width: '100%',
   },
 }))
 
-const PublicTable = ({
+const PurchasingPage = ({
   selectedCategory,
   handleCategoryChange,
   searchLots,
@@ -96,56 +96,109 @@ const PublicTable = ({
   isLoading,
   suppliers,
   lots,
+  setOpenModalAddLot,
+  openModalAddLot,
+  products,
+  snackbarMessage,
+  setSnackbarMessage,
+  setOpenModalAddSupplier,
+  openModalAddSupplier
 }) => {
-
-const [openModal, setOpenModal] = useState(false);
-
-return (
-  <Container>
-    <div className={classes.containerTools}>
-      <Tabs
-        value={selectedCategory}
-        onChange={handleCategoryChange}
-        indicatorColor="primary"
-        textColor="primary"
-      >
-        <Tab label="Lots" value="lots" />
-        <Tab label="Suppliers" value="suppliers" />
-      </Tabs>
-
-      <div className={classes.inputGroup}>
-        <OutlinedInput
-          className={classes.searchInput}
-          placeholder="Search product"
-          size="small"
-          value={selectedCategory === 'lots' ? searchLots : searchSuppliers}
-          onChange={selectedCategory === 'lots' ? handleSearchLotsChange : handleSearchSuppliersChange}
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon color='background'/>
-            </InputAdornment>
-          }
-        />
-        <Button
-          className={classes.button}
-          variant='contained'
-          color='success'
-          onClick={() => setOpenModal(true)}
+  return (
+    <Container>
+      <div className={classes.containerTools}>
+        <Tabs
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          indicatorColor="primary"
+          textColor="primary"
         >
-          ADD PRODUCT
-        </Button>
-      </div>
-    </div>
-    {isLoading
-        ? (<Loading />) : (
-          <div className={classes.tableContainer}>
-          {selectedCategory === 'lots' && <LotsTable search={searchLots} lots={lots} />}
-          {selectedCategory === 'suppliers' && <SuppliersTable search={searchSuppliers} suppliers={suppliers} />}
+          <Tab label="Lots" value="lots" />
+          <Tab label="Suppliers" value="suppliers" />
+        </Tabs>
+        <div className={classes.inputGroup}>
+          <OutlinedInput
+            className={classes.searchInput}
+            placeholder="Search by name"
+            size="small"
+            value={selectedCategory === 'lots' ? searchLots : searchSuppliers}
+            onChange={selectedCategory === 'lots' ? handleSearchLotsChange : handleSearchSuppliersChange}
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon color='background'/>
+              </InputAdornment>
+            }
+          />
+          { selectedCategory === 'lots'
+            ? (
+              <Button
+                variant='contained'
+                color='success'
+                disabled={isLoading}
+                onClick={() => setOpenModalAddLot(true)}
+              >
+                Add Lot
+              </Button>
+            )
+            : (
+              <Button
+                variant='contained'
+                color='success'
+                disabled={isLoading}
+                onClick={() => setOpenModalAddSupplier(true)}
+              >
+                Add Supplier
+              </Button>
+            )
+          }
         </div>
-        )}
-     <ModalLots open={openModal} onClose={() => setOpenModal(false)} />
-  </Container>
-)
+      </div>
+      <div className={classes.tableContainer}>
+        {selectedCategory === 'lots' && <LotsTable search={searchLots} lots={lots} />}
+        {selectedCategory === 'suppliers' && <SuppliersTable search={searchSuppliers} suppliers={suppliers} />}
+      </div>
+      { selectedCategory === 'lots'
+        ? (
+          <Modal
+            open={openModalAddLot}
+            onClose={() => setOpenModalAddLot(false)}
+          >
+            <ModalAddLot
+              products={products}
+              onClose={() => setOpenModalAddLot(false)}
+              setSnackbarMessage={setSnackbarMessage}
+              search={searchLots}
+            />
+          </Modal>
+        )
+        : (
+          <Modal
+            open={openModalAddSupplier}
+            onClose={() => setOpenModalAddSupplier(false)}
+          >
+            <ModalAddSupplier
+              products={products}
+              onClose={() => setOpenModalAddSupplier(false)}
+              setSnackbarMessage={setSnackbarMessage}
+              search={searchSuppliers}
+            />
+          </Modal>
+        )
+      }
+      <Snackbar
+        open={Boolean(snackbarMessage)}
+        autoHideDuration={5000}
+        onClose={() => setSnackbarMessage(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
+          severity={snackbarMessage?.severity}
+        >
+          {snackbarMessage?.message}
+        </Alert>
+      </Snackbar>
+    </Container>
+  )
 }
 
 const Wrapper = () => {
@@ -154,42 +207,60 @@ const Wrapper = () => {
   const [searchLots, setSearchLots] = useState('')
   const [suppliers, setSuppliers] = useState([])
   const [lots, setLots] = useState([])
+  const [products, setProducts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [openModalAddLot, setOpenModalAddLot] = useState(false)
+  const [openModalAddSupplier, setOpenModalAddSupplier] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState(null)
   const { token } = useToken()
 
   const handleCategoryChange = (_, newValue) => setSelectedCategory(newValue)
-  const handleSearchSuChange = (event) => setSearchSuppliers(event.target.value)
-  const handleSearchLotsChange = (event) => setSearchLots(event.target.value)
+  const handleSearchSuChange = event => setSearchSuppliers(event.target.value)
+  const handleSearchLotsChange = event => setSearchLots(event.target.value)
 
   useEffect(() => {
     setIsLoading(true)
-    const getLotsAndSupppliers = async () => {
+    const getLotsSupppliersAndProducts = async () => {
       const responseSuppliers = await apiFetch({ url: 'api/supplier', method: 'GET', token })
       const responseLots = await apiFetch({ url: 'api/lot', method: 'GET', token })
-      if (responseSuppliers.error && responseLots.error) {
+      const responseProducts = await apiFetch({ url: 'api/product', method: 'GET', token })
+      if (responseSuppliers.error && responseLots.error && responseProducts.error) {
         setSuppliers([])
         setLots([])
+        setProducts([])
       } else {
         setSuppliers(responseSuppliers)
         setLots(responseLots)
+        setProducts(responseProducts)
       }
       setIsLoading(false)
     }
-    getLotsAndSupppliers()
+    getLotsSupppliersAndProducts()
   }, [token])
 
+  if (isLoading) return <Loading />
+
   return (
-    <PublicTable
-      selectedCategory={selectedCategory}
-      handleCategoryChange={handleCategoryChange}
-      searchLots={searchLots}
-      handleSearchLotsChange={handleSearchLotsChange}
-      searchSuppliers={searchSuppliers}
-      handleSearchSuppliersChange={handleSearchSuChange}
-      isLoading={isLoading}
-      suppliers={suppliers}
-      lots={lots}
-    />
+    <AuthWrapper Fallback={<NotAvailable />} roleRequired='WAREHOUSE'>
+      <PurchasingPage
+        selectedCategory={selectedCategory}
+        handleCategoryChange={handleCategoryChange}
+        searchLots={searchLots}
+        handleSearchLotsChange={handleSearchLotsChange}
+        searchSuppliers={searchSuppliers}
+        handleSearchSuppliersChange={handleSearchSuChange}
+        isLoading={isLoading}
+        suppliers={suppliers}
+        lots={lots}
+        openModalAddLot={openModalAddLot}
+        setOpenModalAddLot={setOpenModalAddLot}
+        products={products}
+        snackbarMessage={snackbarMessage}
+        setSnackbarMessage={setSnackbarMessage}
+        openModalAddSupplier={openModalAddSupplier}
+        setOpenModalAddSupplier={setOpenModalAddSupplier}
+      />
+    </AuthWrapper>
   )
 }
 

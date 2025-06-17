@@ -8,11 +8,9 @@ import {
   Typography,
   TablePagination,
   TableContainer,
-  Modal
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useState } from 'react'
-import EditModal from './ModalLots'
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   width: '100%',
@@ -21,8 +19,6 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
 }))
 
 const LotsTable = ({ search, lots = [] }) => {
-
-  console.log('LotsTable', lots)
   const filteredData = lots?.filter(item => item.product.name.toLowerCase().includes(search.toLowerCase()))
 
   const [page, setPage] = useState(0)
@@ -31,11 +27,6 @@ const LotsTable = ({ search, lots = [] }) => {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   )
-
-  // 👇 Estas son las líneas agregadas
-  const [openEditModal, setOpenEditModal] = useState(false)
-  const [selectedCompetitor, setSelectedCompetitor] = useState(null)
-  const [setSnackbarMessage] = useState(() => () => {})
 
   const handleChangePage = (_, newPage) => setPage(newPage)
   const handleChangeRowsPerPage = event => {
@@ -79,7 +70,6 @@ const LotsTable = ({ search, lots = [] }) => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         labelRowsPerPage="Products per page"
       />
-    
     </StyledTableContainer>
   )
 }

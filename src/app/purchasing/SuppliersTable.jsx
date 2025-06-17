@@ -8,11 +8,9 @@ import {
   Typography as T,
   TablePagination,
   TableContainer,
-  Modal
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useState } from 'react'
-import EditModal from './ModalLots'
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   width: '100%',
@@ -29,11 +27,6 @@ const SuppliersTable = ({ search = '', suppliers = [] }) => {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   )
-
-  // 👇 Estas son las líneas agregadas
-  const [openEditModal, setOpenEditModal] = useState(false)
-  const [selectedCompetitor, setSelectedCompetitor] = useState(null)
-  const [setSnackbarMessage] = useState(() => () => {})
 
   const handleChangePage = (_, newPage) => setPage(newPage)
   const handleChangeRowsPerPage = event => {
@@ -77,7 +70,6 @@ const SuppliersTable = ({ search = '', suppliers = [] }) => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         labelRowsPerPage="Products per page"
       />
-    
     </StyledTableContainer>
   )
 }
