@@ -8,7 +8,7 @@ import prisma from '~/app/api/Libs/prisma'
 
 export const POST = async request => {
   try {
-    const { role = null, userId } = authenticateToken(request) ?? {}
+    const { role, userId } = authenticateToken(request) ?? {}
     const data = await request.json()
     const isValid = validatorFields({ data, shape: Lots.shape })
     const validRoles = ['ADMIN', 'WAREHOUSE']
@@ -23,8 +23,8 @@ export const POST = async request => {
       const payload = await prisma.lot.create({
         data: {
           productId: data.productId,
-          initialAmount: data.initialAmount,
-          currentAmount: data.initialAmount,
+          initialAmount: Number(data.initialAmount),
+          currentAmount: Number(data.initialAmount),
           expirationDate: data.expirationDate,
         },
         include: {
@@ -36,6 +36,7 @@ export const POST = async request => {
     }
     return ERROR.FORBIDDEN()
   } catch (error) {
+    console.error('Error in POST /api/lot:', error)
     return NextResponse.json(
       { error: error.message },
       { status: error.status || 500 }
@@ -48,7 +49,11 @@ export const GET = async request => {
     const { role, userId } = authenticateToken(request) ?? {}
     const validRoles = ['ADMIN', 'WAREHOUSE']
     if (!userId || !validRoles.includes(role)) return ERROR.FORBIDDEN()
-    const payloads = await prisma.lot.findMany()
+    const payloads = await prisma.lot.findMany({
+      include: {
+        product: true,
+      },
+    })
 
     if (payloads.length > 0) {
       const response = payloads.map(payload => cleanerData({ payload }))

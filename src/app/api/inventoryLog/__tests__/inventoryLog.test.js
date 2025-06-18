@@ -17,7 +17,7 @@ vi.mock('~/app/api/Libs/prisma', () => {
             user: {
               name: 'Admin'
             },
-            createdAt: 'createdAt',
+            createdAt: new Date('2023-06-15T12:00:00Z'),
             updatedAt: 'updatedAt'
           },
           {
@@ -30,7 +30,7 @@ vi.mock('~/app/api/Libs/prisma', () => {
             user: {
               name: 'Warehouse'
             },
-            createdAt: 'createdAt',
+            createdAt: new Date('2023-06-15T12:00:00Z'),
             updatedAt: 'updatedAt'
           }
         ])),
@@ -80,7 +80,8 @@ describe('API InventoryLog - GET', () => {
           description: 'Ingreso inicial',
           expirationDate: '2025-12-31',
           type: 'INCOME',
-          user: 'Admin'
+          user: 'Admin',
+          date: '2023-06-15'
         },
         {
           id: 2,
@@ -89,7 +90,8 @@ describe('API InventoryLog - GET', () => {
           description: 'Retiro por daños',
           expirationDate: '2025-10-15',
           type: 'DECREASE',
-          user: 'Warehouse'
+          user: 'Warehouse',
+          date: '2023-06-15'
         }
       ]
     },
@@ -298,7 +300,6 @@ describe('API InventoryLog - POST', () => {
       json: async () => request,
       nextUrl: { searchParams: new URLSearchParams() }
     }
-    
     const response = await POST(mockRequest)
     const jsonResponse = await response.json()
     expect(response.status).toBe(expectedStatus)

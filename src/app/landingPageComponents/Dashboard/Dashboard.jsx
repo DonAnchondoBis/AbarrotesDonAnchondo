@@ -16,13 +16,10 @@ const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
   display: 'flex',
-  flex: '2',
-  padding: '12rem',
-  flexDirection: 'column',
+  padding: '8rem',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: '1.5rem',
-  boxSizing: 'border-box',
+  gap: '1rem',
   '& a': {
     textDecoration: 'none',
   },
@@ -34,18 +31,17 @@ const Container = styled('div')(({ theme }) => ({
   },
   [`& .${classes.btnContainer}`]: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, 16rem)',
-    width: '100%',
-    gap: '4rem',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '1rem',
     alignItems: 'center',
     justifyContent: 'center',
-    '@media (min-width: 481px) and (max-width: 768px)': {
-      gridTemplateColumns: 'repeat(auto-fit, 12rem)',
+    '@media (min-width: 481px) and (max-width: 1024px)': {
+      gridTemplateColumns: 'repeat(3, 1fr)',
       gap: '1rem',
     },
     '@media (max-width: 480px)': {
-      gridTemplateColumns: 'repeat(auto-fit, 10rem)',
-      gap: '2rem',
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      gap: ' 1rem',
     },
   },
   [`& .${classes.btn}`]: {
@@ -56,28 +52,23 @@ const Container = styled('div')(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '16rem',
+    width: '250px',
+    '@media (min-width: 481px) and (max-width: 768px)': {
+      width: '200px',
+    },
+    '@media (max-width: 480px)': {
+      gridTemplateColumns: 'repeat(2, 1fr)',
+      width: '150px',
+    },
     aspectRatio: '1',
     '&:hover': {
       backgroundColor: theme.palette.contrast.dark
     },
-    '@media (min-width: 481px) and (max-width: 768px)': {
-      width: '12rem',
-    },
-    '@media (max-width: 480px)': {
-      width: '10rem',
-    },
   },
   [`& .${classes.icon}`]: {
     color: theme.palette.background.main,
-    fontSize: '10rem',
+    fontSize: '8rem',
     marginBottom: '0.5rem',
-    '@media (min-width: 481px) and (max-width: 768px)': {
-      fontSize: '8rem',
-    },
-    '@media (max-width: 480px)': {
-      fontSize: '5rem',
-    },
   },
   [`& .${classes.text}`]: {
     color: theme.palette.background.main,
@@ -93,7 +84,7 @@ const Dashboard = () => {
           <Link href="/point-of-sale">
             <IconButton className={classes.btn}>
               <ShoppingCartIcon className={classes.icon} />
-              <T variant="h4" className={classes.text}>Point Of Sale</T>
+              <T variant="h5" className={classes.text}>Point Of Sale</T>
             </IconButton>
           </Link>
         )}
@@ -101,7 +92,7 @@ const Dashboard = () => {
           <Link href="/inventory">
             <IconButton className={classes.btn}>
               <InventoryIcon className={classes.icon} />
-              <T variant="h4" className={classes.text}>Inventory</T>
+              <T variant="h5" className={classes.text}>Inventory</T>
             </IconButton>
           </Link>
         )}
@@ -109,7 +100,7 @@ const Dashboard = () => {
           <Link href="/payments">
             <IconButton className={classes.btn}>
               <PaidIcon className={classes.icon} />
-              <T variant="h4" className={classes.text}>Payments</T>
+              <T variant="h5" className={classes.text}>Purchasing</T>
             </IconButton>
           </Link>
         )}
@@ -117,7 +108,7 @@ const Dashboard = () => {
           <Link href="/reports">
             <IconButton className={classes.btn}>
               <DescriptionIcon className={classes.icon} />
-              <T variant="h4" className={classes.text}>Reports</T>
+              <T variant="h5" className={classes.text}>Reports</T>
             </IconButton>
           </Link>
         )}
@@ -125,7 +116,7 @@ const Dashboard = () => {
           <Link href="/settings">
             <IconButton className={classes.btn}>
               <SettingsIcon className={classes.icon} />
-              <T variant="h4" className={classes.text}>Settings</T>
+              <T variant="h5" className={classes.text}>Settings</T>
             </IconButton>
           </Link>
         )}
