@@ -28,7 +28,6 @@ export const POST = async request => {
         }
       })
       if (!target) return ERROR.NOT_FOUND()
-        
       // Check if the new amount is less than 0
       const newAmount = (data.type== 'INCREASE' || data.type=='INCOME')?(target.currentAmount+data.amount):(target.currentAmount-data.amount)
 
@@ -43,15 +42,12 @@ export const POST = async request => {
           currentAmount: newAmount
         }
       })
-        
       //If the action is succesful, the inventory log is created
       const payload = await prisma.inventoryLog.create({
         data
       })
       const response = cleanerData({ payload })
       return NextResponse.json(response, { status: 201 })
-
-
     }
     return ERROR.FORBIDDEN()
   } catch (error) {
@@ -73,6 +69,7 @@ export const GET = async request => {
         description: true,
         expirationDate: true,
         type: true,
+        createdAt: true,
         user:{
           select:{
             name:true
@@ -85,9 +82,13 @@ export const GET = async request => {
     })
     if (payloads.length > 0){
       const processedPayloads = payloads.map(payload => {
+        const year = payload.createdAt.getFullYear()
+        const month = String(payload.createdAt.getMonth() + 1).padStart(2, '0')
+        const day = String(payload.createdAt.getDate()).padStart(2, '0')
         return {
           ...payload,
-          user: payload.user.name
+          user: payload.user.name,
+          date: `${year}-${month}-${day}`,
         }
       })
       const response = processedPayloads.map(payload => cleanerData({ payload }))
