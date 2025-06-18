@@ -61,6 +61,16 @@ const theme = createTheme({
         },
       },
     },
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          borderRadius: '2rem',
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderRadius: '2rem',
+          },
+        },
+      },
+    },
   },
 })
 
