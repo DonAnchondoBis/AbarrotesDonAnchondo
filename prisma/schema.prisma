@@ -37,6 +37,7 @@ model Product {
   unit           Unit
   price          Float
   SKU            String          @unique
+  image          String          @unique
   active         Boolean         @default(true)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt

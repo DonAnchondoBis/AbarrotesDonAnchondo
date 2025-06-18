@@ -41,6 +41,7 @@ export const Product = {
     'name',
     'unit',
     'price',
-    'SKU'
+    'SKU',
+    'image'
   ]
 }
