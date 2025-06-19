@@ -17,7 +17,7 @@ import { useToken } from '~/app/store/useToken'
 import { useState } from 'react'
 import Loading from '~/app/UI/Shared/Loading'
 
-const displayName = 'ModalAddLots'
+const displayName = 'ModalAddSuppliers'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
@@ -26,22 +26,114 @@ const Container = styled('div')(({ theme }) => ({
   alignItems: 'center',
   height: '80vh',
   width: '100vw',
+[`& .${classes.modalContainer}`]: {
+    width: '40vw',
+    '@media (max-width: 768px)': {
+      width: '90vw',
+    },
+    border: `solid 3px ${theme.palette.primary.main}`,
+    background: theme.palette.background.main,
+    display: 'flex',
+    justifyContent: 'center',
+    borderRadius: '1rem',
+    padding: '2rem',
+    flexDirection: 'column',
+  },
+
+  [`& .${classes.header}`]: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '1rem'
+  },
+  [`& .${classes.productRow}`]: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: '1rem',
+    marginBottom: '1.5rem',
+    width: '100%',
+  },
+  [`& .${classes.buttonContainer}`]: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: '1.5rem'
+  },
 }))
 
-const ModalAddLots = ({ onClose }) => {
+const ModalAddSuppliers = ({ onClose}) => {
   const { isValid, dirty } = useFormikContext()
   return (
     <Container>
-      AQUI VA LA OTRA MODAL
+      <div className={classes.modalContainer}>
+        <div className={classes.header}>
+          <T color="primary" variant="h5">
+            New Supplier
+          </T>
+          <IconButton onClick={onClose}>
+            <CloseIcon color="primary" />
+          </IconButton>
+        </div>
+        <Divider sx={{ mb: 3 }} />
+        <Form>
+          <div className={classes.productRow}>
+            <Field
+              name="name"
+              label="Name"
+              variant="outlined"
+              type="text"
+              component={TextField}
+            />
+            <Field
+              name="contact"
+              label="Email"
+              variant="outlined"
+              type="email"
+              component={TextField}
+            />
+          </div>
+          <Field
+            name="phone"
+            label="Number"
+            variant="outlined"
+            type="number"
+            component={TextField}
+            InputLabelProps={{ shrink: true }}
+          />
+          <div className={classes.buttonContainer}>
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={!isValid || !dirty}
+            >
+              Save
+            </Button>
+          </div>
+        </Form>
+      </div>
     </Container>
   )
 }
 
-const Wrapper = ({ onClose, setSnackbarMessage }) => {
-  const handleSubmit = async values => console.log(values)
+const Wrapper = ({ onClose,setSnackbarMessage, fetchData}) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const { token } = useToken()
+  const handleSubmit = async values => {
+    setIsLoading(true)
+    const response = await apiFetch({ url: '/api/supplier', method: 'POST', payload: values, token })
+    if (response.error) {
+      setSnackbarMessage({ message: 'Error adding the lot', severity: 'error' })
+    } else {
+      setSnackbarMessage({ message: 'Lot added successfully', severity: 'success' })
+      fetchData({ entity: 'lot' })
+      onClose()
+    }
+    setIsLoading(false)
+  }
 
   const validationSchema = getAddSupplierValidationSchema()
   const initialValues = getAddSupplierInitialValues()
+
+  if (isLoading) return <Loading />
 
   return (
     <Formik
@@ -49,7 +141,7 @@ const Wrapper = ({ onClose, setSnackbarMessage }) => {
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      <ModalAddLots
+      <ModalAddSuppliers
         onClose={onClose}
       />
     </Formik>

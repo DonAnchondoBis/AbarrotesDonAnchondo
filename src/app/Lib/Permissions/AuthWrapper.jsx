@@ -1,15 +1,13 @@
-import usePermitted from '~/app/Lib/Permissions/utils'
+import usePermitted from '~/app/Lib/Permissions/utils';
 
 const AuthWrapper = ({ children, Fallback, roleRequired = 'ADMIN' }) => {
-  const permitted = usePermitted({ roleRequired })
-  if (permitted) {
-    return (
-      <>
-        {children}
-      </>
-    )
-  }
-  return <Fallback/>
-}
+  const permitted = usePermitted({ roleRequired });
 
-export default AuthWrapper
+  if (permitted) {
+    return <>{children}</>;
+  }
+
+  return <Fallback />;
+};
+
+export default AuthWrapper;
