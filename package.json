@@ -19,6 +19,7 @@
     "@mui/icons-material": "^6.4.6",
     "@mui/material": "^6.4.6",
     "@prisma/client": "^6.5.0",
+    "@react-pdf/renderer": "^4.3.0",
     "abarrotes-don-anchondo": "file:",
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",

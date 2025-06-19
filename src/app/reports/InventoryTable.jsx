@@ -7,14 +7,14 @@ import {
   Paper,
   Typography,
   TablePagination,
-  TableContainer,
-  Button
+  TableContainer
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useState } from 'react'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import EmptyState from './EmptyState'
 import { SentimentDissatisfied } from '@mui/icons-material'
+import { ReportButton } from './ReportButton'
 
 const displayName = 'InventoryTable'
 const classes = getClassPrefixer(displayName)
@@ -118,10 +118,7 @@ const InventoryTable = ({ data = [], search = '' }) => {
         />
       </TableContainer>
       <div className={classes.buttonContainer}>
-        {/* TODO ADD Dani's function to generate reports */}
-        <Button variant='contained' color='green' onClick={() => {}} >
-          Generate Report
-        </Button>
+        <ReportButton category="inventory" data={data} />
       </div>
     </Container>
   )
