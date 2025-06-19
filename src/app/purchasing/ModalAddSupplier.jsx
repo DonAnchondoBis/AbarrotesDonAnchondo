@@ -7,14 +7,18 @@ import {
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import CloseIcon from '@mui/icons-material/Close'
-import { Formik, Form, Field, useFormikContext } from 'formik'
 import getClassPrefixer from '~/app/UI/classPrefixer'
-import TextField from '~/app/UI/Shared/FormikTextField'
+
+import { Formik, Form, Field, useFormikContext } from 'formik'
 import { getAddSupplierValidationSchema, getAddSupplierInitialValues } from '~/app/purchasing/utils'
-import apiFetch from '~/app/Lib/apiFetch'
+import TextField from '~/app/UI/Shared/FormikTextField'
+
 import { useToken } from '~/app/store/useToken'
-import { useState } from 'react'
+import apiFetch from '~/app/Lib/apiFetch'
 import Loading from '~/app/UI/Shared/Loading'
+
+import { useState } from 'react'
+
 
 const displayName = 'ModalAddSuppliers'
 const classes = getClassPrefixer(displayName)
@@ -25,7 +29,6 @@ const Container = styled('div')(({ theme }) => ({
   alignItems: 'center',
   height: '80vh',
   width: '100vw',
-
   [`& .${classes.modalContainer}`]: {
     width: '40vw',
     '@media (max-width: 768px)': {
@@ -39,30 +42,26 @@ const Container = styled('div')(({ theme }) => ({
     padding: '2rem',
     flexDirection: 'column',
   },
-
   [`& .${classes.header}`]: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '1rem',
   },
-
-  [`& .${classes.productRow}`]: {
+  [`& .${classes.inputs}`]: {
     display: 'flex',
-    flexDirection: 'row',
-    gap: '1rem',
-    marginBottom: '1.5rem',
+    flexDirection: 'column',
+    gap: '2rem',
     width: '100%',
   },
-
   [`& .${classes.buttonContainer}`]: {
     display: 'flex',
     justifyContent: 'flex-end',
     marginTop: '1.5rem',
   },
-}));
+}))
 
-const ModalAddSuppliers = ({ onClose}) => {
+const ModalAddSuppliers = ({ onClose }) => {
   const { isValid, dirty } = useFormikContext()
   return (
     <Container>
@@ -77,7 +76,7 @@ const ModalAddSuppliers = ({ onClose}) => {
         </div>
         <Divider sx={{ mb: 3 }} />
         <Form>
-          <div className={classes.productRow}>
+          <div className={classes.inputs}>
             <Field
               name="name"
               label="Name"
@@ -86,21 +85,20 @@ const ModalAddSuppliers = ({ onClose}) => {
               component={TextField}
             />
             <Field
-              name="contact"
+              name="email"
               label="Email"
               variant="outlined"
               type="email"
               component={TextField}
             />
+            <Field
+              name="phone"
+              label="Number"
+              variant="outlined"
+              type="number"
+              component={TextField}
+            />
           </div>
-          <Field
-            name="phone"
-            label="Number"
-            variant="outlined"
-            type="number"
-            component={TextField}
-            InputLabelProps={{ shrink: true }}
-          />
           <div className={classes.buttonContainer}>
             <Button
               variant="contained"
@@ -116,17 +114,18 @@ const ModalAddSuppliers = ({ onClose}) => {
   )
 }
 
-const Wrapper = ({ onClose,setSnackbarMessage, fetchData}) => {
+const Wrapper = ({ onClose,setSnackbarMessage, fetchData }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { token } = useToken()
+
   const handleSubmit = async values => {
     setIsLoading(true)
     const response = await apiFetch({ url: '/api/supplier', method: 'POST', payload: values, token })
     if (response.error) {
-      setSnackbarMessage({ message: 'Error adding the lot', severity: 'error' })
+      setSnackbarMessage({ message: 'Error adding the Supplier', severity: 'error' })
     } else {
-      setSnackbarMessage({ message: 'Lot added successfully', severity: 'success' })
-      fetchData({ entity: 'lot' })
+      setSnackbarMessage({ message: 'Supplier added successfully', severity: 'success' })
+      fetchData()
       onClose()
     }
     setIsLoading(false)
