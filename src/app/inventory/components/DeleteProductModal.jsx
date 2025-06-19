@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import {
   Box,
   Button,
@@ -11,42 +10,42 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  bgcolor: '#FEF7E5',
-  borderRadius: 2,
-  boxShadow: 24,
-  p: 4,
-  width: 420,
-};
-
 export default function DeleteProductModal({ open, onClose, onDelete }) {
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={modalStyle}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: '#FEF7E5',
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 4,
+          width: 400
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" sx={{ color: '#8B0002', fontWeight: 'bold' }}>
-            Delete
+            Delete Product
           </Typography>
           <IconButton
             onClick={onClose}
             sx={{
-              border: '1px solid #7A5C40',
-              borderRadius: '50%',
-              width: 28,
-              height: 28,
-              color: '#7A5C40',
-              padding: 0,
+              bgcolor: '#FEF7E5',
+              border: '1px solid #B19A7B',
+              width: 24,
+              height: 24,
+              p: 0,
+              '&:hover': { bgcolor: '#f1e3cb' }
             }}
           >
-            <CloseIcon sx={{ fontSize: 16 }} />
+            <CloseIcon sx={{ color: '#7A5C40', fontSize: 16 }} />
           </IconButton>
         </Box>
 
-        <Divider sx={{ my: 2, borderColor: '#E0D6C1' }} />
+        <Divider sx={{ my: 2, borderColor: '#D8CBB3' }} />
 
         <Typography sx={{ mb: 1.5, textAlign: 'center', color: '#7A5C40' }}>
           Are you sure you want to delete this product from the inventory?
@@ -66,9 +65,7 @@ export default function DeleteProductModal({ open, onClose, onDelete }) {
               textTransform: 'none',
               borderRadius: '20px',
               fontWeight: 'bold',
-              '&:hover': {
-                bgcolor: '#6F0002'
-              }
+              '&:hover': { bgcolor: '#6F0002' }
             }}
           >
             Delete

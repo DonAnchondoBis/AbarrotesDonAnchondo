@@ -4,39 +4,24 @@ import React, { useState } from 'react';
 import {
   Box,
   Container,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
-  IconButton,
   Menu,
   MenuItem,
   TablePagination,
-  Paper,
-  OutlinedInput,
   InputAdornment,
   Button,
-  Tabs,
-  Tab
+  OutlinedInput
 } from '@mui/material';
 
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { styled } from '@mui/material/styles';
 
+import Table from './components/Table'; // asegúrate que tu archivo se llama Table.jsx
 import EditProductModal from './components/EditProductModal';
 import DeleteProductModal from './components/DeleteProductModal';
 import WasteModal from './components/WasteModal';
 import AdjustmentModal from './components/AdjustmentModal';
-
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  width: '100%',
-  border: `3px solid ${theme.palette.primary.main}`,
-  borderRadius: '1rem',
-}));
+import { styled } from '@mui/material/styles';
 
 const StyledInput = styled(OutlinedInput)(({ theme }) => ({
   minWidth: '250px',
@@ -66,11 +51,16 @@ export default function InventoryPage() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleSearchChange = (event) => setSearch(event.target.value);
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+    setPage(0); // reset page to 0 on new search
+  };
+
   const handleMenuClick = (event, index) => {
     setAnchorEl(event.currentTarget);
     setSelectedRow(index);
   };
+
   const handleMenuClose = () => setAnchorEl(null);
 
   const handleEditSave = (updatedProduct) => {
@@ -86,8 +76,8 @@ export default function InventoryPage() {
     setDeleteOpen(false);
   };
 
-  const handleRegisterWaste = (quantity) => {
-    alert(`Registered waste: ${quantity} units`);
+  const handleRegisterWaste = (data) => {
+    console.log('Registered waste:', data);
   };
 
   const handleAdjustment = (newStock) => {
@@ -100,12 +90,18 @@ export default function InventoryPage() {
   };
 
   const handleChangePage = (_, newPage) => setPage(newPage);
+
   const handleChangeRowsPerPage = event => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const paginatedRows = rows.slice(
+  // ✅ Aplicar filtro por nombre
+  const filteredRows = rows.filter(row =>
+    row.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const paginatedRows = filteredRows.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -161,46 +157,18 @@ export default function InventoryPage() {
           </Box>
         </Box>
 
-        <StyledTableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                {['SKU', 'Product', 'Unit', 'Stock', 'Price'].map((header) => (
-                  <TableCell key={header} align="center">
-                    <Typography color="primary.main" fontWeight="bold">{header}</Typography>
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedRows.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell align="center">{row.sku}</TableCell>
-                  <TableCell align="center">{row.name}</TableCell>
-                  <TableCell align="center">{row.unit}</TableCell>
-                  <TableCell align="center">{row.stock}</TableCell>
-                  <TableCell align="center">
-                    {row.price}
-                    <IconButton onClick={(e) => handleMenuClick(e, index)} sx={{ ml: 1 }}>
-                      <MoreVertIcon sx={{ color: '#7A5C40' }} />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <Table rows={paginatedRows} onMenuClick={handleMenuClick} />
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Products per page"
-          />
-        </StyledTableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={filteredRows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Products per page"
+        />
 
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
           <MenuItem onClick={() => { setEditOpen(true); handleMenuClose(); }}>Edit</MenuItem>
