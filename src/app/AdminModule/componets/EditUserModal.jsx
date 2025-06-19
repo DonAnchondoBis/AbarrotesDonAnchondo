@@ -6,94 +6,103 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
-  Select,
   MenuItem,
-  FormControl,
-  InputLabel,
-  Checkbox,
-  FormControlLabel
-} from '@mui/material';
-import { useState, useEffect } from 'react';
+  Snackbar,
+  Alert
+} from '@mui/material'
+import { Formik, Form, Field } from 'formik'
+import TextField from '~/app/UI/Shared/FormikTextField'
+import { Select, InputLabel, FormControl } from '@mui/material'
 
-const EditUserModal = ({ open, onClose, user, onConfirm }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    username: '',
-    role: 'CASHIER',
-    active: true
-  });
+import apiFetch from '~/app/Lib/apiFetch'
+import { useToken } from '~/app/store/useToken'
+import { useState, useEffect } from 'react'
+import { getEditUserValidationSchema } from './utils'
 
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || '',
-        username: user.username || '',
-        role: user.role || 'CASHIER',
-        active: user.active ?? true
-      });
+const EditUserModal = ({ open, onClose, user, onSuccess }) => {
+  const { token } = useToken()
+  const [snackbar, setSnackbar] = useState(null)
+
+  const initialValues = {
+    name: user?.name || '',
+    username: user?.username || '',
+    role: user?.role || 'CASHIER',
+    active: user?.active ?? true,
+    password: ''
+  }
+
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    const response = await apiFetch({
+      url: `/api/user/${user.id}`,
+      method: 'PATCH',
+      payload: {
+        name: values.name,
+        username: values.username,
+        role: values.role,
+        active: values.active,
+        ...(values.password ? { password: values.password } : {}),
+      },
+      token
+    })
+
+    if (response?.error) {
+      setSnackbar({ message: 'Error updating user.', severity: 'error' })
+    } else {
+      setSnackbar({ message: 'User updated successfully.', severity: 'success' })
+      onSuccess(response)
+      onClose()
+      resetForm()
     }
-  }, [user]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleCheckboxChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      active: e.target.checked
-    }));
-  };
-
-  const handleSubmit = () => {
-    onConfirm(formData);
-  };
+    setSubmitting(false)
+  }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Editar Usuario</DialogTitle>
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-        <TextField
-          label="Nombre"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          fullWidth
-        />
-        <TextField
-          label="Username"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-          fullWidth
-        />
-        <FormControl fullWidth>
-          <InputLabel>Rol</InputLabel>
-          <Select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            label="Rol"
+    <>
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+        <DialogTitle>Editar Usuario</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={getEditUserValidationSchema()}
+            onSubmit={handleSubmit}
+            enableReinitialize
           >
-            <MenuItem value="ADMIN">ADMIN</MenuItem>
-            <MenuItem value="CASHIER">CASHIER</MenuItem>
-            <MenuItem value="MANAGER">MANAGER</MenuItem>
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button variant="contained" onClick={handleSubmit}>
-          Guardar
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+            {({ isValid, dirty, isSubmitting }) => (
+              <Form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <Field name="name" component={TextField} label="Nombre" fullWidth />
+                <Field name="username" component={TextField} label="Username" fullWidth />
+                <Field name="password" component={TextField} label="Password (optional)" fullWidth />
+                <FormControl fullWidth>
+                  <InputLabel>Rol</InputLabel>
+                  <Field name="role" as={Select} label="Rol">
+                    <MenuItem value="ADMIN">ADMIN</MenuItem>
+                    <MenuItem value="CASHIER">CASHIER</MenuItem>
+                    <MenuItem value="WAREHOUSE">WAREHOUSE</MenuItem>
+                  </Field>
+                </FormControl>
+                <DialogActions>
+                  <Button onClick={onClose} disabled={isSubmitting}>Cancelar</Button>
+                  <Button type="submit" variant="contained" disabled={!dirty || !isValid || isSubmitting}>
+                    Guardar
+                  </Button>
+                </DialogActions>
+              </Form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
 
-export default EditUserModal;
+      <Snackbar
+        open={!!snackbar}
+        autoHideDuration={5000}
+        onClose={() => setSnackbar(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert severity={snackbar?.severity}>{snackbar?.message}</Alert>
+      </Snackbar>
+    </>
+  )
+}
+
+export default EditUserModal
