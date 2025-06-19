@@ -5,6 +5,7 @@ import ERROR from '~/Libs/error'
 import cleanerData from '~/app/api/Libs/cleanerData'
 import validatorFields from '~/app/api/Libs/validatorFields'
 import prisma from '~/app/api/Libs/prisma'
+const CLOUDINARY_URL = process.env.CLOUDINARY_URL
 
 export const GET = async request => {
   try {
@@ -30,34 +31,36 @@ export const POST = async request => {
 
     const formData = await request.formData()
     const file = formData.get('file')
-    if (!file) return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
+    if (!file) return ERROR.INVALID_FIELDS()
 
     const data = JSON.parse(formData.get('data'))
-    const isValid = validatorFields({ data, shape: Product.shape })
-    if (!isValid) return ERROR.FORBIDDEN()
 
     const uploadForm = new FormData()
     uploadForm.append('file', file)
     uploadForm.append('upload_preset', 'unsignedV')
     uploadForm.append('cloud_name', 'dhpnfud6f')
 
-    const res = await fetch('https://api.cloudinary.com/v1_1/dhpnfud6f/image/upload', {
+    const res = await fetch(CLOUDINARY_URL, {
       method: 'POST',
       body: uploadForm
-    })
+    })  
     const uploadResult = await res.json()
-    if (!uploadResult.url) return NextResponse.json({ error: 'Image upload failed' }, { status: 500 })
+    if (!uploadResult.url) return ERROR.SERVICE_UNAVAILABLE()
+
+    // Add image URL to data
+    data.image = uploadResult.url
+
+    // Validate after image is present
+    const isValid = validatorFields({ data, shape: Product.shape })
+    if (!isValid) return ERROR.INVALID_FIELDS()
 
     const payload = await prisma.product.create({
-      data: {
-        ...data,
-        image: uploadResult.url
-      }
+      data
     })
     const response = cleanerData({ payload })
     return NextResponse.json(response, { status: 201 })
   } catch (error) {
     console.error('Error in POST /api/product:', error)
-    return NextResponse.json({ error: error.message }, { status: error.status || 500 })
+    return NextResponse.json({ error: error.message }, { status: error.status })
   }
 }

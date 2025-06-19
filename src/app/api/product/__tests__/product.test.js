@@ -57,6 +57,12 @@ vi.mock('~/app/api/Libs/validatorFields', () => ({
   default: ({ data }) => data.name && data.unit && data.price && data.SKU,
 }))
 
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    json: () => Promise.resolve({ url: 'https://cloudinary.com/fake-image.jpg' }),
+  })
+)
+
 describe('API Product - GET', () => {
   it.each([
     {
