@@ -62,6 +62,10 @@ const Container = styled('div')(({ theme }) => ({
     marginLeft: '1rem',
     backgroundColor: theme.palette.contrast.main,
     borderRadius: '2rem',
+    '@media  (max-width: 768px)': {
+      marginTop: '1rem',
+      marginLeft: '0',
+    },
     '& input::placeholder': {
       color: theme.palette.background.main,
       opacity: 0.7
@@ -168,24 +172,23 @@ const ReportsPage = ({
             icon={<ErrorIcon sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
             title="Sorry, an error was ocurred."
             subtitle="Please considerer try again later."
-          /> 
+          />
         )}
         {(!selectedDateSalesday) && (selectedCategory === 'salesday') && (
           <EmptyState
             icon={<CalendarMonthTwoToneIcon sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
             title="Welcome to Sales of the Day."
             subtitle="Please choose a date to start."
-          /> 
+          />
         )}
         {(!selectedDateShrinkage) && (selectedCategory === 'shrinkage') && (
           <EmptyState
             icon={<CalendarMonthTwoToneIcon sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
             title="Welcome to Shrinkage."
             subtitle="Please choose a date to start."
-          /> 
+          />
         )}
       </div>
-    
     </Container>
   )
 }
@@ -208,37 +211,29 @@ const Wrapper = () => {
   const handleSearchChange = event => setSearch(event.target.value)
 
   useEffect(() => {
-    setIsLoading(true)
     const fetchData = async () => {
+      setIsLoading(true)
       const [inventoryData, shrinkageData, salesdayData] = await Promise.all([
         apiFetch({ url: 'api/lot', method: 'GET', token }),
         apiFetch({ url: 'api/inventoryLog?type=SHRINKAGE', method: 'GET', token }),
         apiFetch({ url: 'api/ticket', method: 'GET', token })
       ])
-
-      if (inventoryData.error) {
+      if (inventoryData.error && salesdayData.error && shrinkageData.error ) {
+        const isForbidden = inventoryData.error === 'Not Allowed'
+                            || salesdayData.error === 'Not Allowed'
+                            || shrinkageData.error === 'Not Allowed'
         setError(true)
         setInventory([])
+        setSalesday([])
+        setShrinkage([])
+        setIsLoading(!isForbidden)
       } else {
         setInventory(inventoryData)
-      }
-
-      if (shrinkageData.error) {
-        setError(true)
-        setShrinkage([])
-      } else {
         setShrinkage(shrinkageData)
-      }
-
-      if (salesdayData.error) {
-        setError(true)
-        setSalesday([])
-      } else {
         setSalesday(salesdayData)
+        setError(false)
+        setIsLoading(false)
       }
-      setError(false)
-
-      setIsLoading(false)
     }
 
     fetchData()
