@@ -124,7 +124,7 @@ const Wrapper = ({ onClose, products, setSnackbarMessage, fetchData }) => {
       setSnackbarMessage({ message: 'Error adding the lot', severity: 'error' })
     } else {
       setSnackbarMessage({ message: 'Lot added successfully', severity: 'success' })
-      fetchData({ entity: 'lot' })
+      fetchData()
       onClose()
     }
     setIsLoading(false)
