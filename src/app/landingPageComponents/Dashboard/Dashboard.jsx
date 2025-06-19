@@ -81,7 +81,7 @@ const Dashboard = () => {
     <Container>
       <div className={classes.btnContainer}>
         {usePermitted({ roleRequired: 'CASHIER' }) && (
-          <Link href="/point-of-sale">
+          <Link href="/PointOfSale">
             <IconButton className={classes.btn}>
               <ShoppingCartIcon className={classes.icon} />
               <T variant="h5" className={classes.text}>Point Of Sale</T>

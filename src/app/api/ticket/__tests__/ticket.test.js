@@ -6,20 +6,20 @@ vi.mock('~/app/api/Libs/prisma', () => {
     default: {
       ticket: {
         findMany: () => ([
-          { id: 1, total: 100, userId: 1, products: [], createdAt: 'createdAt', updatedAt: 'updatedAt' },
-          { id: 2, total: 200, userId: 2, products: [], createdAt: 'createdAt', updatedAt: 'updatedAt' }
+          { id: 1, total: 100, userId: 1, products: [], createdAt: new Date('2023-06-15T12:00:00Z'), updatedAt: 'updatedAt' },
+          { id: 2, total: 200, userId: 2, products: [], createdAt: new Date('2023-06-15T12:00:00Z'), updatedAt: 'updatedAt' }
         ]),
         create: ({ data }) => ({
           id: 1,
           ...data,
-          createdAt: 'createdAt',
+          createdAt: new Date('2023-06-15T12:00:00Z'),
           updatedAt: 'updatedAt'
         }),
       },
       lot: {
         findMany: () => ([
-          { id: 1, productId: 1, currentAmount: 10, createdAt: 'createdAt' },
-          { id: 2, productId: 1, currentAmount: 5, createdAt: 'createdAt' }
+          { id: 1, productId: 1, currentAmount: 10, createdAt: new Date('2023-06-15T12:00:00Z') },
+          { id: 2, productId: 1, currentAmount: 5, createdAt: new Date('2023-06-15T12:00:00Z') }
         ]),
         update: ({ where, data }) => ({ ...where, ...data }),
       }
@@ -37,8 +37,8 @@ describe('API Ticket - GET', () => {
       descr: 'Successful response',
       expectedStatus: 200,
       expectedResponse: [
-        { id: 1, total: 100, userId: 1, products: [] },
-        { id: 2, total: 200, userId: 2, products: [] }
+        { id: 1, total: 100, userId: 1, products: [], date: '2023-06-15' },
+        { id: 2, total: 200, userId: 2, products: [], date: '2023-06-15'  }
       ]
     },
     {
