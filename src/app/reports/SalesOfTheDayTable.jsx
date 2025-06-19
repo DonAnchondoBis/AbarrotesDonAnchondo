@@ -43,25 +43,45 @@ const Container = styled(TableContainer)(({ theme }) => ({
 }))
 
 const SalesOfTheDayTable = ({ data = [], date = '' }) => {
-
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const salesDayData = data.filter(item => item?.date === date)
-  const paginatedRows = salesDayData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  const formattedData = Object.values(salesDayData.reduce((acc, item) => {
+    item.products.forEach(productEntry => {
+      const { product, quantityProduct } = productEntry
+      const productName = product.name
+      const productPrice = product.price
+      const subtotal = productPrice * quantityProduct
+      if (acc[productName]) {
+        acc[productName].quantity += quantityProduct
+        acc[productName].subtotal += subtotal
+      } else {
+        acc[productName] = {
+          name: productName,
+          quantity: quantityProduct,
+          price: productPrice,
+          subtotal: subtotal
+        }
+      }
+    })
+    return acc
+  }, {}))
+
+  const paginatedRows = formattedData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 
   const handleChangePage = (_, newPage) => setPage(newPage)
   const handleChangeRowsPerPage = event => {
     setRowsPerPage(parseInt(event.target.value, 10))
     setPage(0)
   }
-  
+
   if (!salesDayData || salesDayData.length === 0) {
     return (
       <EmptyState
         icon={<SentimentDissatisfied sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
         title="No sales found for this date."
         subtitle="Please try selecting another one."
-      /> 
+      />
     )
   }
 
@@ -74,22 +94,17 @@ const SalesOfTheDayTable = ({ data = [], date = '' }) => {
             <TableRow>
               <TableCell align="center">
                 <T color="primary.main" fontWeight="bold">
-                  TICKET #
+                  Product
                 </T>
               </TableCell>
               <TableCell align="center">
                 <T color="primary.main" fontWeight="bold">
-                  Products Sold
+                  Quantity
                 </T>
               </TableCell>
               <TableCell align="center">
                 <T color="primary.main" fontWeight="bold">
-                  Total
-                </T>
-              </TableCell>
-              <TableCell align="center">
-                <T color="primary.main" fontWeight="bold">
-                  Date
+                  Subtotal
                 </T>
               </TableCell>
             </TableRow>
@@ -97,14 +112,9 @@ const SalesOfTheDayTable = ({ data = [], date = '' }) => {
           <TableBody>
             {paginatedRows.map((row, index) => (
               <TableRow key={index}>
-                <TableCell align="center">{row.id}</TableCell>
-                <TableCell align="center">
-                  {row.products.map((p, i) => (
-                    <div key={i}>{p.product.name}</div>
-                  ))}
-                </TableCell>
-                <TableCell align="center">{row.total}</TableCell>
-                <TableCell align="center">{row.date}</TableCell>
+                <TableCell align="center">{row.name}</TableCell>
+                <TableCell align="center">{row.quantity}</TableCell>
+                <TableCell align="center">${row.subtotal}</TableCell>
               </TableRow>
             ))}
           </TableBody>
