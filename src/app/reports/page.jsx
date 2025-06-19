@@ -5,11 +5,15 @@ import {
   OutlinedInput,
   InputAdornment,
   TextField,
-  Typography as T,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import SearchIcon from '@mui/icons-material/Search'
 import getClassPrefixer from '~/app/UI/classPrefixer'
+
+import EmptyState from './EmptyState'
+
+import ErrorIcon from '@mui/icons-material/Error'
+import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone'
 
 import InventoryTable from './InventoryTable'
 import ShrinkageTable from './ShrinkageTable'
@@ -89,7 +93,8 @@ const ReportsPage = ({
   search,
   handleSearchChange,
   shrinkage,
-  isLoading,
+  salesday,
+  inventory,
   selectedDateShrinkage,
   handleDateChangeShrinkage,
   selectedDateSalesday,
@@ -154,31 +159,33 @@ const ReportsPage = ({
           />
         )}
       </div>
-      {isLoading
-        ? (<Loading />)
-        : (
-          <div className={classes.tableContainer}>
-            {selectedCategory === 'inventory' && !error && <InventoryTable search={search} />}
-            {selectedCategory === 'shrinkage' && !error && selectedDateShrinkage && <ShrinkageTable data={shrinkage} date={selectedDateShrinkage} />}
-            {selectedCategory === 'salesday' && !error && selectedDateSalesday && <SalesOfTheDayTable search={search} />}
-            {error && (
-              <T color="error" variant="h6">
-                Sorry there was an error, please try again later.
-              </T>
-            )}
-            {(!selectedDateSalesday) && (selectedCategory === 'salesday') && (
-              <T variant="h6">
-                Select a date, please.
-              </T>
-            )}
-            {(!selectedDateShrinkage) && (selectedCategory === 'shrinkage') && (
-              <T variant="h6">
-                Select a date, please.
-              </T>
-            )}
-          </div>
-        )
-      }
+      <div className={classes.tableContainer}>
+        {selectedCategory === 'inventory' && !error && <InventoryTable data={inventory} search={search} />}
+        {selectedCategory === 'shrinkage' && !error && selectedDateShrinkage && <ShrinkageTable data={shrinkage} date={selectedDateShrinkage} />}
+        {selectedCategory === 'salesday' && !error && selectedDateSalesday && <SalesOfTheDayTable data={salesday} date={selectedDateSalesday} />}
+        {error && (
+          <EmptyState
+            icon={<ErrorIcon sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
+            title="Sorry, an error was ocurred."
+            subtitle="Please considerer try again later."
+          /> 
+        )}
+        {(!selectedDateSalesday) && (selectedCategory === 'salesday') && (
+          <EmptyState
+            icon={<CalendarMonthTwoToneIcon sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
+            title="Welcome to Sales of the Day."
+            subtitle="Please choose a date to start."
+          /> 
+        )}
+        {(!selectedDateShrinkage) && (selectedCategory === 'shrinkage') && (
+          <EmptyState
+            icon={<CalendarMonthTwoToneIcon sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
+            title="Welcome to Shrinkage."
+            subtitle="Please choose a date to start."
+          /> 
+        )}
+      </div>
+    
     </Container>
   )
 }
@@ -189,7 +196,9 @@ const Wrapper = () => {
   const [selectedDateSalesday, setSelectedDateSalesday] = useState(null)
   const [error, setError] = useState(false)
   const [shrinkage, setShrinkage] = useState([])
+  const [salesday, setSalesday] = useState([])
   const [search, setSearch] = useState('')
+  const [inventory, setInventory] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const { token } = useToken()
 
@@ -200,20 +209,43 @@ const Wrapper = () => {
 
   useEffect(() => {
     setIsLoading(true)
-    const getShrinkage = async () => {
-      const response = await apiFetch({ url: 'api/inventoryLog?type=SHRINKAGE', method: 'GET', token })
-      if (response.error && response.error !== 'Not allowed') {
+    const fetchData = async () => {
+      const [inventoryData, shrinkageData, salesdayData] = await Promise.all([
+        apiFetch({ url: 'api/lot', method: 'GET', token }),
+        apiFetch({ url: 'api/inventoryLog?type=SHRINKAGE', method: 'GET', token }),
+        apiFetch({ url: 'api/ticket', method: 'GET', token })
+      ])
+
+      if (inventoryData.error) {
+        setError(true)
+        setInventory([])
+      } else {
+        setInventory(inventoryData)
+      }
+
+      if (shrinkageData.error) {
         setError(true)
         setShrinkage([])
       } else {
-        setError(false)
-        setShrinkage(response)
+        setShrinkage(shrinkageData)
       }
+
+      if (salesdayData.error) {
+        setError(true)
+        setSalesday([])
+      } else {
+        setSalesday(salesdayData)
+      }
+      setError(false)
+
       setIsLoading(false)
     }
-    getShrinkage()
+
+    fetchData()
+
   }, [token])
 
+  if (isLoading) return <Loading />
   return (
     <AuthWrapper Fallback={NotAvailable} roleRequired='ADMIN'>
       <ReportsPage
@@ -222,6 +254,8 @@ const Wrapper = () => {
         search={search}
         handleSearchChange={handleSearchChange}
         shrinkage={shrinkage}
+        salesday={salesday}
+        inventory={inventory}
         isLoading={isLoading}
         error={error}
         selectedDateShrinkage={selectedDateShrinkage}

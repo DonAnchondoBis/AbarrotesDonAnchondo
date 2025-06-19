@@ -71,16 +71,37 @@ export const POST = async request => {
 // Get method for tickets
 export const GET = async request => {
   try {
-    const { role } = authenticateToken(request)
-    if (role != 'ADMIN' && role != 'CASHIER') return ERROR.FORBIDDEN()
+    const { role, userId } = authenticateToken(request) ?? {}
+    const validRoles = ['ADMIN', 'CASHIER']
+    if (!userId || !validRoles.includes(role)) return ERROR.FORBIDDEN()
     const filter = Object.fromEntries(request?.nextUrl?.searchParams ?? '')
     const payloads = await prisma.ticket.findMany({
+      select: {
+        id: true,
+        total: true,
+        createdAt: true,
+        userId: true,
+        products: {
+          include: {
+            product: true
+          },
+        },
+      },
       where: {
         ...(filter)
       }
     })
-    if (payloads.length > 0){
-      const response = payloads.map(payload => cleanerData({ payload }))
+    if (payloads.length > 0) {
+      const processedPayloads = payloads.map(payload => {
+        const year = payload.createdAt.getFullYear()
+        const month = String(payload.createdAt.getMonth() + 1).padStart(2, '0')
+        const day = String(payload.createdAt.getDate()).padStart(2, '0')
+        return {
+          ...payload,
+          date: `${year}-${month}-${day}`,
+        }
+      })
+      const response = processedPayloads.map(payload => cleanerData({ payload }))
       return NextResponse.json(response, { status: 200 })
     }
     return ERROR.NOT_FOUND()

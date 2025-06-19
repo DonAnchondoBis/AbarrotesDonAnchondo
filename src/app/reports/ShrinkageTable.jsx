@@ -16,7 +16,8 @@ import {
 import { styled } from '@mui/material/styles'
 import { useState } from 'react'
 import getClassPrefixer from '~/app/UI/classPrefixer'
-
+import { SentimentDissatisfied } from '@mui/icons-material'
+import EmptyState from './EmptyState'
 
 const displayName = 'ShrinkageTable'
 const classes = getClassPrefixer(displayName)
@@ -51,6 +52,16 @@ const ShrinkageTable = ({ data = [], date = '' }) => {
   const handleChangeRowsPerPage = event => {
     setRowsPerPage(parseInt(event.target.value, 10))
     setPage(0)
+  }
+
+  if (!shrinkageData || shrinkageData.length === 0) {
+    return (
+      <EmptyState
+        icon={<SentimentDissatisfied sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
+        title="No shrinkage found for this date."
+        subtitle="Please try selecting another one."
+      /> 
+    )
   }
 
   return (
