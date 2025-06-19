@@ -11,7 +11,7 @@ export const POST = async request => {
     const { role, userId } = authenticateToken(request) ?? {}
     const data = await request.json()
     const isValid = validatorFields({ data, shape: Supplier.shape })
-    const validRoles = ['ADMIN']
+    const validRoles = ['ADMIN', 'WAREHOUSE']
     if (userId && validRoles.includes(role) && isValid) {
       const payload = await prisma.supplier.create({
         data,
@@ -31,7 +31,7 @@ export const POST = async request => {
 export const GET = async request => {
   try {
     const { role, userId } = authenticateToken(request) ?? {}
-    const validRoles = ['ADMIN']
+    const validRoles = ['ADMIN', 'WAREHOUSE']
     if (!userId || !validRoles.includes(role)) return ERROR.FORBIDDEN()
     const payloads = await prisma.supplier.findMany()
     if (payloads.length > 0) {
