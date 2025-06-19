@@ -102,7 +102,8 @@ const PurchasingPage = ({
   snackbarMessage,
   setSnackbarMessage,
   setOpenModalAddSupplier,
-  openModalAddSupplier
+  openModalAddSupplier,
+  fetchData
 }) => {
   return (
     <Container>
@@ -168,6 +169,7 @@ const PurchasingPage = ({
               onClose={() => setOpenModalAddLot(false)}
               setSnackbarMessage={setSnackbarMessage}
               search={searchLots}
+              fetchData={() => fetchData({ entity: 'lot' })}
             />
           </Modal>
         )
@@ -181,6 +183,7 @@ const PurchasingPage = ({
               onClose={() => setOpenModalAddSupplier(false)}
               setSnackbarMessage={setSnackbarMessage}
               search={searchSuppliers}
+              fetchData={() => fetchData({ entity: 'supplier' })}
             />
           </Modal>
         )
@@ -217,6 +220,21 @@ const Wrapper = () => {
   const handleCategoryChange = (_, newValue) => setSelectedCategory(newValue)
   const handleSearchSuChange = event => setSearchSuppliers(event.target.value)
   const handleSearchLotsChange = event => setSearchLots(event.target.value)
+
+  const fetchData = async ({ entity }) => {
+    setIsLoading(true)
+    const response = await apiFetch({ url: `api/${entity}`, method: 'GET', token })
+    if (response.error) {
+      if (entity === 'supplier') setSuppliers([])
+      if (entity === 'lot') setLots([])
+      if (entity === 'product') setProducts([])
+    } else {
+      if (entity === 'supplier') setSuppliers(response)
+      if (entity === 'lot') setLots(response)
+      if (entity === 'product') setProducts(response)
+    }
+    setIsLoading(false)
+  }
 
   useEffect(() => {
     setIsLoading(true)
@@ -259,6 +277,7 @@ const Wrapper = () => {
         setSnackbarMessage={setSnackbarMessage}
         openModalAddSupplier={openModalAddSupplier}
         setOpenModalAddSupplier={setOpenModalAddSupplier}
+        fetchData={fetchData}
       />
     </AuthWrapper>
   )

@@ -114,7 +114,7 @@ const ModalAddLots = ({ onClose, products = [] }) => {
   )
 }
 
-const Wrapper = ({ onClose, products, setSnackbarMessage }) => {
+const Wrapper = ({ onClose, products, setSnackbarMessage, fetchData }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { token } = useToken()
   const handleSubmit = async values => {
@@ -124,6 +124,7 @@ const Wrapper = ({ onClose, products, setSnackbarMessage }) => {
       setSnackbarMessage({ message: 'Error adding the lot', severity: 'error' })
     } else {
       setSnackbarMessage({ message: 'Lot added successfully', severity: 'success' })
+      fetchData({ entity: 'lot' })
       onClose()
     }
     setIsLoading(false)

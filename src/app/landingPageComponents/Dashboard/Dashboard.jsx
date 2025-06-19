@@ -97,7 +97,7 @@ const Dashboard = () => {
           </Link>
         )}
         {usePermitted({ roleRequired: 'WAREHOUSE' }) && (
-          <Link href="/payments">
+          <Link href="/purchasing">
             <IconButton className={classes.btn}>
               <PaidIcon className={classes.icon} />
               <T variant="h5" className={classes.text}>Purchasing</T>
