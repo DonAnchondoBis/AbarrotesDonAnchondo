@@ -10,7 +10,6 @@ import CloseIcon from '@mui/icons-material/Close'
 import { Formik, Form, Field, useFormikContext } from 'formik'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import TextField from '~/app/UI/Shared/FormikTextField'
-import SelectField from '~/app/UI/Shared/FormikSelect'
 import { getAddSupplierValidationSchema, getAddSupplierInitialValues } from '~/app/purchasing/utils'
 import apiFetch from '~/app/Lib/apiFetch'
 import { useToken } from '~/app/store/useToken'
@@ -26,7 +25,8 @@ const Container = styled('div')(({ theme }) => ({
   alignItems: 'center',
   height: '80vh',
   width: '100vw',
-[`& .${classes.modalContainer}`]: {
+
+  [`& .${classes.modalContainer}`]: {
     width: '40vw',
     '@media (max-width: 768px)': {
       width: '90vw',
@@ -44,8 +44,9 @@ const Container = styled('div')(({ theme }) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '1rem'
+    marginBottom: '1rem',
   },
+
   [`& .${classes.productRow}`]: {
     display: 'flex',
     flexDirection: 'row',
@@ -53,12 +54,13 @@ const Container = styled('div')(({ theme }) => ({
     marginBottom: '1.5rem',
     width: '100%',
   },
+
   [`& .${classes.buttonContainer}`]: {
     display: 'flex',
     justifyContent: 'flex-end',
-    marginTop: '1.5rem'
+    marginTop: '1.5rem',
   },
-}))
+}));
 
 const ModalAddSuppliers = ({ onClose}) => {
   const { isValid, dirty } = useFormikContext()
