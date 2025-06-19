@@ -73,12 +73,14 @@ const Container = styled('div')(({ theme }) => ({
       color: theme.palette.background.main,
     }
   },
-
   [`& .${classes.buttonContainer}`]: {
     display: 'flex',
     justifyContent: 'flex-end',
     width: '100%',
     marginTop: '1rem',
+    color: theme.palette.background.main,
+  },
+  [`& .${classes.button}`]: {
     color: theme.palette.background.main,
   },
   [`& .${classes.tableContainer}`]: {
@@ -134,7 +136,8 @@ const PurchasingPage = ({
             ? (
               <Button
                 variant='contained'
-                color='success'
+                color='green'
+                className={classes.button}
                 disabled={isLoading}
                 onClick={() => setOpenModalAddLot(true)}
               >
@@ -144,7 +147,8 @@ const PurchasingPage = ({
             : (
               <Button
                 variant='contained'
-                color='success'
+                color='green'
+                className={classes.button}
                 disabled={isLoading}
                 onClick={() => setOpenModalAddSupplier(true)}
               >
