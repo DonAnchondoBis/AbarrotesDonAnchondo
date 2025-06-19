@@ -259,7 +259,7 @@ const Wrapper = () => {
   if (isLoading) return <Loading />
 
   return (
-    <AuthWrapper Fallback={NotAvailable} roleRequired='WAREHOUSE'>
+<AuthWrapper Fallback={<NotAvailable />} roleRequired='WAREHOUSE'>
       <PurchasingPage
         selectedCategory={selectedCategory}
         handleCategoryChange={handleCategoryChange}

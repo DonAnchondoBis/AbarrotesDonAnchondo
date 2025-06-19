@@ -12,4 +12,4 @@ const AuthWrapper = ({ children, Fallback, roleRequired = 'ADMIN' }) => {
   return <Fallback/>
 }
 
-export default AuthWrapper
+export default AuthWrapper
