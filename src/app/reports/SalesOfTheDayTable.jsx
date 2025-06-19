@@ -10,13 +10,13 @@ import {
   Typography as T,
   TablePagination,
   TableContainer,
-  Button
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useState } from 'react'
 import getClassPrefixer from '../UI/classPrefixer'
 import { SentimentDissatisfied } from '@mui/icons-material'
 import EmptyState from './EmptyState'
+import { ReportButton } from './ReportButton'
 
 const displayName = 'SalesOfTheDayTable'
 const classes = getClassPrefixer(displayName)
@@ -46,12 +46,13 @@ const SalesOfTheDayTable = ({ data = [], date = '' }) => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const salesDayData = data.filter(item => item?.date === date)
-  const formattedData = Object.values(salesDayData.reduce((acc, item) => {
+  const { total = '0', ...formattedData } = salesDayData.reduce((acc, item) => {
     item.products.forEach(productEntry => {
       const { product, quantityProduct } = productEntry
       const productName = product.name
       const productPrice = product.price
       const subtotal = productPrice * quantityProduct
+      acc.total = acc.total ? acc.total + subtotal : subtotal
       if (acc[productName]) {
         acc[productName].quantity += quantityProduct
         acc[productName].subtotal += subtotal
@@ -65,9 +66,9 @@ const SalesOfTheDayTable = ({ data = [], date = '' }) => {
       }
     })
     return acc
-  }, {}))
+  }, {})
 
-  const paginatedRows = formattedData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  const paginatedRows = Object.values(formattedData ?? {}).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 
   const handleChangePage = (_, newPage) => setPage(newPage)
   const handleChangeRowsPerPage = event => {
@@ -117,6 +118,18 @@ const SalesOfTheDayTable = ({ data = [], date = '' }) => {
                 <TableCell align="center">${row.subtotal}</TableCell>
               </TableRow>
             ))}
+            <TableRow key="total">
+              <TableCell align="right" colSpan={2}>
+                <T color="primary.main" fontWeight="bold">
+                  Total:
+                </T>
+              </TableCell>
+              <TableCell align="center">
+                <T color="green.main" fontWeight="bold">
+                  ${total}
+                </T>
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
         <TablePagination
@@ -131,10 +144,7 @@ const SalesOfTheDayTable = ({ data = [], date = '' }) => {
         />
       </TableContainer>
       <div className={classes.buttonContainer}>
-        {/* TODO: Dani's button to generate reports need to be there */}
-        <Button variant='contained' color='green' onClick={() => {}} >
-          Generate Report
-        </Button>
+        <ReportButton category="salesOfTheDay" data={data} />
       </div>
     </Container>
   )

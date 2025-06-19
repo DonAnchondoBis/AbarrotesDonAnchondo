@@ -40,21 +40,19 @@ const Container = styled(TableContainer)(({ theme }) => ({
 }))
 
 const InventoryTable = ({ data = [], search = '' }) => {
-
   const filteredData = data?.filter(item => {
     const searchLower = search?.toLowerCase()
     return (
       item?.product?.name?.toLowerCase().includes(searchLower)
     )
-  }) 
-
+  })
   const formattedData = filteredData.reduce((acc, product) => {
     return {
       ...acc,
       [product.product.name]: {
         name: product.product.name,
         currentAmount: acc[product.product.name]?.currentAmount + product.currentAmount || product.currentAmount,
-        expirationDate: new Date(acc[product.product.name]?.expirationDate) > new Date(product.product.expirationDate)? product.product.expirationDate : acc[product.product.name]?.expirationDate
+        expirationDate: new Date(acc[product.product.name]?.expirationDate ?? '2999-01-01') > new Date(product.expirationDate) ? product.expirationDate : acc[product.product.name]?.expirationDate
       }
     }
   }, {})
@@ -72,7 +70,6 @@ const InventoryTable = ({ data = [], search = '' }) => {
     setRowsPerPage(parseInt(event.target.value, 10))
     setPage(0)
   }
-  
   if (!inventoryData || inventoryData.length === 0) {
     return (
       <EmptyState
@@ -95,6 +92,9 @@ const InventoryTable = ({ data = [], search = '' }) => {
               <TableCell align="center">
                 <Typography color="primary.main" fontWeight="bold">Amount</Typography>
               </TableCell>
+              <TableCell align="center">
+                <Typography color="primary.main" fontWeight="bold">Expires sooner</Typography>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -102,6 +102,9 @@ const InventoryTable = ({ data = [], search = '' }) => {
               <TableRow key={index}>
                 <TableCell align="center">{row.name}</TableCell>
                 <TableCell align="center">{row.currentAmount}</TableCell>
+                <TableCell align="center">
+                  {row.expirationDate ?? 'No expiration date'}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -11,13 +11,13 @@ import {
   TablePagination,
   TableContainer,
   Tooltip,
-  Button,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useState } from 'react'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import { SentimentDissatisfied } from '@mui/icons-material'
 import EmptyState from './EmptyState'
+import { ReportButton } from './ReportButton'
 
 const displayName = 'ShrinkageTable'
 const classes = getClassPrefixer(displayName)
@@ -139,10 +139,7 @@ const ShrinkageTable = ({ data = [], date = '' }) => {
         />
       </TableContainer>
       <div className={classes.buttonContainer}>
-        {/* TODO ADD Dani's function to generate reports */}
-        <Button variant='contained' color='green' onClick={() => {}} >
-          Generate Report
-        </Button>
+        <ReportButton category="shrinkage" data={data} />
       </div>
     </Container>
   )
