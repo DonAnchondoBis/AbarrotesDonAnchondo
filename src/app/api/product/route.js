@@ -9,7 +9,7 @@ const CLOUDINARY_URL = process.env.CLOUDINARY_URL
 
 export const GET = async request => {
   try {
-    const { role = null, userId } = authenticateToken(request) ?? {}
+    const { role, userId } = authenticateToken(request) ?? {}
 
     if (!['ADMIN', 'WAREHOUSE', 'CASHIER'].includes(role) || !userId) return ERROR.FORBIDDEN()
 
@@ -19,14 +19,13 @@ export const GET = async request => {
     const response = products.map(product => cleanerData({ payload: product }))
     return NextResponse.json(response, { status: 200 })
   } catch (error) {
-    console.error('Error in GET /api/product:', error)
     return NextResponse.json({ error: error.message }, { status: error.status || 500 })
   }
 }
 
 export const POST = async request => {
   try {
-    const { role = null, userId } = authenticateToken(request) ?? {}
+    const { role, userId } = authenticateToken(request) ?? {}
     if (!['ADMIN', 'WAREHOUSE'].includes(role) || !userId) return ERROR.FORBIDDEN()
 
     const formData = await request.formData()
@@ -34,6 +33,9 @@ export const POST = async request => {
     if (!file) return ERROR.INVALID_FIELDS()
 
     const data = JSON.parse(formData.get('data'))
+
+    const isValid = validatorFields({ data, shape: Product.shape })
+    if (!isValid) return ERROR.INVALID_FIELDS()
 
     const uploadForm = new FormData()
     uploadForm.append('file', file)
@@ -43,24 +45,19 @@ export const POST = async request => {
     const res = await fetch(CLOUDINARY_URL, {
       method: 'POST',
       body: uploadForm
-    })  
-    const uploadResult = await res.json()
-    if (!uploadResult.url) return ERROR.SERVICE_UNAVAILABLE()
-
-    // Add image URL to data
-    data.image = uploadResult.url
-
-    // Validate after image is present
-    const isValid = validatorFields({ data, shape: Product.shape })
-    if (!isValid) return ERROR.INVALID_FIELDS()
+    })
+    const { url } = await res.json()
+    if (!url) return ERROR.SERVICE_UNAVAILABLE()
 
     const payload = await prisma.product.create({
-      data
+      data: {
+        imageUrl: url,
+        ...data,
+      }
     })
     const response = cleanerData({ payload })
     return NextResponse.json(response, { status: 201 })
   } catch (error) {
-    console.error('Error in POST /api/product:', error)
-    return NextResponse.json({ error: error.message }, { status: error.status })
+    return NextResponse.json({ error: error.message }, { status: error.status || 500 })
   }
 }
