@@ -108,7 +108,6 @@ jobs:
   backup-database:
     name: Backup Neon DB to Repo
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
