@@ -2,10 +2,9 @@ name: Backup Neon DB every 5 minutes
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Cada 5 minutos (en UTC)
+    - cron: '*/5 * * * *'  # Cada 5 minutos (UTC)
+  workflow_dispatch:
   push:
-  pull_request:
-  workflow_dispatch:       # Permite ejecutarlo manualmente desde GitHub
 
 jobs:
   backup:
@@ -15,8 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install PostgreSQL client
-        run: sudo apt-get install -y postgresql-client
+      - name: Add PostgreSQL APT repository (for version 17)
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          sudo apt-get update
+
+      - name: Install PostgreSQL client 17
+        run: sudo apt-get install -y postgresql-client-17
 
       - name: Dump database
         env:
@@ -26,7 +31,7 @@ jobs:
           PGHOST: ${{ secrets.PGHOST }}
         run: |
           echo "Dumping database..."
-          pg_dump -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" -F c -f "backup.dump"
+          /usr/lib/postgresql/17/bin/pg_dump -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" -F c -f "backup.dump"
 
       - name: Upload dump as artifact
         uses: actions/upload-artifact@v4
