@@ -1,10 +1,14 @@
 name: CI
+
 on:
   push:
   pull_request:
+  schedule:
+    - cron: '0 3 * * *'  # Ejecuta el backup todos los días a las 3am UTC
+  workflow_dispatch:     # Permite ejecutar manualmente el workflow
 
 jobs:
-  #EsLint
+  # EsLint
   lint-project:
     name: Lint
     runs-on: ubuntu-latest
@@ -16,7 +20,7 @@ jobs:
       - name: Run eslint
         run: npm run lint
 
-  #BUILD
+  # Build
   build-project:
     name: Build
     runs-on: ubuntu-latest
@@ -31,7 +35,7 @@ jobs:
       - name: Build project
         run: npm run build
 
-  #VITEST
+  # Vitest
   test-vitest:
     name: Test with Coverage
     runs-on: ubuntu-latest
@@ -99,3 +103,44 @@ jobs:
         run: npm install -g vercel
       - name: Deploy to Vercel
         run: vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
+
+  # Backup Neon DB
+  backup-database:
+    name: Backup Neon DB to Repo
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Parse Neon DB URL and Dump
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          regex="postgres://([^:]+):([^@]+)@([^/]+)/(.+)"
+          if [[ $DATABASE_URL =~ $regex ]]; then
+            PGUSER="${BASH_REMATCH[1]}"
+            PGPASSWORD="${BASH_REMATCH[2]}"
+            PGHOST="${BASH_REMATCH[3]}"
+            PGDATABASE="${BASH_REMATCH[4]}"
+          else
+            echo "Error: no se pudo interpretar DATABASE_URL"
+            exit 1
+          fi
+
+          export PGPASSWORD
+
+          TIMESTAMP=$(date +%F_%H-%M)
+          mkdir -p backups
+          pg_dump -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" > "backups/backup_$TIMESTAMP.sql"
+
+      - name: Commit and push backup
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add backups/
+          git commit -m "Backup on $(date +%F_%H-%M)" || echo "Nothing to commit"
+          git push
