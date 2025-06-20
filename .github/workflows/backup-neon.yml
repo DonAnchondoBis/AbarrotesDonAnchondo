@@ -1,0 +1,47 @@
+name: Backup Neon DB to Repo
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Diario a las 3am UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Parse Neon DB URL and Dump
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          # Extraer partes de la URL con Bash
+          regex="postgres://([^:]+):([^@]+)@([^/]+)/(.+)"
+          if [[ $DATABASE_URL =~ $regex ]]; then
+            PGUSER="${BASH_REMATCH[1]}"
+            PGPASSWORD="${BASH_REMATCH[2]}"
+            PGHOST="${BASH_REMATCH[3]}"
+            PGDATABASE="${BASH_REMATCH[4]}"
+          else
+            echo "Error: no se pudo interpretar DATABASE_URL"
+            exit 1
+          fi
+
+          export PGPASSWORD
+
+          TIMESTAMP=$(date +%F_%H-%M)
+          mkdir -p backups
+          pg_dump -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" > "backups/backup_$TIMESTAMP.sql"
+
+      - name: Commit and push backup
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add backups/
+          git commit -m "Backup on $(date +%F_%H-%M)" || echo "Nothing to commit"
+          git push
