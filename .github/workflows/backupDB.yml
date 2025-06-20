@@ -1,0 +1,37 @@
+name: Backup Neon DB every 5 minutes
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Cada 5 minutos (en UTC)
+  workflow_dispatch:       # Permite ejecutarlo manualmente desde GitHub
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get install -y postgresql-client
+
+      - name: Parse connection string and dump DB
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "Parsing connection string..."
+          PGPASSWORD=$(echo "$DATABASE_URL" | sed -E 's/.*:([^@]*)@.*/\1/')
+          PGHOST=$(echo "$DATABASE_URL" | sed -E 's/.*@([^:]*):.*/\1/')
+          PGUSER=$(echo "$DATABASE_URL" | sed -E 's/postgresql:\/\/([^:]*):.*/\1/')
+          PGDATABASE=$(echo "$DATABASE_URL" | sed -E 's/.*\/([^?]*)\??.*/\1/')
+
+          echo "Dumping database..."
+          export PGPASSWORD
+          pg_dump -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" -F c -f "backup.dump"
+
+      - name: Upload dump as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: neon-db-backup-${{ github.run_id }}
+          path: backup.dump
