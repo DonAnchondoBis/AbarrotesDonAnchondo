@@ -3,6 +3,8 @@ name: Backup Neon DB every 5 minutes
 on:
   schedule:
     - cron: '*/5 * * * *'  # Cada 5 minutos (en UTC)
+  push:
+  pull_request:
   workflow_dispatch:       # Permite ejecutarlo manualmente desde GitHub
 
 jobs:
