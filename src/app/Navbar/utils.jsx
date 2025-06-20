@@ -9,7 +9,7 @@ import usePermitted from '~/app/Lib/Permissions/utils'
 export const useSideBarOpts = () => ([
   {
     title: 'Point of Sale',
-    path: '/point-of-sale',
+    path: '/pointOfSale',
     Icon: props => <ShoppingCartIcon {...props} />,
     status: (usePermitted({ roleRequired: 'CASHIER' }) ? 'available' : 'unavailable')
   },
