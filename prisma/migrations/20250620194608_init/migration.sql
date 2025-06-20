@@ -10,7 +10,7 @@ CREATE TYPE "Unit" AS ENUM ('KG', 'PIECE');
 -- CreateTable
 CREATE TABLE "InventoryLog" (
     "id" SERIAL NOT NULL,
-    "productName" INTEGER NOT NULL,
+    "productName" TEXT NOT NULL,
     "amount" INTEGER NOT NULL,
     "description" TEXT NOT NULL,
     "expirationDate" TEXT NOT NULL,
@@ -29,7 +29,6 @@ CREATE TABLE "Lot" (
     "initialAmount" INTEGER NOT NULL,
     "currentAmount" INTEGER NOT NULL,
     "expirationDate" TEXT NOT NULL,
-    "status" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -43,6 +42,7 @@ CREATE TABLE "Product" (
     "unit" "Unit" NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "SKU" TEXT NOT NULL,
+    "imageUrl" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -91,12 +91,10 @@ CREATE TABLE "Ticket" (
 -- CreateTable
 CREATE TABLE "TicketProduct" (
     "id" SERIAL NOT NULL,
-    "tickId" INTEGER NOT NULL,
     "quantityProduct" INTEGER NOT NULL,
     "productId" INTEGER NOT NULL,
     "ticketId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "TicketProduct_pkey" PRIMARY KEY ("id")
 );
@@ -116,7 +114,13 @@ CREATE TABLE "User" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Product_SKU_key" ON "Product"("SKU");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Product_imageUrl_key" ON "Product"("imageUrl");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
@@ -131,4 +135,4 @@ ALTER TABLE "Lot" ADD CONSTRAINT "Lot_productId_fkey" FOREIGN KEY ("productId") 
 ALTER TABLE "TicketProduct" ADD CONSTRAINT "TicketProduct_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TicketProduct" ADD CONSTRAINT "TicketProduct_tickId_fkey" FOREIGN KEY ("tickId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TicketProduct" ADD CONSTRAINT "TicketProduct_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
