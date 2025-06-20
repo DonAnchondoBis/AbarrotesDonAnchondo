@@ -1,8 +1,8 @@
-name: Backup Neon DB every 5 minutes
+name: Backup Neon DB Daily
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Cada 5 minutos (UTC)
+    - cron: '0 4 * * *'  # Cada día a las 4:00 AM (UTC)
   workflow_dispatch:
   push:
 
