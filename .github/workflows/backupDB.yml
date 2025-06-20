@@ -18,18 +18,14 @@ jobs:
       - name: Install PostgreSQL client
         run: sudo apt-get install -y postgresql-client
 
-      - name: Parse connection string and dump DB
+      - name: Dump database
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PGUSER: ${{ secrets.PGUSER }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+          PGDATABASE: ${{ secrets.PGDATABASE }}
+          PGHOST: ${{ secrets.PGHOST }}
         run: |
-          echo "Parsing connection string..."
-          PGPASSWORD=$(echo "$DATABASE_URL" | sed -E 's/.*:([^@]*)@.*/\1/')
-          PGHOST=$(echo "$DATABASE_URL" | sed -E 's/.*@([^:]*):.*/\1/')
-          PGUSER=$(echo "$DATABASE_URL" | sed -E 's/postgresql:\/\/([^:]*):.*/\1/')
-          PGDATABASE=$(echo "$DATABASE_URL" | sed -E 's/.*\/([^?]*)\??.*/\1/')
-
           echo "Dumping database..."
-          export PGPASSWORD
           pg_dump -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" -F c -f "backup.dump"
 
       - name: Upload dump as artifact
