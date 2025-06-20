@@ -1,0 +1,40 @@
+name: Backup Neon DB Daily
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # Cada día a las 4:00 AM (UTC)
+  workflow_dispatch:
+  push:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Add PostgreSQL APT repository (for version 17)
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          sudo apt-get update
+
+      - name: Install PostgreSQL client 17
+        run: sudo apt-get install -y postgresql-client-17
+
+      - name: Dump database
+        env:
+          PGUSER: ${{ secrets.PGUSER }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+          PGDATABASE: ${{ secrets.PGDATABASE }}
+          PGHOST: ${{ secrets.PGHOST }}
+        run: |
+          echo "Dumping database..."
+          /usr/lib/postgresql/17/bin/pg_dump -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" -F c -f "backup.dump"
+
+      - name: Upload dump as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: neon-db-backup-${{ github.run_id }}
+          path: backup.dump
