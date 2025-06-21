@@ -246,10 +246,14 @@ const Wrapper = () => {
       const responseSuppliers = await apiFetch({ url: 'api/supplier', method: 'GET', token })
       const responseLots = await apiFetch({ url: 'api/lot', method: 'GET', token })
       const responseProducts = await apiFetch({ url: 'api/product', method: 'GET', token })
-      if (responseSuppliers.error && responseLots.error && responseProducts.error) {
+      if (responseSuppliers.error || responseLots.error || responseProducts.error) {
+        const isForbidden = responseSuppliers.error === 'Not Allowed'
+                            && responseLots.error === 'Not Allowed'
+                            && responseProducts.error === 'Not Allowed'
         setSuppliers([])
         setLots([])
         setProducts([])
+        setIsLoading(isForbidden)
       } else {
         setSuppliers(responseSuppliers)
         setLots(responseLots)
