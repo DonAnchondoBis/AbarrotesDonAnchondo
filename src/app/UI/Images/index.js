@@ -1,4 +1,5 @@
 export const brownLogo = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v1749072096/logoCafe_fibumk.png'
 export const whiteLogo = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v1749072101/logoBlanco_gcxiri.png'
 export const forbidden = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v1749071759/403_Error_Forbidden-amico_winhhy.svg'
+export const notFound = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v1750360875/404_Error_with_a_cute_animal-bro_cmefzm.svg'
 export const favIcon = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v1749055475/1024_1_nlqmvp.png'
