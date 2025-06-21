@@ -1,3 +1,4 @@
+'use client'
 import {
   Table,
   TableBody,
@@ -18,7 +19,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   borderRadius: '1rem',
 }))
 
-const LotsTable = ({ search, lots = [] }) => {
+const LotsTable = ({ search = '', lots = [] }) => {
   const filteredData = lots?.filter(item => item.product.name.toLowerCase().includes(search.toLowerCase()))
 
   const [page, setPage] = useState(0)

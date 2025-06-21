@@ -218,15 +218,15 @@ const Wrapper = () => {
         apiFetch({ url: 'api/inventoryLog?type=SHRINKAGE', method: 'GET', token }),
         apiFetch({ url: 'api/ticket', method: 'GET', token })
       ])
-      if (inventoryData.error && salesdayData.error && shrinkageData.error ) {
+      if (inventoryData.error || salesdayData.error || shrinkageData.error ) {
         const isForbidden = inventoryData.error === 'Not Allowed'
                             || salesdayData.error === 'Not Allowed'
                             || shrinkageData.error === 'Not Allowed'
-        setError(true)
+        setError(isForbidden)
         setInventory([])
         setSalesday([])
         setShrinkage([])
-        setIsLoading(!isForbidden)
+        setIsLoading(isForbidden)
       } else {
         setInventory(inventoryData)
         setShrinkage(shrinkageData)
@@ -235,7 +235,6 @@ const Wrapper = () => {
         setIsLoading(false)
       }
     }
-
     fetchData()
 
   }, [token])
