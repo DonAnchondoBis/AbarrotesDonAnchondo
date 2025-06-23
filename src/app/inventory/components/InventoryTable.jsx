@@ -30,7 +30,7 @@ const Container = styled(TableContainer)(({ theme }) => ({
   },
 }))
 
-const InventoryTable = ({ data = [], search = '', onEdit }) => {
+const InventoryTable = ({ data = [], search = '', onEdit, onDelete, onWaste, onAdjust }) => {
   const filteredData = Array.isArray(data)
     ? data.filter(item => {
         const searchLower = search?.toLowerCase()
@@ -66,6 +66,21 @@ const InventoryTable = ({ data = [], search = '', onEdit }) => {
 
   const handleEdit = () => {
     if (onEdit && selectedRow) onEdit(selectedRow)
+    handleCloseMenu()
+  }
+
+  const handleDelete = () => {
+    if (onDelete && selectedRow) onDelete(selectedRow)
+    handleCloseMenu()
+  }
+
+  const handleWaste = () => {
+    if (onWaste && selectedRow) onWaste(selectedRow)
+    handleCloseMenu()
+  }
+
+  const handleAdjust = () => {
+    if (onAdjust && selectedRow) onAdjust(selectedRow)
     handleCloseMenu()
   }
 
@@ -124,9 +139,9 @@ const InventoryTable = ({ data = [], search = '', onEdit }) => {
           onClose={handleCloseMenu}
         >
           <MenuItem onClick={handleEdit}>Edit</MenuItem>
-          <MenuItem disabled>Delete</MenuItem>
-          <MenuItem disabled>Register Waste</MenuItem>
-          <MenuItem disabled>Adjust Inventory</MenuItem>
+          <MenuItem onClick={handleDelete}>Delete</MenuItem>
+          <MenuItem onClick={handleWaste}>Register Waste</MenuItem>
+          <MenuItem onClick={handleAdjust}>Adjust Inventory</MenuItem>
         </Menu>
       </TableContainer>
     </Container>

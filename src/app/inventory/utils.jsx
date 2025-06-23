@@ -20,3 +20,15 @@ export const getAddProductInitialValues = () => ({
   stock: '',
   price: ''
 })
+
+export const getAdjustmentValidationSchema = () =>
+  Yup.object({
+    stock: Yup.number()
+      .required('Stock is required')
+      .min(0, 'Stock must be 0 or greater')
+      .integer('Stock must be a whole number')
+  })
+
+export const getAdjustmentInitialValues = (initialStock = '') => ({
+  stock: initialStock
+})

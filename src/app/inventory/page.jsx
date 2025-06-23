@@ -2,7 +2,9 @@
 
 import {
   OutlinedInput,
-  InputAdornment
+  InputAdornment,
+  Tabs,
+  Tab
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import SearchIcon from '@mui/icons-material/Search'
@@ -11,6 +13,13 @@ import { useState } from 'react'
 import InventoryTable from './components/InventoryTable'
 import AddProductButton from './components/AddProductButton'
 import EditProductModal from './components/EditProductModal'
+import DeleteProductModal from './components/DeleteProductModal'
+import WasteModal from './components/WasteModal'
+import AdjustmentModal from './components/AdjustmentModal'
+import getClassPrefixer from '~/app/UI/classPrefixer'
+
+const displayName = 'InventoryPage'
+const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -22,15 +31,19 @@ const Container = styled('div')(({ theme }) => ({
   '@media (max-width: 768px)': {
     padding: '1rem 2rem',
   },
-  '& .toolbar': {
+  [`& .${classes.toolbar}`]: {
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
     flexWrap: 'wrap',
-    gap: 0
+    gap: '1rem'
   },
-  '& .searchInput': {
+  [`& .${classes.searchGroup}`]: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  [`& .${classes.searchInput}`]: {
     minWidth: '150px',
     backgroundColor: theme.palette.contrast.main,
     borderRadius: '2rem',
@@ -43,8 +56,9 @@ const Container = styled('div')(({ theme }) => ({
       color: theme.palette.background.main,
     }
   },
-  '& .tableContainer': {
+  [`& .${classes.tableContainer}`]: {
     width: '100%',
+    marginTop: '-0.5rem',
   },
 }))
 
@@ -52,39 +66,102 @@ const InventoryPage = () => {
   const [search, setSearch] = useState('')
   const [inventory, setInventory] = useState([])
   const [modalOpen, setModalOpen] = useState(false)
+  const [tab, setTab] = useState('inventory')
+  const [editProduct, setEditProduct] = useState(null)
+  const [deleteProduct, setDeleteProduct] = useState(null)
+  const [wasteProduct, setWasteProduct] = useState(null)
+  const [adjustProduct, setAdjustProduct] = useState(null)
 
   const handleAddProduct = (newProduct) => {
     setInventory(prev => [...prev, newProduct])
     setModalOpen(false)
   }
 
+  const handleUpdateProduct = (updatedProduct) => {
+    setInventory(prev => prev.map(p => p.sku === updatedProduct.sku ? updatedProduct : p))
+    setEditProduct(null)
+  }
+
+  const handleDeleteProduct = () => {
+    setInventory(prev => prev.filter(p => p.sku !== deleteProduct.sku))
+    setDeleteProduct(null)
+  }
+
+  const handleAdjustStock = (newStock) => {
+    setInventory(prev => prev.map(p => p.sku === adjustProduct.sku ? { ...p, stock: newStock } : p))
+    setAdjustProduct(null)
+  }
+
   return (
     <Container>
-      <div className="toolbar">
-        <OutlinedInput
-          className="searchInput"
-          placeholder="Search by name"
-          size="small"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon color="background" />
-            </InputAdornment>
-          }
-        />
-        <AddProductButton onClick={() => setModalOpen(true)} />
+      <div className={classes.toolbar}>
+        <Tabs
+          value={tab}
+          onChange={(_, newValue) => setTab(newValue)}
+          indicatorColor="primary"
+          textColor="primary"
+        >
+          <Tab label="Inventory" value="inventory" />
+        </Tabs>
+        <div className={classes.searchGroup}>
+          <OutlinedInput
+            className={classes.searchInput}
+            placeholder="Search by name"
+            size="small"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon color="background" />
+              </InputAdornment>
+            }
+          />
+          <AddProductButton onClick={() => setModalOpen(true)} />
+        </div>
       </div>
 
-      <div className="tableContainer">
-        <InventoryTable data={inventory} search={search} />
+      <div className={classes.tableContainer}>
+        <InventoryTable
+          data={inventory}
+          search={search}
+          onEdit={setEditProduct}
+          onDelete={setDeleteProduct}
+          onWaste={setWasteProduct}
+          onAdjust={setAdjustProduct}
+        />
       </div>
 
       <EditProductModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        isNew={true}
-        onSave={handleAddProduct}
+        open={modalOpen || Boolean(editProduct)}
+        onClose={() => {
+          setModalOpen(false)
+          setEditProduct(null)
+        }}
+        isNew={!editProduct}
+        product={editProduct}
+        onSave={editProduct ? handleUpdateProduct : handleAddProduct}
+      />
+
+      <DeleteProductModal
+        open={Boolean(deleteProduct)}
+        onClose={() => setDeleteProduct(null)}
+        onDelete={handleDeleteProduct}
+      />
+
+      <WasteModal
+        open={Boolean(wasteProduct)}
+        onClose={() => setWasteProduct(null)}
+        onRegister={(waste) => {
+          console.log('Waste registered:', waste)
+          setWasteProduct(null)
+        }}
+      />
+
+      <AdjustmentModal
+        open={Boolean(adjustProduct)}
+        onClose={() => setAdjustProduct(null)}
+        product={adjustProduct}
+        onAdjust={handleAdjustStock}
       />
     </Container>
   )
