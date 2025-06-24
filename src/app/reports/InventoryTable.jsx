@@ -12,7 +12,7 @@ import {
 import { styled } from '@mui/material/styles'
 import { useState } from 'react'
 import getClassPrefixer from '~/app/UI/classPrefixer'
-import EmptyState from './EmptyState'
+import EmptyState from '../UI/Shared/EmptyState'
 import { SentimentDissatisfied } from '@mui/icons-material'
 import { ReportButton } from './ReportButton'
 

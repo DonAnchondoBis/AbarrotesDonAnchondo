@@ -13,11 +13,14 @@ import { styled } from '@mui/material/styles'
 import SearchIcon from '@mui/icons-material/Search'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 
+import { SentimentDissatisfied } from '@mui/icons-material'
+
 import LotsTable from './LotsTable'
 import SuppliersTable from './SuppliersTable'
-import ModalAddLot from '~/app/purchasing/ModalAddLot'
-import ModalAddSupplier from '~/app/purchasing/ModalAddSupplier'
+import ModalAddLot from '~/app/acquisitions/ModalAddLot'
+import ModalAddSupplier from '~/app/acquisitions/ModalAddSupplier'
 import NotAvailable from '~/app/UI/Shared/NotAvailable'
+import EmptyState from '~/app/UI/Shared/EmptyState'
 
 import { useState, useEffect } from 'react'
 
@@ -26,7 +29,7 @@ import { useToken } from '~/app/store/useToken'
 import Loading from '~/app/UI/Shared/Loading'
 import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
 
-const displayName = 'purchasingPage'
+const displayName = 'acquisitionsPage'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
@@ -88,7 +91,7 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-const PurchasingPage = ({
+const AcquisitionsPage = ({
   selectedCategory,
   handleCategoryChange,
   searchLots,
@@ -159,7 +162,17 @@ const PurchasingPage = ({
         </div>
       </div>
       <div className={classes.tableContainer}>
-        {selectedCategory === 'lots' && <LotsTable search={searchLots} lots={lots} />}
+        {selectedCategory === 'lots'
+        && (
+          lots.length === 0 && !isLoading
+            ? <EmptyState
+              icon={<SentimentDissatisfied sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
+              title="No Lots Data"
+              description="There are no lots available."
+            />
+            : (<LotsTable search={searchLots} lots={lots} />)
+        )
+        }
         {selectedCategory === 'suppliers' && <SuppliersTable search={searchSuppliers} suppliers={suppliers} />}
       </div>
       { selectedCategory === 'lots'
@@ -246,20 +259,13 @@ const Wrapper = () => {
       const responseSuppliers = await apiFetch({ url: 'api/supplier', method: 'GET', token })
       const responseLots = await apiFetch({ url: 'api/lot', method: 'GET', token })
       const responseProducts = await apiFetch({ url: 'api/product', method: 'GET', token })
-      if (responseSuppliers.error || responseLots.error || responseProducts.error) {
-        const isForbidden = responseSuppliers.error === 'Not Allowed'
-                            && responseLots.error === 'Not Allowed'
-                            && responseProducts.error === 'Not Allowed'
-        setSuppliers([])
-        setLots([])
-        setProducts([])
-        setIsLoading(isForbidden)
-      } else {
-        setSuppliers(responseSuppliers)
-        setLots(responseLots)
-        setProducts(responseProducts)
-      }
-      setIsLoading(false)
+      const isForbidden = responseSuppliers.error === 'Not Allowed' || responseLots.error === 'Not Allowed' || responseProducts.error === 'Not Allowed'
+
+
+      setSuppliers(responseSuppliers?.error ? [] : responseSuppliers)
+      setLots(responseLots?.error ? [] : responseLots)
+      setProducts(responseProducts?.error ? [] : responseProducts)
+      setIsLoading(isForbidden)
     }
     getLotsSupppliersAndProducts()
   }, [token])
@@ -268,7 +274,7 @@ const Wrapper = () => {
 
   return (
     <AuthWrapper Fallback={NotAvailable} roleRequired='WAREHOUSE'>
-      <PurchasingPage
+      <AcquisitionsPage
         selectedCategory={selectedCategory}
         handleCategoryChange={handleCategoryChange}
         searchLots={searchLots}

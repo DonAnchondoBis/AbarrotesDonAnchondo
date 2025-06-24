@@ -10,7 +10,7 @@ import { styled } from '@mui/material/styles'
 import SearchIcon from '@mui/icons-material/Search'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 
-import EmptyState from './EmptyState'
+import EmptyState from '~/app/UI/Shared/EmptyState'
 
 import ErrorIcon from '@mui/icons-material/Error'
 import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone'

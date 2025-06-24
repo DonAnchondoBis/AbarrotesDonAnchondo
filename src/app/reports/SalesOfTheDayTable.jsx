@@ -15,7 +15,7 @@ import { styled } from '@mui/material/styles'
 import { useState } from 'react'
 import getClassPrefixer from '../UI/classPrefixer'
 import { SentimentDissatisfied } from '@mui/icons-material'
-import EmptyState from './EmptyState'
+import EmptyState from '../UI/Shared/EmptyState'
 import { ReportButton } from './ReportButton'
 
 const displayName = 'SalesOfTheDayTable'
