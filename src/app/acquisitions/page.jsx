@@ -15,8 +15,8 @@ import getClassPrefixer from '~/app/UI/classPrefixer'
 
 import LotsTable from './LotsTable'
 import SuppliersTable from './SuppliersTable'
-import ModalAddLot from '~/app/purchasing/ModalAddLot'
-import ModalAddSupplier from '~/app/purchasing/ModalAddSupplier'
+import ModalAddLot from '~/app/acquisitions/ModalAddLot'
+import ModalAddSupplier from '~/app/acquisitions/ModalAddSupplier'
 import NotAvailable from '~/app/UI/Shared/NotAvailable'
 
 import { useState, useEffect } from 'react'
@@ -26,7 +26,7 @@ import { useToken } from '~/app/store/useToken'
 import Loading from '~/app/UI/Shared/Loading'
 import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
 
-const displayName = 'purchasingPage'
+const displayName = 'acquisitionsPage'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
@@ -88,7 +88,7 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-const PurchasingPage = ({
+const AcquisitionsPage = ({
   selectedCategory,
   handleCategoryChange,
   searchLots,
@@ -268,7 +268,7 @@ const Wrapper = () => {
 
   return (
     <AuthWrapper Fallback={NotAvailable} roleRequired='WAREHOUSE'>
-      <PurchasingPage
+      <AcquisitionsPage
         selectedCategory={selectedCategory}
         handleCategoryChange={handleCategoryChange}
         searchLots={searchLots}

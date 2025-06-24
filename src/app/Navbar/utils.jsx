@@ -20,8 +20,8 @@ export const useSideBarOpts = () => ([
     status: (usePermitted({ roleRequired: 'WAREHOUSE' }) ? 'available' : 'unavailable')
   },
   {
-    title: 'Purchasing',
-    path: '/purchasing',
+    title: 'Acquisitions',
+    path: '/acquisitions',
     Icon: props => <PaidIcon {...props} />,
     status: (usePermitted({ roleRequired: 'WAREHOUSE' }) ? 'available' : 'unavailable')
   },
