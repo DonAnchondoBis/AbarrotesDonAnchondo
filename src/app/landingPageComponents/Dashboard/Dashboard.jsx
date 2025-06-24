@@ -97,10 +97,10 @@ const Dashboard = () => {
           </Link>
         )}
         {usePermitted({ roleRequired: 'WAREHOUSE' }) && (
-          <Link href="/purchasing">
+          <Link href="/acquisitions">
             <IconButton className={classes.btn}>
               <PaidIcon className={classes.icon} />
-              <T variant="h5" className={classes.text}>Purchasing</T>
+              <T variant="h5" className={classes.text}>Acquisitions</T>
             </IconButton>
           </Link>
         )}

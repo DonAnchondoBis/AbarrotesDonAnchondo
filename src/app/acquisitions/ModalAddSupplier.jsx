@@ -10,7 +10,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 
 import { Formik, Form, Field, useFormikContext } from 'formik'
-import { getAddSupplierValidationSchema, getAddSupplierInitialValues } from '~/app/purchasing/utils'
+import { getAddSupplierValidationSchema, getAddSupplierInitialValues } from '~/app/acquisitions/utils'
 import TextField from '~/app/UI/Shared/FormikTextField'
 
 import { useToken } from '~/app/store/useToken'
@@ -93,7 +93,7 @@ const ModalAddSuppliers = ({ onClose }) => {
             />
             <Field
               name="phone"
-              label="Number"
+              label="Phone"
               variant="outlined"
               type="number"
               component={TextField}
