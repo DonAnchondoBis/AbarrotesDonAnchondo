@@ -113,6 +113,7 @@ const Login = ({
             name="password"
             component={TextField}
             placeholder="Password"
+            password
             type="password"
             label="Password"
             variant="outlined"

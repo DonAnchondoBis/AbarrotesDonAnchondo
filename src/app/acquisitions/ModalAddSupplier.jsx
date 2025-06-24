@@ -93,7 +93,7 @@ const ModalAddSuppliers = ({ onClose }) => {
             />
             <Field
               name="phone"
-              label="Number"
+              label="Phone"
               variant="outlined"
               type="number"
               component={TextField}

@@ -5,8 +5,16 @@ import PaidIcon from '@mui/icons-material/Paid'
 import DescriptionIcon from '@mui/icons-material/Description'
 import SettingsIcon from '@mui/icons-material/Settings'
 import usePermitted from '~/app/Lib/Permissions/utils'
+import HomeIcon from '@mui/icons-material/Home'
+import LogoutIcon from '@mui/icons-material/Logout'
 
 export const useSideBarOpts = () => ([
+  {
+    title: 'Home',
+    path: '/',
+    Icon: props => <HomeIcon {...props} />,
+    status: 'available'
+  },
   {
     title: 'Point of Sale',
     path: '/point-of-sale',
@@ -36,5 +44,11 @@ export const useSideBarOpts = () => ([
     path: '/settings',
     Icon: props => <SettingsIcon {...props} />,
     status: (usePermitted({ roleRequired: 'ADMIN' }) ? 'available' : 'unavailable')
+  },
+  {
+    title: 'Logout',
+    path: '/logout',
+    Icon: props => <LogoutIcon {...props} />,
+    status: 'available'
   },
 ])
