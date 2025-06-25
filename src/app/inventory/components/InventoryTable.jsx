@@ -96,7 +96,12 @@ const Container = styled(TableContainer)(({ theme }) => ({
   },
 }))
 
-const InventoryTable = ({ data = [], search = '', setSelectedProduct, setOpenModalEditProduct }) => {
+const InventoryTable = ({
+  data = [], search = '',
+  setSelectedProduct,
+  setOpenModalEditProduct,
+  setOpenModalAdjustment
+}) => {
   const [menuAnchorEl, setAnchorEl] = useState(null)
   const [imageDialog, setImageDialog] = useState({
     open: false,
@@ -154,8 +159,8 @@ const InventoryTable = ({ data = [], search = '', setSelectedProduct, setOpenMod
     return data?.filter(item => {
       const searchLower = search?.toLowerCase() || ''
       return (
-        item?.name?.toLowerCase().includes(searchLower) ||
-        item?.SKU?.toLowerCase().includes(searchLower)
+        item?.name?.toLowerCase().includes(searchLower)
+        || item?.SKU?.toLowerCase().includes(searchLower)
       )
     }) || []
   }, [data, search])
@@ -276,8 +281,14 @@ const InventoryTable = ({ data = [], search = '', setSelectedProduct, setOpenMod
             setOpenModalEditProduct(true)
             handleMenuClose()
           }}>Edit</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Delete</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Adjustment</MenuItem>
+          <MenuItem onClick={() => {
+            setOpenModalAdjustment(true)
+            handleMenuClose()
+          }}>Delete</MenuItem>
+          <MenuItem onClick={() => {
+            setOpenModalAdjustment(true)
+            handleMenuClose()
+          }}>Adjustment</MenuItem>
         </Menu>
       </TableContainer>
       <Dialog

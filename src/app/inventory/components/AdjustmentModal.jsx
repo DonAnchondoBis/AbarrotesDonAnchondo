@@ -1,171 +1,177 @@
 'use client'
-
 import {
   Button,
   IconButton,
-  Modal,
-  TextField,
-  Typography,
-  Grid
+  Typography as T,
+  Divider,
 } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
 import { styled } from '@mui/material/styles'
-import { Formik, Form } from 'formik'
-import * as Yup from 'yup'
+import CloseIcon from '@mui/icons-material/Close'
+import { Formik, Form, Field, useFormikContext } from 'formik'
 import getClassPrefixer from '~/app/UI/classPrefixer'
+import TextField from '~/app/UI/Shared/FormikTextField'
+import SelectField from '~/app/UI/Shared/FormikSelect'
+import { getAdjustmentValidationSchema, getAdjustmentInitialValues } from '~/app/inventory/utils'
+import { useToken } from '~/app/store/useToken'
+import { useState } from 'react'
+import Loading from '~/app/UI/Shared/Loading'
+import { InventoryLogTypeOptions } from '~/Libs/enums'
+import apiFetch from '~/app/Lib/apiFetch'
+import { useData } from '~/app/store/useData'
 
 const displayName = 'AdjustmentModal'
 const classes = getClassPrefixer(displayName)
 
-const getAdjustmentInitialValues = () => ({
-  sku: '',
-  reason: '',
-  quantity: ''
-})
+const Container = styled('div')(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100vh',
+  width: '100vw',
+  overflow: 'auto',
+  [`& .${classes.modalContainer}`]: {
+    width: '40vw',
+    '@media (max-width: 768px)': {
+      width: '90vw',
+    },
+    overflowY: 'auto',
+    maxHeight: '90vh',
+    border: `solid 3px ${theme.palette.primary.main}`,
+    background: theme.palette.background.main,
+    display: 'flex',
+    justifyContent: 'center',
+    borderRadius: '1rem',
+    padding: '2rem',
+    flexDirection: 'column',
+  },
 
-const getAdjustmentValidationSchema = () =>
-  Yup.object().shape({
-    sku: Yup.string().required('SKU is required'),
-    reason: Yup.string().required('Reason is required'),
-    quantity: Yup.number()
-      .required('Quantity is required')
-      .min(1, 'Quantity must be at least 1')
-  })
-
-const Container = styled('div')(() => ({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  backgroundColor: '#FEF7E5',
-  borderRadius: 16,
-  boxShadow: 24,
-  padding: '2rem',
-  width: 360,
   [`& .${classes.header}`]: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '1rem'
   },
-  [`& .${classes.divider}`]: {
+  [`& .${classes.inputs}`]: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2rem',
     width: '100%',
-    height: '1px',
-    backgroundColor: '#D8CBB3',
-    margin: '0.5rem 0 1.5rem 0'
-  },
-  [`& .${classes.label}`]: {
-    color: '#7A5C40',
-    fontSize: 14
-  },
-  [`& .${classes.textField}`]: {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '10px',
-      backgroundColor: '#FEF7E5',
-      height: 32,
-      '& fieldset': { borderColor: '#B19A7B' },
-      '&:hover fieldset': { borderColor: '#B19A7B' },
-      '&.Mui-focused fieldset': { borderColor: '#7A5C40' },
-      '& input': { color: '#1F1F1F', fontSize: 14 }
-    }
   },
   [`& .${classes.buttonContainer}`]: {
     display: 'flex',
     justifyContent: 'flex-end',
     marginTop: '1.5rem'
   },
-  [`& .${classes.saveButton}`]: {
-    padding: '0.5rem 2rem',
-    backgroundColor: '#5A7D2A',
-    color: 'white',
-    textTransform: 'none',
-    borderRadius: '20px',
-    fontWeight: 'bold',
-    '&:hover': { backgroundColor: '#4C681F' }
-  },
-  [`& .${classes.closeButton}`]: {
-    backgroundColor: '#FEF7E5',
-    border: '1px solid #B19A7B',
-    width: 24,
-    height: 24,
-    padding: 0,
-    '&:hover': { backgroundColor: '#f1e3cb' }
-  },
-  [`& .${classes.closeIcon}`]: {
-    color: '#7A5C40',
-    fontSize: 16
-  },
-  [`& .${classes.title}`]: {
-    color: '#8B0002',
-    fontWeight: 'bold'
-  }
 }))
 
-const AdjustmentModal = ({ open, onClose, onSave }) => {
+const AdjustmentModal = ({ onClose, selectedProduct }) => {
+  const { isValid, dirty } = useFormikContext()
   return (
-    <Modal open={open} onClose={onClose}>
-      <Formik
-        initialValues={getAdjustmentInitialValues()}
-        validationSchema={getAdjustmentValidationSchema()}
-        onSubmit={(values, { resetForm }) => {
-          onSave(values)
-          onClose()
-          resetForm()
-        }}
-      >
-        {({ values, handleChange, resetForm, errors, touched }) => (
-          <Form>
-            <Container>
-              <div className={classes.header}>
-                <Typography variant="h6" className={classes.title}>
-                  Adjustment
-                </Typography>
-                <IconButton
-                  onClick={() => {
-                    resetForm()
-                    onClose()
-                  }}
-                  className={classes.closeButton}
-                >
-                  <CloseIcon className={classes.closeIcon} />
-                </IconButton>
-              </div>
-
-              <div className={classes.divider} />
-
-              {[{ name: 'sku', label: 'SKU:' },
-                { name: 'reason', label: 'Reason:' },
-                { name: 'quantity', label: 'Quantity:' }].map(({ name, label }) => (
-                <Grid container spacing={2} alignItems="center" key={name} style={{ marginBottom: '1rem' }}>
-                  <Grid item xs={4}>
-                    <Typography className={classes.label}>{label}</Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <TextField
-                      fullWidth
-                      name={name}
-                      type={name === 'quantity' ? 'number' : 'text'}
-                      value={values[name]}
-                      onChange={handleChange}
-                      className={classes.textField}
-                      error={touched[name] && Boolean(errors[name])}
-                      helperText={touched[name] && errors[name] ? errors[name] : ''}
-                    />
-                  </Grid>
-                </Grid>
-              ))}
-
-              <div className={classes.buttonContainer}>
-                <Button type="submit" className={classes.saveButton}>
-                  Save
-                </Button>
-              </div>
-            </Container>
-          </Form>
-        )}
-      </Formik>
-    </Modal>
+    <Container>
+      <div className={classes.modalContainer}>
+        <div className={classes.header}>
+          <T color="primary" variant="h5">
+            New Product
+          </T>
+          <IconButton onClick={onClose}>
+            <CloseIcon color="primary" />
+          </IconButton>
+        </div>
+        <Divider sx={{ mb: 3 }} />
+        <Form>
+          <div className={classes.inputs}>
+            <Field
+              name="type"
+              label="Type"
+              variant="outlined"
+              type="text"
+              component={SelectField}
+              options={InventoryLogTypeOptions}
+            />
+            <Field
+              name="expirationDate"
+              label="Expiration Date"
+              variant="outlined"
+              type="text"
+              component={SelectField}
+              options={selectedProduct?.lots.map(lot => ({
+                label: lot.expirationDate,
+                value: lot.expirationDate
+              }))}
+            />
+            <Field
+              name="description"
+              label="Description"
+              variant="outlined"
+              type="text"
+              component={TextField}
+            />
+            <Field
+              name="amount"
+              label="Amount"
+              variant="outlined"
+              type="number"
+              component={TextField}
+            />
+          </div>
+          <div className={classes.buttonContainer}>
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={!isValid || !dirty}
+            >
+              Save
+            </Button>
+          </div>
+        </Form>
+      </div>
+    </Container>
   )
 }
 
-export default AdjustmentModal
+const Wrapper = ({ onClose, selectedProduct, setSnackbarMessage, refresh }) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const { token } = useToken()
+  const { userId } = useData()
+
+  const handleSubmit = async payload => {
+    setIsLoading(true)
+    const response = await apiFetch({
+      url: '/api/inventoryLog',
+      method: 'POST',
+      payload: {
+        ...payload,
+        amount: Number(payload.amount),
+      },
+      token,
+    })
+    if (response.error) {
+      setIsLoading(false)
+      setSnackbarMessage({ message: 'Error adding the Adjustment', severity: 'error' })
+    } else {
+      refresh()
+      setSnackbarMessage({ message: 'Adjustment added successfully', severity: 'success' })
+      onClose()
+    }
+  }
+
+  const validationSchema = getAdjustmentValidationSchema()
+  const initialValues = getAdjustmentInitialValues({ productName: selectedProduct?.name, userId })
+
+  if (isLoading) return <Loading />
+
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+    >
+      <AdjustmentModal
+        onClose={onClose}
+        selectedProduct={selectedProduct}
+      />
+    </Formik>
+  )
+}
+
+export default Wrapper

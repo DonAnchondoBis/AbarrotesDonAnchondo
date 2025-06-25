@@ -18,7 +18,7 @@ import Loading from '~/app/UI/Shared/Loading'
 import { UnitOptions } from '~/Libs/enums'
 import apiFetch from '~/app/Lib/apiFetch'
 
-const displayName = 'ModalAddLots'
+const displayName = 'ModalEditLots'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({

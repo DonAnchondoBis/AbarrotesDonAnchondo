@@ -20,7 +20,7 @@ import Loading from '~/app/UI/Shared/Loading'
 import { UnitOptions } from '~/Libs/enums'
 import apiFetch from '~/app/Lib/apiFetch'
 
-const displayName = 'ModalAddLots'
+const displayName = 'AddProductModal'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
@@ -160,7 +160,7 @@ const ImageUpload = ({ field, form }) => {
   )
 }
 
-const ModalAddLots = ({ onClose }) => {
+const AddProductModal = ({ onClose }) => {
   const { isValid, dirty } = useFormikContext()
   return (
     <Container>
@@ -225,7 +225,7 @@ const ModalAddLots = ({ onClose }) => {
   )
 }
 
-const Wrapper = ({ onClose, products, setSnackbarMessage, refresh }) => {
+const Wrapper = ({ onClose, setSnackbarMessage, refresh }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { token } = useToken()
   const handleSubmit = async values => {
@@ -262,9 +262,8 @@ const Wrapper = ({ onClose, products, setSnackbarMessage, refresh }) => {
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      <ModalAddLots
+      <AddProductModal
         onClose={onClose}
-        products={products}
       />
     </Formik>
   )
