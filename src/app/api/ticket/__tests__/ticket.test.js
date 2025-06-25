@@ -9,12 +9,24 @@ vi.mock('~/app/api/Libs/prisma', () => {
           { id: 1, total: 100, userId: 1, products: [], createdAt: new Date('2023-06-15T12:00:00Z'), updatedAt: 'updatedAt' },
           { id: 2, total: 200, userId: 2, products: [], createdAt: new Date('2023-06-15T12:00:00Z'), updatedAt: 'updatedAt' }
         ]),
-        create: ({ data }) => ({
-          id: 1,
-          ...data,
-          createdAt: new Date('2023-06-15T12:00:00Z'),
-          updatedAt: 'updatedAt'
-        }),
+        create: ({ data }) => {
+          return {
+            id: 1,
+            products: {
+              create: data.products.create.map(p => {
+                const productId = p?.product?.connect?.id ?? p?.id
+                return {
+                  product: productId ? { connect: { id: productId } } : {},
+                  quantityProduct: p.quantityProduct ?? p.quantity,
+                }
+              }),
+            },
+            userId: data.userId ?? 1,
+            total: data.total,
+            createdAt: new Date('2023-06-15T12:00:00Z'),
+            updatedAt: 'updatedAt'
+          }
+        }
       },
       lot: {
         findMany: () => ([
@@ -90,15 +102,15 @@ describe('API Ticket - POST', () => {
       expectedStatus: 201,
       expectedResponse: {
         id: 1,
-        products: { create: [{ connect: { productId: 1 }, quantityProduct: 2 }] },
+        products: { create: [{ product: { connect: { id: 1 } }, quantityProduct: 2 }] },
         userId: 1,
         total: 100,
-      }
+      },
     },
     {
       descr: 'Error creating ticket',
       request: {
-        products: [{ productId: 1, quantity: 2 }],
+        products: [{ id: 1, quantity: 2 }],
         total: 100
       },
       mockImplementation: new Error('DB error'),
@@ -108,7 +120,7 @@ describe('API Ticket - POST', () => {
     {
       descr: 'Error has not permission',
       request: {
-        products: [{ productId: 1, quantity: 2 }],
+        products: [{ id: 1, quantity: 2 }],
         total: 100
       },
       isNotAllowed: true,
