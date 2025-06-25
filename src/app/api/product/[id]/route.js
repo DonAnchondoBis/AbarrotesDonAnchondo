@@ -39,8 +39,7 @@ export const PATCH = async (request, { params }) => {
   try {
     const { role = null, userId } = authenticateToken(request) ?? {}
     if (!['ADMIN', 'WAREHOUSE'].includes(role) || !userId) return ERROR.FORBIDDEN()
-
-    const { id } = params
+    const { id } = await params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
 
     const data = await request.json()
