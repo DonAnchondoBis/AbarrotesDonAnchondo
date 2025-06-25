@@ -23,6 +23,7 @@ import Loading from '~/app/UI/Shared/Loading'
 import InventoryTable from './components/InventoryTable'
 import AddProductModal from './components/AddProductModal'
 import EditProductModal from './components/EditProductModal'
+import AdjustmentModal from './components/AdjustmentModal'
 
 const displayName = 'InventoryPage'
 const classes = getClassPrefixer(displayName)
@@ -85,7 +86,9 @@ const InventoryPage = ({
   openModalEditProduct,
   setOpenModalEditProduct,
   selectedProduct,
-  setSelectedProduct
+  setSelectedProduct,
+  openModalAdjustment,
+  setOpenModalAdjustment
 }) => {
   return (
     <Container>
@@ -130,6 +133,7 @@ const InventoryPage = ({
           lots={lots}
           setSelectedProduct={setSelectedProduct}
           setOpenModalEditProduct={setOpenModalEditProduct}
+          setOpenModalAdjustment={setOpenModalAdjustment}
         />
       </div>
 
@@ -186,6 +190,17 @@ const InventoryPage = ({
           selectedProduct={selectedProduct}
         />
       </Modal>
+      <Modal
+        open={openModalAdjustment}
+        onClose={() => setOpenModalAdjustment(false)}
+      >
+        <AdjustmentModal
+          onClose={() => setOpenModalAdjustment(false)}
+          setSnackbarMessage={setSnackbarMessage}
+          refresh={refresh}
+          selectedProduct={selectedProduct}
+        />
+      </Modal>
       <Snackbar
         open={Boolean(snackbarMessage)}
         autoHideDuration={5000}
@@ -208,6 +223,7 @@ const Wrapper = () => {
   const [searchProducts, setSearchProducts] = useState('')
   const [openModalAddProduct, setModalOpenAddProduct] = useState(false)
   const [openModalEditProduct, setModalOpenEditProduct] = useState(false)
+  const [openModalAdjustment, setModalOpenAdjustment] = useState(false)
   const [products, setProducts] = useState([])
   const [lots, setLots] = useState([])
   const [snackbarMessage, setSnackbarMessage] = useState(null)
@@ -254,6 +270,8 @@ const Wrapper = () => {
       setOpenModalEditProduct={setModalOpenEditProduct}
       selectedProduct={selectedProduct}
       setSelectedProduct={setSelectedProduct}
+      openModalAdjustment={openModalAdjustment}
+      setOpenModalAdjustment={setModalOpenAdjustment}
     />
   )
 }
