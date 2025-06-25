@@ -3,8 +3,8 @@
 import {
   Button,
   IconButton,
-  Modal,
   Typography as T,
+  Divider
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { styled } from '@mui/material/styles'
@@ -13,99 +13,95 @@ import getClassPrefixer from '~/app/UI/classPrefixer'
 const displayName = 'DeleteProductModal'
 const classes = getClassPrefixer(displayName)
 
-const Container = styled('div')(() => ({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  backgroundColor: '#FEF7E5',
-  borderRadius: 16,
-  boxShadow: 24,
-  padding: '2rem',
-  width: 360,
+const Container = styled('div')(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100vh',
+  width: '100vw',
+  overflow: 'auto',
+  [`& .${classes.modalContainer}`]: {
+    width: '40vw',
+    '@media (max-width: 768px)': {
+      width: '90vw',
+    },
+    overflowY: 'auto',
+    maxHeight: '90vh',
+    border: `solid 3px ${theme.palette.primary.main}`,
+    background: theme.palette.background.main,
+    display: 'flex',
+    justifyContent: 'center',
+    borderRadius: '1rem',
+    padding: '2rem',
+    flexDirection: 'column',
+    gap: '1ch',
+  },
   [`& .${classes.header}`]: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '1rem'
   },
-  [`& .${classes.divider}`]: {
+  [`& .${classes.inputs}`]: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2rem',
     width: '100%',
-    height: '1px',
-    backgroundColor: '#D8CBB3',
-    margin: '0.5rem 0 1.5rem 0'
-  },
-  [`& .${classes.message}`]: {
-    textAlign: 'center',
-    color: '#7A5C40',
-    marginBottom: '1.5rem'
-  },
-  [`& .${classes.subMessage}`]: {
-    textAlign: 'center',
-    color: '#7A5C40',
-    fontSize: 13,
-    marginBottom: '2rem'
   },
   [`& .${classes.buttonContainer}`]: {
     display: 'flex',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    marginTop: '1.5rem',
+    gap: '1rem',
   },
-  [`& .${classes.deleteButton}`]: {
-    padding: '0.5rem 2rem',
-    backgroundColor: '#8B0002',
-    color: 'white',
-    textTransform: 'none',
-    borderRadius: '20px',
-    fontWeight: 'bold',
-    '&:hover': { backgroundColor: '#6F0002' }
+  [`& .${classes.btn}`]: {
+    color: theme.palette.background.main,
   },
-  [`& .${classes.closeButton}`]: {
-    backgroundColor: '#FEF7E5',
-    border: '1px solid #B19A7B',
-    width: 24,
-    height: 24,
-    padding: 0,
-    '&:hover': { backgroundColor: '#f1e3cb' }
-  },
-  [`& .${classes.closeIcon}`]: {
-    color: '#7A5C40',
-    fontSize: 16
-  },
-  [`& .${classes.title}`]: {
-    color: '#8B0002',
-    fontWeight: 'bold'
-  }
 }))
 
-const DeleteProductModal = ({ open, onClose, onDelete }) => {
+const DeleteProductModal = ({ onClose, onDelete, selectedProduct }) => {
   return (
-    <Modal open={open} onClose={onClose}>
-      <Container>
+    <Container>
+      <div className={classes.modalContainer}>
         <div className={classes.header}>
-          <T variant="h6" className={classes.title}>
+          <T color="primary" variant="h5">
             Delete Product
           </T>
-          <IconButton onClick={onClose} className={classes.closeButton}>
-            <CloseIcon className={classes.closeIcon} />
+          <IconButton onClick={onClose}>
+            <CloseIcon color="primary" />
           </IconButton>
         </div>
-
-        <div className={classes.divider} />
-
-        <T className={classes.message}>
-          Are you sure you want to delete this product from the inventory?
+        <Divider sx={{ mb: 3 }} />
+        <T color='primary' variant='h6' textAlign='center'>
+          Confirm Product Deletion
         </T>
-        <T className={classes.subMessage}>
-          This action cannot be undone.
+        <T color='primary' variant='body1' textAlign='center'>
+          Are you sure you want to delete <strong>{selectedProduct?.name || 'this product'}</strong> from inventory?
         </T>
-
+        <T color='darkRed' variant='body2' textAlign='center'>
+          This action will permanently remove the product and all its associated inventory data. This cannot be undone.
+        </T>
         <div className={classes.buttonContainer}>
-          <Button onClick={onDelete} className={classes.deleteButton}>
-            Delete
+          {/* TODO add functionality of delete  */}
+          <Button
+            onClick={() => {}}
+            color='primary'
+            variant='outlined'
+            className={classes.cancelBtn}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={onDelete}
+            color='darkRed'
+            variant='contained'
+            className={classes.btn}
+          >
+            Delete Permanently
           </Button>
         </div>
-      </Container>
-    </Modal>
+      </div>
+    </Container>
   )
 }
 

@@ -24,6 +24,7 @@ import InventoryTable from './components/InventoryTable'
 import AddProductModal from './components/AddProductModal'
 import EditProductModal from './components/EditProductModal'
 import AdjustmentModal from './components/AdjustmentModal'
+import DeleteProductModal from '~/app/inventory/components/DeleteProductModal'
 
 const displayName = 'InventoryPage'
 const classes = getClassPrefixer(displayName)
@@ -88,7 +89,9 @@ const InventoryPage = ({
   selectedProduct,
   setSelectedProduct,
   openModalAdjustment,
-  setOpenModalAdjustment
+  setOpenModalAdjustment,
+  setModalOpenDeleteProduct,
+  openModalDeleteProduct
 }) => {
   return (
     <Container>
@@ -134,42 +137,10 @@ const InventoryPage = ({
           setSelectedProduct={setSelectedProduct}
           setOpenModalEditProduct={setOpenModalEditProduct}
           setOpenModalAdjustment={setOpenModalAdjustment}
+          setModalOpenDeleteProduct={setModalOpenDeleteProduct}
           selectedProduct={selectedProduct}
         />
       </div>
-
-      {/* <EditProductModal
-        open={openModalAddProduct}
-        onClose={() => {
-          setModalOpen(false)
-          setEditProduct(null)
-        }}
-        isNew={!editProduct}
-        product={editProduct}
-        onSave={editProduct ? handleUpdateProduct : handleAddProduct}
-      />
-
-      <DeleteProductModal
-        open={Boolean(deleteProduct)}
-        onClose={() => setDeleteProduct(null)}
-        onDelete={handleDeleteProduct}
-      />
-
-      <WasteModal
-        open={Boolean(wasteProduct)}
-        onClose={() => setWasteProduct(null)}
-        onRegister={(waste) => {
-          console.log('Waste registered:', waste)
-          setWasteProduct(null)
-        }}
-      />
-
-      <AdjustmentModal
-        open={Boolean(adjustProduct)}
-        onClose={() => setAdjustProduct(null)}
-        product={adjustProduct}
-        onAdjust={handleAdjustStock}
-      /> */}
       <Modal
         open={openModalAddProduct}
         onClose={() => setOpenModalAddProduct(false)}
@@ -202,6 +173,17 @@ const InventoryPage = ({
           selectedProduct={selectedProduct}
         />
       </Modal>
+      <Modal
+        open={openModalDeleteProduct}
+        onClose={() => setModalOpenDeleteProduct(false)}
+      >
+        <DeleteProductModal
+          onClose={() => setModalOpenDeleteProduct(false)}
+          setSnackbarMessage={setSnackbarMessage}
+          refresh={refresh}
+          selectedProduct={selectedProduct}
+        />
+      </Modal>
       <Snackbar
         open={Boolean(snackbarMessage)}
         autoHideDuration={5000}
@@ -225,6 +207,7 @@ const Wrapper = () => {
   const [openModalAddProduct, setModalOpenAddProduct] = useState(false)
   const [openModalEditProduct, setModalOpenEditProduct] = useState(false)
   const [openModalAdjustment, setModalOpenAdjustment] = useState(false)
+  const [openModalDeleteProduct, setModalOpenDeleteProduct] = useState(false)
   const [products, setProducts] = useState([])
   const [lots, setLots] = useState([])
   const [snackbarMessage, setSnackbarMessage] = useState(null)
@@ -273,6 +256,8 @@ const Wrapper = () => {
       setSelectedProduct={setSelectedProduct}
       openModalAdjustment={openModalAdjustment}
       setOpenModalAdjustment={setModalOpenAdjustment}
+      setModalOpenDeleteProduct={setModalOpenDeleteProduct}
+      openModalDeleteProduct={openModalDeleteProduct}
     />
   )
 }

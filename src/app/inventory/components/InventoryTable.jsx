@@ -101,7 +101,8 @@ const InventoryTable = ({
   setSelectedProduct,
   selectedProduct,
   setOpenModalEditProduct,
-  setOpenModalAdjustment
+  setOpenModalAdjustment,
+  setModalOpenDeleteProduct
 }) => {
   const [menuAnchorEl, setAnchorEl] = useState(null)
   const [imageDialog, setImageDialog] = useState({
@@ -281,11 +282,9 @@ const InventoryTable = ({
           <MenuItem onClick={() => {
             setOpenModalEditProduct(true)
             handleMenuClose()
-          }}>Edit</MenuItem>
-          <MenuItem onClick={() => {
-            setOpenModalAdjustment(true)
-            handleMenuClose()
-          }}>Delete</MenuItem>
+          }}>
+            Edit
+          </MenuItem>
           {selectedProduct?.totalStock > 0 && (
             <MenuItem onClick={() => {
               setOpenModalAdjustment(true)
@@ -294,6 +293,12 @@ const InventoryTable = ({
               Adjustment
             </MenuItem>
           )}
+          <MenuItem onClick={() => {
+            setModalOpenDeleteProduct(true)
+            handleMenuClose()
+          }}>
+            Delete
+          </MenuItem>
         </Menu>
       </TableContainer>
       <Dialog
