@@ -3,3 +3,4 @@ export const whiteLogo = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v174
 export const forbidden = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v1749071759/403_Error_Forbidden-amico_winhhy.svg'
 export const notFound = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v1750360875/404_Error_with_a_cute_animal-bro_cmefzm.svg'
 export const favIcon = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v1749055475/1024_1_nlqmvp.png'
+export const notPhoto = 'https://res.cloudinary.com/dhpnfud6f/image/upload/v1750867522/no_photography_48dp_7A5C40_FILL0_wght700_GRAD200_opsz48_ra5af3.svg'
