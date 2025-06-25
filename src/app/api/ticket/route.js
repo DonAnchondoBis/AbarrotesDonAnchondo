@@ -14,11 +14,27 @@ export const POST = async request => {
     const isValid = validatorFields({ data, shape: Ticket.shape })
 
     if (userId && isValid && (role == 'ADMIN' || role == 'CASHIER')){
+      for (const product of data.products) {
+        const lots = await prisma.lot.findMany({
+          where: {
+            productId: product.productId,
+            currentAmount: { gt: 0 }
+          }
+        })
+        const totalAvailable = lots.reduce((sum, lot) => sum + lot.currentAmount, 0)
+        if (totalAvailable < product.quantity) {
+          return NextResponse.json(
+            { error: `Not enough stock for product ID ${product.productId}` },
+            { status: 400 }
+          )
+        }
+      }
+
       const payload = await prisma.ticket.create({
         data: {
           products: {
             create: data.products.map(product => ({
-              connect: { productId: product.productId },
+              product: { connect: { id: product.productId } },
               quantityProduct: product.quantity
             }))
           },
