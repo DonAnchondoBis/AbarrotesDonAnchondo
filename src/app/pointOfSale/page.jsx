@@ -7,6 +7,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import apiFetch from '~/app/Lib/apiFetch' // <--- IMPORTANTE
 import { useToken } from '~/app/store/useToken'
+import Image from 'next/image'
 
 const displayName = 'PointOfSale'
 const classes = getClassPrefixer(displayName)
@@ -183,7 +184,6 @@ const PointOfSale = () => {
           url: '/api/product',
           token
         })
-        console.log(result)
         setProducts(Array.isArray(result) ? result : result.data || result.products || [])
       } catch (error) {
         setProducts([])
@@ -266,17 +266,18 @@ const PointOfSale = () => {
               >
                 <div className={classes.productImage}>
                   {product.imageUrl && (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      style={{
-                        width: '100%',
-                        height: '120px',
-                        objectFit: 'contain',
-                        borderRadius: '12px',
-                        background: '#fff'
-                      }}
-                    />
+                    <div style={{ position: 'relative', width: '100%', height: '120px' }}>
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        style={{
+                          objectFit: 'contain',
+                          borderRadius: '12px',
+                          background: '#fff'
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
                 <T variant="subtitle2">{product.name}</T>
@@ -344,7 +345,28 @@ const PointOfSale = () => {
             <IconButton
               className={classes.buttonSale}
               variant="contained"
-              onClick={() => alert('Sale completed!')}
+              onClick={async () => {
+                const salePayload = {
+                  products: cart.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity
+                  })),
+                  total
+                }
+                try {
+                  await apiFetch({
+                    method: 'POST',
+                    url: '/api/ticket',
+                    payload: salePayload,
+                    token
+                  })
+                  alert('Sale completed!')
+                  setCart([])
+                } catch (err) {
+                  alert('Error completing sale')
+                  console.error(err)
+                }
+              }}
             >
               Sale Products
             </IconButton>
