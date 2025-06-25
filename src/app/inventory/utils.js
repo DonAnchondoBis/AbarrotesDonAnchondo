@@ -37,12 +37,19 @@ export const getAddProductInitialValues = () => ({
 
 export const getAdjustmentValidationSchema = () =>
   Yup.object({
-    stock: Yup.number()
-      .required('Stock is required')
-      .min(0, 'Stock must be 0 or greater')
-      .integer('Stock must be a whole number')
+    amount: Yup.number()
+      .required('Amount is required')
+      .min(0, 'Amount must be 0 or greater'),
+    description: Yup.string().required('Description is required'),
+    expirationDate: Yup.date().required('Expiration date is required'),
+    type: Yup.string().required('Type is required'),
   })
 
-export const getAdjustmentInitialValues = (initialStock = '') => ({
-  stock: initialStock
+export const getAdjustmentInitialValues = ({ productName, userId }) => ({
+  productName: productName || '',
+  amount: '',
+  description: '',
+  expirationDate: '',
+  type: '',
+  userId: userId || '',
 })
