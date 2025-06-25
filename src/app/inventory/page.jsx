@@ -134,6 +134,7 @@ const InventoryPage = ({
           setSelectedProduct={setSelectedProduct}
           setOpenModalEditProduct={setOpenModalEditProduct}
           setOpenModalAdjustment={setOpenModalAdjustment}
+          selectedProduct={selectedProduct}
         />
       </div>
 

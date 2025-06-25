@@ -4,8 +4,7 @@ import {
   Button,
   IconButton,
   Modal,
-  Typography,
-  Divider
+  Typography as T,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { styled } from '@mui/material/styles'
@@ -83,9 +82,9 @@ const DeleteProductModal = ({ open, onClose, onDelete }) => {
     <Modal open={open} onClose={onClose}>
       <Container>
         <div className={classes.header}>
-          <Typography variant="h6" className={classes.title}>
+          <T variant="h6" className={classes.title}>
             Delete Product
-          </Typography>
+          </T>
           <IconButton onClick={onClose} className={classes.closeButton}>
             <CloseIcon className={classes.closeIcon} />
           </IconButton>
@@ -93,12 +92,12 @@ const DeleteProductModal = ({ open, onClose, onDelete }) => {
 
         <div className={classes.divider} />
 
-        <Typography className={classes.message}>
+        <T className={classes.message}>
           Are you sure you want to delete this product from the inventory?
-        </Typography>
-        <Typography className={classes.subMessage}>
+        </T>
+        <T className={classes.subMessage}>
           This action cannot be undone.
-        </Typography>
+        </T>
 
         <div className={classes.buttonContainer}>
           <Button onClick={onDelete} className={classes.deleteButton}>

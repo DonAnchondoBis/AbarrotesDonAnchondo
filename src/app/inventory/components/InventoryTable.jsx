@@ -99,6 +99,7 @@ const Container = styled(TableContainer)(({ theme }) => ({
 const InventoryTable = ({
   data = [], search = '',
   setSelectedProduct,
+  selectedProduct,
   setOpenModalEditProduct,
   setOpenModalAdjustment
 }) => {
@@ -285,10 +286,14 @@ const InventoryTable = ({
             setOpenModalAdjustment(true)
             handleMenuClose()
           }}>Delete</MenuItem>
-          <MenuItem onClick={() => {
-            setOpenModalAdjustment(true)
-            handleMenuClose()
-          }}>Adjustment</MenuItem>
+          {selectedProduct?.totalStock > 0 && (
+            <MenuItem onClick={() => {
+              setOpenModalAdjustment(true)
+              handleMenuClose()
+            }}>
+              Adjustment
+            </MenuItem>
+          )}
         </Menu>
       </TableContainer>
       <Dialog
