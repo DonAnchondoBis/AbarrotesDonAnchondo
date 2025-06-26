@@ -1,10 +1,12 @@
 'use client'
 import { PDFDownloadLink } from '@react-pdf/renderer'
-import { InventoryReportPdf } from './ReportsBase'
 import { Button } from '@mui/material'
 
 import { styled } from '@mui/material/styles'
 import getClassPrefixer from '~/app/UI/classPrefixer'
+import { InventoryReportPdf } from './InventoryReportPdf'
+import { ShrinkageReportPdf } from './ShrinkageReportPdf'
+import { SalesOfTheDayReportPdf } from './SalesOfTheDayReportPdf'
 
 const displayName = 'ShrinkageTable'
 const classes = getClassPrefixer(displayName)
@@ -26,8 +28,7 @@ const Container = styled('div')(({ theme }) => ({
 
 export const ReportButton = ({ category = '', data = [] }) => {
   const hasValidData = data.length > 0
-  // TODO: DELETE THIS CONDITION WHEN WE HAVE REPORTS FOR ALL CATEGORIES
-  if (!hasValidData || category !== 'inventory') {
+  if (!hasValidData) {
     return (
       <Button
         variant="contained"
@@ -38,12 +39,24 @@ export const ReportButton = ({ category = '', data = [] }) => {
       </Button>
     )
   }
+
+  const getReportDocument = (category, data) => {
+    switch (category) {
+      case 'inventory':
+        return <InventoryReportPdf data={data} />
+      case 'shrinkage':
+        return <ShrinkageReportPdf data={data} />
+      case 'salesOfTheDay':
+        return <SalesOfTheDayReportPdf data={data} />
+      default:
+        return <></>
+    }
+  }
+
   return (
     <Container>
       <PDFDownloadLink
-        document={
-          category === 'inventory' ? <InventoryReportPdf data={data} /> : <></>
-        }
+        document={getReportDocument(category, data)}
         fileName={`${category}Report_${new Date().toLocaleDateString()}.pdf`}
       >
         <Button
