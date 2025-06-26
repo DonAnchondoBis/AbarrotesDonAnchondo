@@ -1,13 +1,14 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { styled } from '@mui/material/styles'
-import { Typography as T, TextField, Paper, Table, TableBody, TableCell, TableRow, Button, IconButton, InputAdornment } from '@mui/material'
+import { Typography as T, TextField, Paper, Table, TableBody, TableCell, TableRow, Button, IconButton, InputAdornment, Select, MenuItem, FormControl } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import SearchIcon from '@mui/icons-material/Search'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import apiFetch from '~/app/Lib/apiFetch' // <--- IMPORTANTE
 import { useToken } from '~/app/store/useToken'
 import Image from 'next/image'
+import { notPhoto } from '~/app/UI/Images'
 
 const displayName = 'PointOfSale'
 const classes = getClassPrefixer(displayName)
@@ -33,6 +34,21 @@ const Container = styled('div')(({ theme }) => ({
   [`& .${classes.searchContainer}`]: {
     width: '100%',
     padding: '0.5rem 0',
+    display: 'flex',
+    gap: '0.5rem',
+    alignItems: 'center',
+  },
+
+  [`& .${classes.searchTypeSelector}`]: {
+    minWidth: '120px',
+    '& .MuiInputBase-root': {
+      backgroundColor: theme.palette.contrast.main,
+      borderRadius: '50px',
+      height: '40px',
+      '&:hover': {
+        backgroundColor: theme.palette.contrast.dark,
+      },
+    },
   },
 
   [`& .${classes.textFieldStyled} .MuiInputBase-root`]: {
@@ -172,6 +188,7 @@ const Container = styled('div')(({ theme }) => ({
 
 const PointOfSale = () => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchType, setSearchType] = useState('name')
   const [cart, setCart] = useState([])
   const [products, setProducts] = useState([])
   const { token } = useToken()
@@ -191,7 +208,7 @@ const PointOfSale = () => {
       
     }
     fetchProducts()
-  }, [])
+  }, [token])
 
   
 
@@ -227,15 +244,32 @@ const PointOfSale = () => {
     setCart(prevCart => prevCart.filter(item => item.id !== productId))
   }
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredProducts = products.filter(product => {
+    const searchValue = searchTerm.toLowerCase()
+    if (searchType === 'name') {
+      return product.name?.toLowerCase().includes(searchValue)
+    } else if (searchType === 'SKU') {
+      return product.SKU?.toLowerCase().includes(searchValue)
+    }
+    return true
+  })
 
 
   return (
     <Container>
       <div className={classes.mainContent}>
         <div className={classes.searchContainer}>
+          <FormControl className={classes.searchTypeSelector}>
+            <Select
+              value={searchType}
+              onChange={e => setSearchType(e.target.value)}
+              size="small"
+              displayEmpty
+            >
+              <MenuItem value="name">Name</MenuItem>
+              <MenuItem value="SKU">SKU</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             label="Buscar productos"
             variant="outlined"
@@ -265,20 +299,18 @@ const PointOfSale = () => {
                 onClick={() => handleAddToCart(product)}
               >
                 <div className={classes.productImage}>
-                  {product.imageUrl && (
-                    <div style={{ position: 'relative', width: '100%', height: '120px' }}>
-                      <Image
-                        src={product.imageUrl}
-                        alt={product.name}
-                        fill
-                        style={{
-                          objectFit: 'contain',
-                          borderRadius: '12px',
-                          background: '#fff'
-                        }}
-                      />
-                    </div>
-                  )}
+                  <div style={{ position: 'relative', width: '100%', height: '120px' }}>
+                    <Image
+                      src={product?.imageUrl || notPhoto}
+                      alt={product.name}
+                      fill
+                      style={{
+                        objectFit: 'contain',
+                        borderRadius: '12px',
+                        background: '#fff'
+                      }}
+                    />
+                  </div>
                 </div>
                 <T variant="subtitle2">{product.name}</T>
                 <T variant="body2">${product.price}</T>
