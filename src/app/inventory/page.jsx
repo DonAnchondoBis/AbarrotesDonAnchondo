@@ -107,7 +107,7 @@ const InventoryPage = ({
         <div className={classes.searchGroup}>
           <OutlinedInput
             className={classes.searchInput}
-            placeholder="Search by name"
+            placeholder="Search by name or SKU"
             size="small"
             value={searchProducts}
             onChange={handleSearchProducts}
