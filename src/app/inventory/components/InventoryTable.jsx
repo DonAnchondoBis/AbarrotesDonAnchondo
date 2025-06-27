@@ -293,12 +293,14 @@ const InventoryTable = ({
               Adjustment
             </MenuItem>
           )}
-          <MenuItem onClick={() => {
-            setModalOpenDeleteProduct(true)
-            handleMenuClose()
-          }}>
-            Delete
-          </MenuItem>
+          {selectedProduct?.totalStock <= 0 && (
+            <MenuItem onClick={() => {
+              setModalOpenDeleteProduct(true)
+              handleMenuClose()
+            }}>
+              Delete
+            </MenuItem>
+          )}
         </Menu>
       </TableContainer>
       <Dialog

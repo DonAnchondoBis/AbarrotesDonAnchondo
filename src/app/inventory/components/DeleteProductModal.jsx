@@ -10,6 +10,11 @@ import CloseIcon from '@mui/icons-material/Close'
 import { styled } from '@mui/material/styles'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 
+import { useToken } from '~/app/store/useToken'
+import apiFetch from '~/app/Lib/apiFetch'
+import { useState } from 'react'
+import Loading from '~/app/UI/Shared/Loading'
+
 const displayName = 'DeleteProductModal'
 const classes = getClassPrefixer(displayName)
 
@@ -59,7 +64,7 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-const DeleteProductModal = ({ onClose, onDelete, selectedProduct }) => {
+const DeleteProductModal = ({ onClose, handleDelete, selectedProduct }) => {
   return (
     <Container>
       <div className={classes.modalContainer}>
@@ -82,9 +87,8 @@ const DeleteProductModal = ({ onClose, onDelete, selectedProduct }) => {
           This action will permanently remove the product and all its associated inventory data. This cannot be undone.
         </T>
         <div className={classes.buttonContainer}>
-          {/* TODO add functionality of delete  */}
           <Button
-            onClick={() => {}}
+            onClick={onClose}
             color='primary'
             variant='outlined'
             className={classes.cancelBtn}
@@ -92,7 +96,7 @@ const DeleteProductModal = ({ onClose, onDelete, selectedProduct }) => {
             Cancel
           </Button>
           <Button
-            onClick={onDelete}
+            onClick={handleDelete}
             color='darkRed'
             variant='contained'
             className={classes.btn}
@@ -105,4 +109,37 @@ const DeleteProductModal = ({ onClose, onDelete, selectedProduct }) => {
   )
 }
 
-export default DeleteProductModal
+const Wrapper = ({ refresh, setSnackbarMessage, onClose, selectedProduct }) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const { token } = useToken()
+  const handleDelete = async () => {
+    setIsLoading(true)
+    const response = await apiFetch({
+      url: `/api/product/${selectedProduct.id}`,
+      method: 'DELETE',
+      token,
+    })
+    if (response.error) {
+      const message = response.error === 'Product has stock' ? 'Product has stock, cannot delete' : 'Failed to delete product, please try again later'
+      setIsLoading(false)
+      setSnackbarMessage({ message, severity: 'error' })
+    } else {
+      refresh()
+      setSnackbarMessage({ message: 'Product deleted successfully', severity: 'success' })
+      setIsLoading(false)
+      onClose()
+    }
+  }
+
+  if (isLoading) return <Loading />
+
+  return (
+    <DeleteProductModal
+      selectedProduct={selectedProduct}
+      onClose={onClose}
+      handleDelete={handleDelete}
+    />
+  )
+}
+
+export default Wrapper
