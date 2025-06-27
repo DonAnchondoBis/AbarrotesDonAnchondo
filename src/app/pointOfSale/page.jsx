@@ -1,11 +1,10 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { styled } from '@mui/material/styles'
-import { Typography as T, TextField, Paper, Table, TableBody, TableCell, TableRow, Button, IconButton, InputAdornment, Select, MenuItem, FormControl } from '@mui/material'
+import { Typography as T, TextField, Paper, Table, TableBody, TableCell, TableRow, Button, IconButton, Select, MenuItem, FormControl, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import SearchIcon from '@mui/icons-material/Search'
 import getClassPrefixer from '~/app/UI/classPrefixer'
-import apiFetch from '~/app/Lib/apiFetch' // <--- IMPORTANTE
+import apiFetch from '~/app/Lib/apiFetch'
 import { useToken } from '~/app/store/useToken'
 import Image from 'next/image'
 import { notPhoto } from '~/app/UI/Images'
@@ -42,20 +41,35 @@ const Container = styled('div')(({ theme }) => ({
   [`& .${classes.searchTypeSelector}`]: {
     minWidth: '120px',
     '& .MuiInputBase-root': {
-      backgroundColor: theme.palette.contrast.main,
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.background.main,
       borderRadius: '50px',
       height: '40px',
       '&:hover': {
-        backgroundColor: theme.palette.contrast.dark,
+        backgroundColor: theme.palette.primary.dark,
       },
     },
   },
 
-  [`& .${classes.textFieldStyled} .MuiInputBase-root`]: {
-    backgroundColor: theme.palette.contrast.main,
-    borderRadius: '50px',
+  [`& .${classes.searchIcon} .MuiInputBase-root`]: {
+    color: theme.palette.background.main,
     '&:hover': {
-      backgroundColor: theme.palette.contrast.dark,
+      color: theme.palette.background.main, 
+    },
+  },
+
+  [`& .${classes.textFieldStyled}`]: {
+    background: theme.palette.primary.main,
+    '& .MuiInputLabel-outlined': {
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.background.main,
+      
+      borderRadius: '2rem',
+      padding: '0 1rem',
+      marginLeft: '-4px',
+    },
+    '& .MuiInputBase-input': {
+      color: theme.palette.background.main,
     },
   },
 
@@ -74,13 +88,13 @@ const Container = styled('div')(({ theme }) => ({
 
   [`& .${classes.productCard}`]: {
     display: 'flex',
-    backgroundColor: theme.palette.contrast.main,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.background.main,
     flexDirection: 'column',
     alignItems: 'center',
     gap: '0.75rem',
     padding: '0.75rem',
     cursor: 'pointer',
-    height: '252px',
     borderRadius: '12px',
     transition: 'transform 0.2s',
     '&:hover': {
@@ -91,7 +105,7 @@ const Container = styled('div')(({ theme }) => ({
   [`& .${classes.productImage}`]: {
     width: '100%',
     height: '100%',
-    backgroundColor: theme.palette.background.main,
+    backgroundColor: theme.palette.primary.main,
     borderRadius: '12px',
   },
 
@@ -100,7 +114,7 @@ const Container = styled('div')(({ theme }) => ({
     minWidth: '320px',
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: theme.palette.contrast.main,
+    backgroundColor: theme.palette.primary.main,
     borderRadius: '12px',
     overflow: 'hidden',
     '@media (max-width: 768px)': {
@@ -112,7 +126,7 @@ const Container = styled('div')(({ theme }) => ({
   [`& .${classes.salesHeader}`]: {
     padding: '1rem',
     borderBottom: `1px solid ${theme.palette.background.main}`,
-    color: theme.palette.text.primary,
+    color: theme.palette.background.main,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -123,7 +137,7 @@ const Container = styled('div')(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    backgroundColor: theme.palette.contrast.main,
+    backgroundColor: theme.palette.primary.main,
     borderRadius: '12px',
   },
 
@@ -137,9 +151,28 @@ const Container = styled('div')(({ theme }) => ({
   },
 
   [`& .${classes.salesTable} .MuiTableCell-root`]: {
-    borderBottom: `1px solid ${theme.palette.text.main}`,
+    borderBottom: `1px solid ${theme.palette.primary.main}`,
     color: theme.palette.text.primary,
     padding: '0.5rem',
+  },
+
+  [`& .${classes.buttonDeleteProducts}`]: {
+    backgroundColor: theme.palette.red.main,
+    color: theme.palette.background.main,
+    width: '28px',
+    height: '28px',
+    minWidth: '28px',
+    minHeight: '28px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
+    fontSize: '1.1rem',
+    lineHeight: 1,
+    '&:hover': {
+      backgroundColor: theme.palette.red.main,
+    },
   },
 
   [`& .${classes.totalSection}`]: {
@@ -148,16 +181,13 @@ const Container = styled('div')(({ theme }) => ({
     marginRight: '1rem',
     borderRadius: '12px',
     backgroundColor: theme.palette.background.main,
-    boxShadow: `0 2px 4px ${theme.palette.text.main}`,
   },
 
   [`& .${classes.containerButtons}`]: {
     display: 'grid',
-    gridGap: '1rem',
-    gridTemplateColumns: '1fr 5fr',
-    justifyContent: 'space-between',
+    gridTemplateColumns: '1fr 4fr',
     padding: '1rem',
-    borderTop: `1px solid ${theme.palette.primary.main}`,
+
   },
 
   [`& .${classes.buttonDelete}`]: {
@@ -166,22 +196,18 @@ const Container = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     flexDirection: 'row',
-    borderRadius: '50px',
-    minWidth: '24px',
-    width: '24px',
-    height: '24px',
-    padding: '0',
     marginRight: '1rem',
   },
 
   [`& .${classes.buttonSale}`]: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.text.main,
+    backgroundColor: theme.palette.green.main,
+    color: theme.palette.background.main,
+    fontWeight: 'bold',
     display: 'flex',
     alignItems: 'center',
     flexDirection: 'row',
     borderRadius: '50px',
-  },
+  }
 }))
 
 
@@ -189,6 +215,7 @@ const Container = styled('div')(({ theme }) => ({
 const PointOfSale = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchType, setSearchType] = useState('name')
+  const [openModal, setOpenModal] = useState(false)
   const [cart, setCart] = useState([])
   const [products, setProducts] = useState([])
   const { token } = useToken()
@@ -240,8 +267,16 @@ const PointOfSale = () => {
     })
   }
 
-  const handleRemoveFromCart = productId => {
-    setCart(prevCart => prevCart.filter(item => item.id !== productId))
+  const handleRemoveFromCart = indexToRemove => {
+    setCart(prevCart => {
+      return prevCart.flatMap((item, index) => {
+        if (index !== indexToRemove) return [item]
+        if (item.quantity > 1) {
+          return [{ ...item, quantity: item.quantity - 1 }]
+        }
+        return []
+      })
+    })
   }
 
   const filteredProducts = products.filter(product => {
@@ -271,7 +306,7 @@ const PointOfSale = () => {
             </Select>
           </FormControl>
           <TextField
-            label="Buscar productos"
+            label="Search Products"
             variant="outlined"
             fullWidth
             size="small"
@@ -279,13 +314,6 @@ const PointOfSale = () => {
             onChange={e => setSearchTerm(e.target.value)}
             id="input-with-icon-textfield"
             className={classes.textFieldStyled}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
           />
         </div>
 
@@ -329,13 +357,13 @@ const PointOfSale = () => {
           <div className={classes.productsList}>
             <Table className={classes.salesTable}>
               <TableBody>
-                {cart.map(item => (
-                  <TableRow key={item.id}>
+                {cart.map((item, index) => (
+                  <TableRow key={index}>
                     <TableCell>
                       <Button
-                        className={classes.buttonDelete}
+                        className={classes.buttonDeleteProducts}
                         variant="contained"
-                        onClick={() => handleRemoveFromCart(item.id)}
+                        onClick={() => handleRemoveFromCart(index)}
                       >
                         ×
                       </Button>
@@ -353,10 +381,10 @@ const PointOfSale = () => {
             <Table>
               <TableBody>
                 <TableRow>
-                  <TableCell colSpan={2}>
+                  <TableCell sx={{ borderBottom: 'none' }}>
                     <T variant="subtitle1" style={{ fontWeight: 'bold' }}>Total</T>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="right" sx={{ borderBottom: 'none' }}>
                     <T variant="subtitle1" style={{ fontWeight: 'bold' }}>
                       ${total.toFixed(2)}
                     </T>
@@ -365,6 +393,7 @@ const PointOfSale = () => {
               </TableBody>
             </Table>
           </div>
+
           <div className={classes.containerButtons}>
             <IconButton
               className={classes.buttonDelete}
@@ -392,7 +421,7 @@ const PointOfSale = () => {
                     payload: salePayload,
                     token
                   })
-                  alert('Sale completed!')
+                  setOpenModal(true) // Abre el modal
                   setCart([])
                 } catch (err) {
                   alert('Error completing sale')
@@ -400,11 +429,50 @@ const PointOfSale = () => {
                 }
               }}
             >
-              Sale Products
+              Sell Products
             </IconButton>
           </div>
         </div>
       </Paper>
+
+      <Dialog
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        classes={{ paper: classes.dialog }}
+        sx={{
+          '& .MuiDialog-paper': {
+            backgroundColor: 'background.main',
+            color: 'primary.main',
+            borderRadius: '12px',
+            padding: '2rem',
+            textAlign: 'center'
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 'bold', color: 'inherit' }}>
+        successful sale
+        </DialogTitle>
+        <DialogContent>
+          <T variant="body1" sx={{ color: 'inherit' }}>
+          The sale was completed successfully.
+          </T>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center' }}>
+          <Button
+            variant="contained"
+            color="green"
+            onClick={() => setOpenModal(false)}
+            sx={{
+              borderRadius: '50px',
+              fontWeight: 'bold',
+              color: 'background.main',
+              px: 4
+            }}
+          >
+          OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }
