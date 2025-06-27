@@ -22,9 +22,24 @@ vi.mock('~/app/api/Libs/prisma', () => {
           updatedAt: 'updatedAt',
         }),
       },
+      lot: {
+        findMany: ({ where }) => {
+          if (where.productId === 9) {
+            return [{ id: 1, productId: 9, currentAmount: 10 }]
+          }
+          if (where.productId === 8) {
+            return [{ id: 2, productId: 8, currentAmount: 0 }]
+          }
+          return []
+        },
+        deleteMany: () => ({
+          count: 1, 
+        }),
+      },
     },
   }
 })
+
 
 vi.mock('~/app/api/Libs/auth', () => ({
   authenticateToken: () => ({ role: 'ADMIN', userId: 1 }),
@@ -185,7 +200,7 @@ describe('API Product [id] - PATCH', () => {
 describe('API Product [id] - DELETE', () => {
   it.each([
     {
-      descr: 'Successful delete',
+      descr: 'Successful delete with lots and no stock',
       params: { id: '8' },
       expectedStatus: 200,
       expectedResponse: {
@@ -215,20 +230,30 @@ describe('API Product [id] - DELETE', () => {
       mockImplementation: new Error('Delete failed'),
       expectedStatus: 500,
       expectedResponse: { error: 'Delete failed' },
+    },
+    {
+      descr: 'Product has stock - should return 409',
+      params: { id: '9' },
+      expectedStatus: 409,
+      expectedResponse: { error: 'Product has stock' },
     }
-  ])('$descr', async ({ expectedStatus, expectedResponse, params, isNotAllowed, mockImplementation }) => {
-    if (isNotAllowed) {
-      const auth = await import('~/app/api/Libs/auth')
-      vi.spyOn(auth, 'authenticateToken').mockReturnValueOnce(null)
-    }
-    if (mockImplementation) {
-      const prisma = await import('~/app/api/Libs/prisma')
-      vi.spyOn(prisma.default.product, 'delete').mockRejectedValueOnce(mockImplementation)
-    }
+  ])(
+    '$descr',
+    async ({ expectedStatus, expectedResponse, params, isNotAllowed, mockImplementation }) => {
+      if (isNotAllowed) {
+        const auth = await import('~/app/api/Libs/auth')
+        vi.spyOn(auth, 'authenticateToken').mockReturnValueOnce(null)
+      }
 
-    const response = await DELETE({}, { params })
-    const json = await response.json()
-    expect(response.status).toBe(expectedStatus)
-    expect(json).toEqual(expectedResponse)
-  })
+      if (mockImplementation) {
+        const prisma = await import('~/app/api/Libs/prisma')
+        vi.spyOn(prisma.default.product, 'delete').mockRejectedValueOnce(mockImplementation)
+      }
+
+      const response = await DELETE({}, { params })
+      const json = await response.json()
+      expect(response.status).toBe(expectedStatus)
+      expect(json).toEqual(expectedResponse)
+    }
+  )
 })

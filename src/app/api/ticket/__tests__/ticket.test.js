@@ -38,7 +38,7 @@ describe('API Ticket - GET', () => {
       expectedStatus: 200,
       expectedResponse: [
         { id: 1, total: 100, userId: 1, products: [], date: '2023-06-15' },
-        { id: 2, total: 200, userId: 2, products: [], date: '2023-06-15'  }
+        { id: 2, total: 200, userId: 2, products: [], date: '2023-06-15' }
       ]
     },
     {
