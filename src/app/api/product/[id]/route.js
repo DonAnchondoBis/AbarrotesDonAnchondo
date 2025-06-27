@@ -64,6 +64,22 @@ export const DELETE = async (request, { params }) => {
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
 
+    const lots = await prisma.lot.findMany({
+      where: { 
+        productId: Number(id)
+      }
+    })
+
+    const hasStock = lots.some(lot => lot.currentAmount > 0)
+    
+    if (hasStock) return ERROR.PRODUCT_HAS_STOCK()
+
+    if (lots.length > 0) {
+      await prisma.lot.deleteMany({
+        where: { productId: Number(id) }
+      })
+    }
+
     const payload = await prisma.product.delete({
       where: { 
         id: Number(id) 
