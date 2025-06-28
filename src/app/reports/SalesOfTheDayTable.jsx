@@ -144,7 +144,7 @@ const SalesOfTheDayTable = ({ data = [], date = '' }) => {
         />
       </TableContainer>
       <div className={classes.buttonContainer}>
-        <ReportButton category="salesOfTheDay" data={data} />
+        <ReportButton category="salesOfTheDay" data={salesDayData} />
       </div>
     </Container>
   )
