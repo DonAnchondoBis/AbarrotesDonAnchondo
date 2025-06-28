@@ -7,48 +7,64 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import usePermitted from '~/app/Lib/Permissions/utils'
 import HomeIcon from '@mui/icons-material/Home'
 import LogoutIcon from '@mui/icons-material/Logout'
+import { useToken } from '~/app/store/useToken'
+import { useData } from '~/app/store/useData'
+import { useRouter } from 'next/navigation'
 
-export const useSideBarOpts = () => ([
-  {
-    title: 'Home',
-    path: '/',
-    Icon: props => <HomeIcon {...props} />,
-    status: 'available'
-  },
-  {
-    title: 'Point of Sale',
-    path: '/point-of-sale',
-    Icon: props => <ShoppingCartIcon {...props} />,
-    status: (usePermitted({ roleRequired: 'CASHIER' }) ? 'available' : 'unavailable')
-  },
-  {
-    title: 'Inventory',
-    path: '/inventory',
-    Icon: props => <InventoryIcon {...props} />,
-    status: (usePermitted({ roleRequired: 'WAREHOUSE' }) ? 'available' : 'unavailable')
-  },
-  {
-    title: 'Acquisitions',
-    path: '/acquisitions',
-    Icon: props => <PaidIcon {...props} />,
-    status: (usePermitted({ roleRequired: 'WAREHOUSE' }) ? 'available' : 'unavailable')
-  },
-  {
-    title: 'Reports',
-    path: '/reports',
-    Icon: props => <DescriptionIcon {...props} />,
-    status: (usePermitted({ roleRequired: 'ADMIN' }) ? 'available' : 'unavailable')
-  },
-  {
-    title: 'Settings',
-    path: '/settings',
-    Icon: props => <SettingsIcon {...props} />,
-    status: (usePermitted({ roleRequired: 'ADMIN' }) ? 'available' : 'unavailable')
-  },
-  {
-    title: 'Logout',
-    path: '/logout',
-    Icon: props => <LogoutIcon {...props} />,
-    status: 'available'
-  },
-])
+export const useSideBarOpts = () => {
+  const { setToken } = useToken()
+  const { setRole, setUserId } = useData()
+  const router = useRouter()
+
+  const handleLogout = () => {
+    setToken(null)
+    setRole(null)
+    setUserId(null)
+    router.push('/')
+  }
+
+  return [
+    {
+      title: 'Home',
+      path: '/',
+      Icon: props => <HomeIcon {...props} />,
+      status: 'available'
+    },
+    {
+      title: 'Point of Sale',
+      path: '/pointOfSale',
+      Icon: props => <ShoppingCartIcon {...props} />,
+      status: (usePermitted({ roleRequired: 'CASHIER' }) ? 'available' : 'unavailable')
+    },
+    {
+      title: 'Inventory',
+      path: '/inventory',
+      Icon: props => <InventoryIcon {...props} />,
+      status: (usePermitted({ roleRequired: 'WAREHOUSE' }) ? 'available' : 'unavailable')
+    },
+    {
+      title: 'Acquisitions',
+      path: '/acquisitions',
+      Icon: props => <PaidIcon {...props} />,
+      status: (usePermitted({ roleRequired: 'WAREHOUSE' }) ? 'available' : 'unavailable')
+    },
+    {
+      title: 'Reports',
+      path: '/reports',
+      Icon: props => <DescriptionIcon {...props} />,
+      status: (usePermitted({ roleRequired: 'ADMIN' }) ? 'available' : 'unavailable')
+    },
+    {
+      title: 'Settings',
+      path: '/settings',
+      Icon: props => <SettingsIcon {...props} />,
+      status: (usePermitted({ roleRequired: 'ADMIN' }) ? 'available' : 'unavailable')
+    },
+    {
+      title: 'Logout',
+      Icon: props => <LogoutIcon {...props} />,
+      status: 'available',
+      onClick: handleLogout
+    },
+  ]
+}

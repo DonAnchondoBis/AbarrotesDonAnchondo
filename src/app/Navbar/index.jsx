@@ -99,8 +99,18 @@ const Navbar = () => {
             </IconButton>
           </Stack>
           <Stack spacing={2}>
-            {sidebarOpts.map(({ Icon, status, title, path }, index) => {
+            {sidebarOpts.map(({ Icon, status, title, path, onClick }, index) => {
               if (status === 'available') {
+                if (onClick) {
+                  return (
+                    <div key={`${title}-${index}`} className={classes.link} onClick={onClick} style={{ cursor: 'pointer' }}>
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                        <Icon className={classes.navIcon} fontSize="large"/>
+                        <T color="background.main">{title}</T>
+                      </Stack>
+                    </div>
+                  )
+                }
                 return (
                   <Link href={path} key={`${title}-${index}`} className={classes.link}>
                     <Stack direction="row" alignItems="center" spacing={2}>
