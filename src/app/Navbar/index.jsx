@@ -8,7 +8,7 @@ import { AiOutlineClose } from 'react-icons/ai'
 import Image from 'next/image'
 import { brownLogo } from '~/app/UI/Images'
 
-import { IconButton, Stack, Typography as T } from '@mui/material'
+import { IconButton, Stack, Typography as T, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useSideBarOpts } from './utils'
 import getClassPrefixer from '~/app/UI/classPrefixer'
@@ -103,12 +103,9 @@ const Navbar = () => {
               if (status === 'available') {
                 if (onClick) {
                   return (
-                    <div key={`${title}-${index}`} className={classes.link} onClick={onClick} style={{ cursor: 'pointer' }}>
-                      <Stack direction="row" alignItems="center" spacing={2}>
-                        <Icon className={classes.navIcon} fontSize="large"/>
-                        <T color="background.main">{title}</T>
-                      </Stack>
-                    </div>
+                    <Button key={`${title}-${index}`} className={classes.link} onClick={onClick} startIcon={<Icon className={classes.navIcon} fontSize="large"/>}>
+                      <T color="background.main">{title}</T>
+                    </Button>
                   )
                 }
                 return (
