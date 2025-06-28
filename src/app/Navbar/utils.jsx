@@ -20,7 +20,7 @@ export const useSideBarOpts = () => {
     setToken(null)
     setRole(null)
     setUserId(null)
-    router.push('/')
+    router.replace('/')
   }
 
   return [
