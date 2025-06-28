@@ -13,6 +13,7 @@ import {
 import { styled } from '@mui/material/styles'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import SearchIcon from '@mui/icons-material/Search'
+import NotAvailable from '~/app/UI/Shared/NotAvailable'
 
 import { useState, useEffect } from 'react'
 
@@ -25,6 +26,8 @@ import AddProductModal from './components/AddProductModal'
 import EditProductModal from './components/EditProductModal'
 import AdjustmentModal from './components/AdjustmentModal'
 import DeleteProductModal from '~/app/inventory/components/DeleteProductModal'
+
+import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
 
 const displayName = 'InventoryPage'
 const classes = getClassPrefixer(displayName)
@@ -237,28 +240,31 @@ const Wrapper = () => {
   }, [token])
 
   if (isLoading) return <Loading />
+  
   return (
-    <InventoryPage
-      products={products}
-      lots={lots}
-      isLoading={isLoading}
-      searchProducts={searchProducts}
-      handleSearchProducts={handleSearchProducts}
-      modalOpenAddProduct={openModalAddProduct}
-      openModalAddProduct={openModalAddProduct}
-      setOpenModalAddProduct={setModalOpenAddProduct}
-      snackbarMessage={snackbarMessage}
-      setSnackbarMessage={setSnackbarMessage}
-      refresh={refresh}
-      openModalEditProduct={openModalEditProduct}
-      setOpenModalEditProduct={setModalOpenEditProduct}
-      selectedProduct={selectedProduct}
-      setSelectedProduct={setSelectedProduct}
-      openModalAdjustment={openModalAdjustment}
-      setOpenModalAdjustment={setModalOpenAdjustment}
-      setModalOpenDeleteProduct={setModalOpenDeleteProduct}
-      openModalDeleteProduct={openModalDeleteProduct}
-    />
+    <AuthWrapper Fallback={NotAvailable} roleRequired='WAREHOUSE'>
+      <InventoryPage
+        products={products}
+        lots={lots}
+        isLoading={isLoading}
+        searchProducts={searchProducts}
+        handleSearchProducts={handleSearchProducts}
+        modalOpenAddProduct={openModalAddProduct}
+        openModalAddProduct={openModalAddProduct}
+        setOpenModalAddProduct={setModalOpenAddProduct}
+        snackbarMessage={snackbarMessage}
+        setSnackbarMessage={setSnackbarMessage}
+        refresh={refresh}
+        openModalEditProduct={openModalEditProduct}
+        setOpenModalEditProduct={setModalOpenEditProduct}
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
+        openModalAdjustment={openModalAdjustment}
+        setOpenModalAdjustment={setModalOpenAdjustment}
+        setModalOpenDeleteProduct={setModalOpenDeleteProduct}
+        openModalDeleteProduct={openModalDeleteProduct}
+      />
+    </AuthWrapper>
   )
 }
 

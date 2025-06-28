@@ -93,7 +93,7 @@ const InventoryTable = ({ data = [], search = '' }) => {
                 <Typography color="primary.main" fontWeight="bold">Amount</Typography>
               </TableCell>
               <TableCell align="center">
-                <Typography color="primary.main" fontWeight="bold">Expires sooner</Typography>
+                <Typography color="primary.main" fontWeight="bold">Closest expiration date</Typography>
               </TableCell>
             </TableRow>
           </TableHead>

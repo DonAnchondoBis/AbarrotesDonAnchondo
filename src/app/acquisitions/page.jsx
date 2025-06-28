@@ -29,7 +29,7 @@ import { useToken } from '~/app/store/useToken'
 import Loading from '~/app/UI/Shared/Loading'
 import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
 
-const displayName = 'acquisitionsPage'
+const displayName = 'AcquisitionsPage'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({

@@ -105,7 +105,7 @@ const Login = ({
             component={TextField}
             placeholder="Username"
             type="text"
-            label="username"
+            label="Username"
             variant="outlined"
           />
           <Field
