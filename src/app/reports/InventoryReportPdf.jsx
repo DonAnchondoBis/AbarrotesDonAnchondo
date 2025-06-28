@@ -64,33 +64,35 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 3,
   },
-  lotTable: {
-    width: '100%',
-    marginTop: 8,
-    borderCollapse: 'collapse',
-  },
   tableHeader: {
+    flexDirection: 'row',
     backgroundColor: primaryColor,
-    color: 'white',
-    fontSize: 10,
+    borderRadius: 4,
+    marginBottom: 5,
+    paddingVertical: 6,
+    marginTop: 8,
+  },
+  headerCell: {
+    fontSize: 11,
     fontWeight: 'bold',
-    padding: 5,
+    color: 'white',
+    textAlign: 'center',
     flex: 1.5,
   },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-    padding: 5,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  tableRowAlt: {
+    backgroundColor: '#fafafa',
   },
   tableCell: {
-    fontSize: 10,
-    padding: 5,
+    fontSize: 11,
     flex: 1.5,
-  },
-  warningText: {
-    color: '#d32f2f',
-    fontWeight: 'bold',
+    textAlign: 'center',
   },
   summaryBox: {
     backgroundColor: '#f5f5f5',
@@ -165,7 +167,7 @@ export const InventoryReportPdf = ({ data = [] }) => {
           </Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Details of the Products</Text>
+        <Text style={styles.sectionTitle}>Product Details</Text>
 
         {uniqueProducts.map(product => (
           <View key={product.id} style={styles.productCard} wrap={false}>
@@ -178,23 +180,19 @@ export const InventoryReportPdf = ({ data = [] }) => {
               {product.unit === 'PIECE' ? 'units' : product.unit.toLowerCase()}
             </Text>
 
-            <View style={styles.lotTable}>
-              <View
-                style={{ flexDirection: 'row', backgroundColor: '#e3f2fd' }}
-              >
-                <Text style={styles.tableHeader}>Batch</Text>
-                <Text style={styles.tableHeader}>Quantity</Text>
-                <Text style={styles.tableHeader}>Expiration Date</Text>
-              </View>
-
-              {product.lots.map(lot => (
-                <View key={lot.id} style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{lot.id}</Text>
-                  <Text style={styles.tableCell}>{lot.currentAmount}</Text>
-                  <Text style={styles.tableCell}>{lot.expirationDate}</Text>
-                </View>
-              ))}
+            <View style={styles.tableHeader}>
+              <Text style={styles.headerCell}>Batch</Text>
+              <Text style={styles.headerCell}>Quantity</Text>
+              <Text style={styles.headerCell}>Expiration Date</Text>
             </View>
+
+            {product.lots.map((lot, idx) => (
+              <View key={lot.id} style={[styles.tableRow, idx % 2 === 0 && styles.tableRowAlt]}>
+                <Text style={styles.tableCell}>{lot.id}</Text>
+                <Text style={styles.tableCell}>{lot.currentAmount}</Text>
+                <Text style={styles.tableCell}>{lot.expirationDate}</Text>
+              </View>
+            ))}
           </View>
         ))}
 

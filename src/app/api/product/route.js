@@ -14,7 +14,8 @@ export const GET = async request => {
     if (!['ADMIN', 'WAREHOUSE', 'CASHIER'].includes(role) || !userId) return ERROR.FORBIDDEN()
 
     const products = await prisma.product.findMany({
-      where: { active: true }
+      where: { active: true },
+      include: { lots: true }
     })
     const response = products.map(product => cleanerData({ payload: product }))
     return NextResponse.json(response, { status: 200 })
@@ -51,8 +52,9 @@ export const POST = async request => {
 
     const payload = await prisma.product.create({
       data: {
-        imageUrl: url,
         ...data,
+        imageUrl: url,
+        price: Number(data.price ?? 0),
       }
     })
     const response = cleanerData({ payload })

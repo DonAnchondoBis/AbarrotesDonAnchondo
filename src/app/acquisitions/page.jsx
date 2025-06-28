@@ -261,7 +261,6 @@ const Wrapper = () => {
       const responseProducts = await apiFetch({ url: 'api/product', method: 'GET', token })
       const isForbidden = responseSuppliers.error === 'Not Allowed' || responseLots.error === 'Not Allowed' || responseProducts.error === 'Not Allowed'
 
-
       setSuppliers(responseSuppliers?.error ? [] : responseSuppliers)
       setLots(responseLots?.error ? [] : responseLots)
       setProducts(responseProducts?.error ? [] : responseProducts)

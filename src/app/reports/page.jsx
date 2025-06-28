@@ -12,7 +12,6 @@ import getClassPrefixer from '~/app/UI/classPrefixer'
 
 import EmptyState from '~/app/UI/Shared/EmptyState'
 
-import ErrorIcon from '@mui/icons-material/Error'
 import CalendarMonthTwoToneIcon from '@mui/icons-material/CalendarMonthTwoTone'
 
 import InventoryTable from './InventoryTable'
@@ -103,7 +102,6 @@ const ReportsPage = ({
   handleDateChangeShrinkage,
   selectedDateSalesday,
   handleDateChangeSalesday,
-  error
 }) => {
   return (
     <Container>
@@ -120,7 +118,7 @@ const ReportsPage = ({
           <Tab label="Shrinkage" value="shrinkage" />
           <Tab label="Sales of the day" value="salesday" />
         </Tabs>
-        {selectedCategory === 'inventory' && !error && (
+        {selectedCategory === 'inventory' && (
           <OutlinedInput
             className={classes.searchInput}
             placeholder="Search by name"
@@ -164,16 +162,9 @@ const ReportsPage = ({
         )}
       </div>
       <div className={classes.tableContainer}>
-        {selectedCategory === 'inventory' && !error && <InventoryTable data={inventory} search={search} />}
-        {selectedCategory === 'shrinkage' && !error && selectedDateShrinkage && <ShrinkageTable data={shrinkage} date={selectedDateShrinkage} />}
-        {selectedCategory === 'salesday' && !error && selectedDateSalesday && <SalesOfTheDayTable data={salesday} date={selectedDateSalesday} />}
-        {error && (
-          <EmptyState
-            icon={<ErrorIcon sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
-            title="Sorry, an error was ocurred."
-            subtitle="Please considerer try again later."
-          />
-        )}
+        {selectedCategory === 'inventory' && <InventoryTable data={inventory} search={search} />}
+        {selectedCategory === 'shrinkage' && selectedDateShrinkage && <ShrinkageTable data={shrinkage} date={selectedDateShrinkage} />}
+        {selectedCategory === 'salesday' && selectedDateSalesday && <SalesOfTheDayTable data={salesday} date={selectedDateSalesday} />}
         {(!selectedDateSalesday) && (selectedCategory === 'salesday') && (
           <EmptyState
             icon={<CalendarMonthTwoToneIcon sx={{ fontSize: 100, color: theme => theme.palette.primary.main }} />}
@@ -197,7 +188,6 @@ const Wrapper = () => {
   const [selectedCategory, setSelectedCategory] = useState('inventory')
   const [selectedDateShrinkage, setSelectedDateShrinkage] = useState(null)
   const [selectedDateSalesday, setSelectedDateSalesday] = useState(null)
-  const [error, setError] = useState(false)
   const [shrinkage, setShrinkage] = useState([])
   const [salesday, setSalesday] = useState([])
   const [search, setSearch] = useState('')
@@ -218,22 +208,11 @@ const Wrapper = () => {
         apiFetch({ url: 'api/inventoryLog?type=SHRINKAGE', method: 'GET', token }),
         apiFetch({ url: 'api/ticket', method: 'GET', token })
       ])
-      if (inventoryData.error || salesdayData.error || shrinkageData.error ) {
-        const isForbidden = inventoryData.error === 'Not Allowed'
-                            || salesdayData.error === 'Not Allowed'
-                            || shrinkageData.error === 'Not Allowed'
-        setError(isForbidden)
-        setInventory([])
-        setSalesday([])
-        setShrinkage([])
-        setIsLoading(isForbidden)
-      } else {
-        setInventory(inventoryData)
-        setShrinkage(shrinkageData)
-        setSalesday(salesdayData)
-        setError(false)
-        setIsLoading(false)
-      }
+      const isForbidden = inventoryData?.error === 'Not Allowed' && salesdayData?.error === 'Not Allowed' && shrinkageData?.error === 'Not Allowed'
+      setInventory(inventoryData?.error ? [] : inventoryData)
+      setSalesday(salesdayData?.error ? [] : salesdayData)
+      setShrinkage(shrinkageData?.error ? [] : shrinkageData)
+      setIsLoading(isForbidden)
     }
     fetchData()
 
@@ -251,7 +230,6 @@ const Wrapper = () => {
         salesday={salesday}
         inventory={inventory}
         isLoading={isLoading}
-        error={error}
         selectedDateShrinkage={selectedDateShrinkage}
         handleDateChangeShrinkage={handleDateChangeShrinkage}
         selectedDateSalesday={selectedDateSalesday}
