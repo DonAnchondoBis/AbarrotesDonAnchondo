@@ -31,7 +31,7 @@ const background = getThemeColor('#FEF7E5')
 const green = getThemeColor('#2f7d31')
 const gray = getThemeColor('#5A5A5A')
 const red = getThemeColor('#FA6A63')
-const darkRed = getThemeColor('#B19A7B')
+const darkRed = getThemeColor('#C41E3A')
 
 const colors = {
   contrast,

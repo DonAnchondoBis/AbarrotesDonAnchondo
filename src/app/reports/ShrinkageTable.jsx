@@ -139,7 +139,7 @@ const ShrinkageTable = ({ data = [], date = '' }) => {
         />
       </TableContainer>
       <div className={classes.buttonContainer}>
-        <ReportButton category="shrinkage" data={data} />
+        <ReportButton category="shrinkage" data={shrinkageData} />
       </div>
     </Container>
   )

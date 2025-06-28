@@ -11,7 +11,8 @@ const ERROR = {
   FORBIDDEN: () => { throw new CustomError({ message: 'Not allowed', status: 403 }) },
   NOT_FOUND: () => { throw new CustomError({ message: 'Not found', status: 404 }) },
   USER_ALREADY_EXISTS: () => { throw new CustomError({ message: 'User already exists', status: 409 }) },
-  SERVICE_UNAVAILABLE: () => { throw new CustomError({ message: 'Service unavailable', status: 503 }) }
+  SERVICE_UNAVAILABLE: () => { throw new CustomError({ message: 'Service unavailable', status: 503 }) },
+  PRODUCT_HAS_STOCK: () => { throw new CustomError({ message: 'Product has stock', status: 409 }) },
 }
 
 export default ERROR
