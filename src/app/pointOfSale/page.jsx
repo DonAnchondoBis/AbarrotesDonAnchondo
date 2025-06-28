@@ -1,11 +1,36 @@
 'use client'
 import { useState, useEffect } from 'react'
+
 import { styled } from '@mui/material/styles'
-import { Typography as T, TextField, Paper, Table, TableBody, TableCell, TableRow, Button, IconButton, Select, MenuItem, FormControl, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
+
+import { Typography as T, 
+  TextField, 
+  Paper, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableRow, 
+  Button, 
+  IconButton, 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions } from '@mui/material'
+
 import DeleteIcon from '@mui/icons-material/Delete'
+import SearchIcon from '@mui/icons-material/Search'
+import InputAdornment from '@mui/material/InputAdornment'
+import RemoveIcon from '@mui/icons-material/Remove'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import apiFetch from '~/app/Lib/apiFetch'
+
 import { useToken } from '~/app/store/useToken'
+
 import Image from 'next/image'
 import { notPhoto } from '~/app/UI/Images'
 
@@ -32,7 +57,6 @@ const Container = styled('div')(({ theme }) => ({
 
   [`& .${classes.searchContainer}`]: {
     width: '100%',
-    padding: '0.5rem 0',
     display: 'flex',
     gap: '0.5rem',
     alignItems: 'center',
@@ -58,15 +82,23 @@ const Container = styled('div')(({ theme }) => ({
     },
   },
 
+
   [`& .${classes.textFieldStyled}`]: {
     background: theme.palette.primary.main,
     '& .MuiInputLabel-outlined': {
-      backgroundColor: theme.palette.primary.main,
-      color: theme.palette.background.main,
-      
+      backgroundColor: theme.palette.background.main,
+      color: theme.palette.primary.main,
+      border : `1px solid ${theme.palette.primary.main}`,
       borderRadius: '2rem',
       padding: '0 1rem',
       marginLeft: '-4px',
+    },
+    '& .MuiOutlinedInput-root': {
+      color: theme.palette.background.main,
+      paddingLeft: '8px',
+    },
+    '& .MuiSvgIcon-root': {
+      color: theme.palette.background.main,
     },
     '& .MuiInputBase-input': {
       color: theme.palette.background.main,
@@ -110,7 +142,7 @@ const Container = styled('div')(({ theme }) => ({
   },
 
   [`& .${classes.salesSection}`]: {
-    width: '320px',
+    width: '420px',
     minWidth: '320px',
     display: 'flex',
     flexDirection: 'column',
@@ -150,10 +182,46 @@ const Container = styled('div')(({ theme }) => ({
     backgroundColor: theme.palette.background.main,
   },
 
+  [`& .${classes.salesTable}`]: {
+    width: '100%',
+    tableLayout: 'fixed', // Evita que las celdas se expandan demasiado
+    display: 'table', // Fuerza el comportamiento de tabla tradicional
+  },
+
   [`& .${classes.salesTable} .MuiTableCell-root`]: {
     borderBottom: `1px solid ${theme.palette.primary.main}`,
     color: theme.palette.text.primary,
     padding: '0.5rem',
+    fontSize: '0.875rem',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    '@media (max-width: 600px)': {
+      padding: '0.25rem',
+      fontSize: '0.75rem',
+    },
+  },
+
+  [`& .${classes.salesTable} .MuiTableCell-root:first-of-type`]: {
+    width: '120px', // Ancho fijo para la columna de acciones
+    '@media (max-width: 600px)': {
+      width: '100px',
+    },
+  },
+
+  [`& .${classes.salesTable} .MuiTableCell-root:nth-of-type(2)`]: {
+    maxWidth: '150px', // Limita el ancho del nombre del producto
+    '@media (max-width: 600px)': {
+      maxWidth: '100px',
+    },
+  },
+
+  [`& .${classes.salesTable} .MuiTableCell-root:last-of-type`]: {
+    width: '80px', // Ancho fijo para la columna de precio
+    textAlign: 'right',
+    '@media (max-width: 600px)': {
+      width: '60px',
+    },
   },
 
   [`& .${classes.buttonDeleteProducts}`]: {
@@ -185,18 +253,82 @@ const Container = styled('div')(({ theme }) => ({
 
   [`& .${classes.containerButtons}`]: {
     display: 'grid',
-    gridTemplateColumns: '1fr 4fr',
+    gridTemplateColumns: 'auto 4fr',
     padding: '1rem',
 
   },
 
   [`& .${classes.buttonDelete}`]: {
     backgroundColor: theme.palette.red.main,
-    color: theme.palette.text.main,
+    color: theme.palette.background.main,
+    borderRadius: '50%',
+    marginRight: '1rem',
+    '&:hover': {
+      backgroundColor: theme.palette.red.dark,
+    },
+    '&.Mui-disabled': { 
+      backgroundColor: theme.palette.primary.dark, 
+    },
+  },
+
+  [`& .${classes.buttonDeleteDisabled}`]: {
+    backgroundColor: theme.palette.red.main,
+    color: theme.palette.background.main,
+    borderRadius: '50%',
+    marginRight: '1rem',
+  },
+
+  [`& .${classes.buttonSaleDisabled}`]: {
+    fontWeight: 'bold',
+    borderRadius: '50px',
+    '&:hover': {
+      backgroundColor: theme.palette.green.dark,
+    },
+    '&.Mui-disabled': {
+      backgroundColor: theme.palette.primary.dark,
+      color: theme.palette.background.main,
+    },
+  },
+
+  [`& .${classes.productActions}`]: {
     display: 'flex',
     alignItems: 'center',
-    flexDirection: 'row',
-    marginRight: '1rem',
+    gap: '0.25rem',
+  },
+
+
+  [`& .${classes.buttonRemoveOne}`]: {
+    minWidth: '24px',
+    width: '24px',
+    height: '24px',
+    padding: '6px',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.dark,
+    },
+  },
+
+  [`& .${classes.buttonRemoveAll}`]: {
+    minWidth: '24px',
+    width: '24px',
+    height: '24px',
+    padding: '6px',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.dark,
+    },
+  },
+
+  [`& .${classes.quantityBadge}`]: {
+    minWidth: '24px',
+    textAlign: 'center',
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    borderRadius: '12px',
+    padding: '2px 6px',
+    fontSize: '0.8rem',
+    fontWeight: 'bold',
+    margin: '0 4px',
   },
 
   [`& .${classes.buttonSale}`]: {
@@ -208,6 +340,8 @@ const Container = styled('div')(({ theme }) => ({
     flexDirection: 'row',
     borderRadius: '50px',
   }
+
+  
 }))
 
 
@@ -267,6 +401,10 @@ const PointOfSale = () => {
     })
   }
 
+  const handleRemoveAllFromCart = indexToRemove => {
+    setCart(prevCart => prevCart.filter((_, index) => index !== indexToRemove))
+  }
+
   const handleRemoveFromCart = indexToRemove => {
     setCart(prevCart => {
       return prevCart.flatMap((item, index) => {
@@ -306,14 +444,20 @@ const PointOfSale = () => {
             </Select>
           </FormControl>
           <TextField
-            label="Search Products"
+            placeholder="Search Products"
             variant="outlined"
             fullWidth
             size="small"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            id="input-with-icon-textfield"
             className={classes.textFieldStyled}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
           />
         </div>
 
@@ -350,7 +494,7 @@ const PointOfSale = () => {
 
       <Paper className={classes.salesSection} elevation={3}>
         <div className={classes.salesHeader}>
-          <T variant="h6">Product List</T>
+          <T variant="h6">Ticket</T>
         </div>
 
         <div className={classes.salesContent}>
@@ -360,17 +504,36 @@ const PointOfSale = () => {
                 {cart.map((item, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      <Button
-                        className={classes.buttonDeleteProducts}
-                        variant="contained"
-                        onClick={() => handleRemoveFromCart(index)}
-                      >
-                        ×
-                      </Button>
-                      {item.quantity}
+                      <div className={classes.productActions}>
+                        <IconButton
+                          className={classes.buttonRemoveOne}
+                          aria-label="Remove one item"
+                          onClick={() => handleRemoveFromCart(index)}
+                          size="small"
+                        >
+                          <RemoveIcon fontSize="small" />
+                        </IconButton>
+            
+                        <span className={classes.quantityBadge}>
+                          {item.quantity}
+                        </span>
+            
+                        <IconButton
+                          className={classes.buttonRemoveAll}
+                          aria-label="Remove all items"
+                          onClick={() => handleRemoveAllFromCart(index)}
+                          size="small"
+                        >
+                          <DeleteForeverIcon fontSize="small" />
+                        </IconButton>
+                      </div>
                     </TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell align="right">${ensureNumber(item.price).toFixed(2)}</TableCell>
+                    <TableCell>
+                      <T variant="body2" noWrap>{item.name}</T>
+                    </TableCell>
+                    <TableCell align="right">
+                      <T variant="body2">${ensureNumber(item.price).toFixed(2)}</T>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -396,17 +559,22 @@ const PointOfSale = () => {
 
           <div className={classes.containerButtons}>
             <IconButton
-              className={classes.buttonDelete}
+              className={cart.length === 0 ? classes.buttonDelete : classes.buttonDeleteDisabled}
               aria-label="delete"
+              disabled={cart.length === 0} 
               variant="outlined"
               onClick={() => setCart([])}
             >
               <DeleteIcon />
             </IconButton>
-            <IconButton
-              className={classes.buttonSale}
+            <Button
+              className={cart.length === 0 ? classes.buttonSaleDisabled : classes.buttonSale}
               variant="contained"
+              disabled={cart.length === 0}
+              fullWidth
               onClick={async () => {
+                if (cart.length === 0) return
+    
                 const salePayload = {
                   products: cart.map(item => ({
                     productId: item.id,
@@ -421,7 +589,7 @@ const PointOfSale = () => {
                     payload: salePayload,
                     token
                   })
-                  setOpenModal(true) // Abre el modal
+                  setOpenModal(true)
                   setCart([])
                 } catch (err) {
                   alert('Error completing sale')
@@ -430,7 +598,7 @@ const PointOfSale = () => {
               }}
             >
               Sell Products
-            </IconButton>
+            </Button>
           </div>
         </div>
       </Paper>
