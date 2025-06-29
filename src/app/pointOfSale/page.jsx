@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { styled } from '@mui/material/styles'
 
@@ -28,6 +28,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import apiFetch from '~/app/Lib/apiFetch'
+import Loading from '~/app/UI/Shared/Loading'
 
 import { useToken } from '~/app/store/useToken'
 
@@ -350,26 +351,32 @@ const PointOfSale = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchType, setSearchType] = useState('name')
   const [openModal, setOpenModal] = useState(false)
+  const [openStockErrorModal, setOpenStockErrorModal] = useState(false)
+  const [stockErrors, setStockErrors] = useState([])
   const [cart, setCart] = useState([])
   const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const { token } = useToken()
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const result = await apiFetch({
-          method: 'GET',
-          url: '/api/product',
-          token
-        })
-        setProducts(Array.isArray(result) ? result : result.data || result.products || [])
-      } catch (error) {
-        setProducts([])
-      }
-      
+  const fetchProducts = useCallback(async () => {
+    setLoading(true)
+    try {
+      const result = await apiFetch({
+        method: 'GET',
+        url: '/api/product',
+        token
+      })
+      setProducts(Array.isArray(result) ? result : result.data || result.products || [])
+    } catch (error) {
+      setProducts([])
+    } finally {
+      setLoading(false)
     }
-    fetchProducts()
   }, [token])
+
+  useEffect(() => {
+    fetchProducts()
+  }, [token, fetchProducts])
 
   
 
@@ -417,7 +424,61 @@ const PointOfSale = () => {
     })
   }
 
+  const handleSale = async () => {
+    if (cart.length === 0) return
+
+    const stockValidationErrors = []
+    setLoading(true)
+    for (const cartItem of cart) {
+      const product = products.find(p => p.id === cartItem.id)
+      if (product) {
+        const totalStock = product.lots?.reduce((sum, lot) => sum + (lot.currentAmount || 0), 0) || 0
+        if (cartItem.quantity > totalStock) {
+          stockValidationErrors.push({
+            productName: product.name,
+            requested: cartItem.quantity,
+            available: totalStock
+          })
+        }
+      }
+    }
+
+    if (stockValidationErrors.length > 0) {
+      setStockErrors(stockValidationErrors)
+      setOpenStockErrorModal(true)
+      setLoading(false)
+      return
+    }
+
+    const salePayload = {
+      products: cart.map(item => ({
+        productId: item.id,
+        quantity: item.quantity
+      })),
+      total
+    }
+    
+    try {
+      await apiFetch({
+        method: 'POST',
+        url: '/api/ticket',
+        payload: salePayload,
+        token
+      })
+      setOpenModal(true)
+      setCart([])
+      fetchProducts()
+    } catch (err) {
+      alert('Error completing sale')
+      console.error(err)
+    }
+    setLoading(false)
+  }
+
   const filteredProducts = products.filter(product => {
+    const totalStock = product.lots?.reduce((sum, lot) => sum + (lot.currentAmount || 0), 0) || 0
+    if (totalStock === 0) return false
+    
     const searchValue = searchTerm.toLowerCase()
     if (searchType === 'name') {
       return product.name?.toLowerCase().includes(searchValue)
@@ -430,229 +491,251 @@ const PointOfSale = () => {
 
   return (
     <Container>
-      <div className={classes.mainContent}>
-        <div className={classes.searchContainer}>
-          <FormControl className={classes.searchTypeSelector}>
-            <Select
-              value={searchType}
-              onChange={e => setSearchType(e.target.value)}
-              size="small"
-              displayEmpty
-            >
-              <MenuItem value="name">Name</MenuItem>
-              <MenuItem value="SKU">SKU</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            placeholder="Search Products"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className={classes.textFieldStyled}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </div>
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <div className={classes.mainContent}>
+            <div className={classes.searchContainer}>
+              <FormControl className={classes.searchTypeSelector}>
+                <Select
+                  value={searchType}
+                  onChange={e => setSearchType(e.target.value)}
+                  size="small"
+                  displayEmpty
+                >
+                  <MenuItem value="name">Name</MenuItem>
+                  <MenuItem value="SKU">SKU</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                placeholder="Search Products"
+                variant="outlined"
+                fullWidth
+                size="small"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className={classes.textFieldStyled}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </div>
 
-        <div className={classes.productsGridContainer}>
-          <div className={classes.productsGrid}>
-            {filteredProducts.map(product => (
-              <Paper
-                key={product.id}
-                className={classes.productCard}
-                elevation={2}
-                onClick={() => handleAddToCart(product)}
-              >
-                <div className={classes.productImage}>
-                  <div style={{ position: 'relative', width: '100%', height: '120px' }}>
-                    <Image
-                      src={product?.imageUrl || notPhoto}
-                      alt={product.name}
-                      fill
-                      style={{
-                        objectFit: 'contain',
-                        borderRadius: '12px',
-                        background: '#fff'
-                      }}
-                    />
-                  </div>
-                </div>
-                <T variant="subtitle2">{product.name}</T>
-                <T variant="body2">${product.price}</T>
-              </Paper>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <Paper className={classes.salesSection} elevation={3}>
-        <div className={classes.salesHeader}>
-          <T variant="h6">Ticket</T>
-        </div>
-
-        <div className={classes.salesContent}>
-          <div className={classes.productsList}>
-            <Table className={classes.salesTable}>
-              <TableBody>
-                {cart.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <div className={classes.productActions}>
-                        <IconButton
-                          className={classes.buttonRemoveOne}
-                          aria-label="Remove one item"
-                          onClick={() => handleRemoveFromCart(index)}
-                          size="small"
-                        >
-                          <RemoveIcon fontSize="small" />
-                        </IconButton>
-            
-                        <span className={classes.quantityBadge}>
-                          {item.quantity}
-                        </span>
-            
-                        <IconButton
-                          className={classes.buttonRemoveAll}
-                          aria-label="Remove all items"
-                          onClick={() => handleRemoveAllFromCart(index)}
-                          size="small"
-                        >
-                          <DeleteForeverIcon fontSize="small" />
-                        </IconButton>
+            <div className={classes.productsGridContainer}>
+              <div className={classes.productsGrid}>
+                {filteredProducts.map(product => (
+                  <Paper
+                    key={product.id}
+                    className={classes.productCard}
+                    elevation={2}
+                    onClick={() => handleAddToCart(product)}
+                  >
+                    <div className={classes.productImage}>
+                      <div style={{ position: 'relative', width: '100%', height: '120px' }}>
+                        <Image
+                          src={product?.imageUrl || notPhoto}
+                          alt={product.name}
+                          fill
+                          style={{
+                            objectFit: 'contain',
+                            borderRadius: '12px',
+                            background: '#fff'
+                          }}
+                        />
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <T variant="body2" noWrap>{item.name}</T>
-                    </TableCell>
-                    <TableCell align="right">
-                      <T variant="body2">${ensureNumber(item.price).toFixed(2)}</T>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+                    <T variant="subtitle2">{product.name}</T>
+                    <T variant="body2">${product.price}</T>
+                  </Paper>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </div>
           </div>
 
-          <div className={classes.totalSection}>
-            <Table>
-              <TableBody>
-                <TableRow>
-                  <TableCell sx={{ borderBottom: 'none' }}>
-                    <T variant="subtitle1" style={{ fontWeight: 'bold' }}>Total</T>
-                  </TableCell>
-                  <TableCell align="right" sx={{ borderBottom: 'none' }}>
-                    <T variant="subtitle1" style={{ fontWeight: 'bold' }}>
-                      ${total.toFixed(2)}
-                    </T>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
+          <Paper className={classes.salesSection} elevation={3}>
+            <div className={classes.salesHeader}>
+              <T variant="h6">Ticket</T>
+            </div>
 
-          <div className={classes.containerButtons}>
-            <IconButton
-              className={cart.length === 0 ? classes.buttonDelete : classes.buttonDeleteDisabled}
-              aria-label="delete"
-              disabled={cart.length === 0} 
-              variant="outlined"
-              onClick={() => setCart([])}
-            >
-              <DeleteIcon />
-            </IconButton>
-            <Button
-              className={cart.length === 0 ? classes.buttonSaleDisabled : classes.buttonSale}
-              variant="contained"
-              disabled={cart.length === 0}
-              fullWidth
-              onClick={async () => {
-                if (cart.length === 0) return
-    
-                const salePayload = {
-                  products: cart.map(item => ({
-                    productId: item.id,
-                    quantity: item.quantity
-                  })),
-                  total
-                }
-                try {
-                  await apiFetch({
-                    method: 'POST',
-                    url: '/api/ticket',
-                    payload: salePayload,
-                    token
-                  })
-                  setOpenModal(true)
-                  setCart([])
-                } catch (err) {
-                  alert('Error completing sale')
-                  console.error(err)
-                }
-              }}
-            >
-              Sell Products
-            </Button>
-          </div>
-        </div>
-      </Paper>
+            <div className={classes.salesContent}>
+              <div className={classes.productsList}>
+                <Table className={classes.salesTable}>
+                  <TableBody>
+                    {cart.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <div className={classes.productActions}>
+                            <IconButton
+                              className={classes.buttonRemoveOne}
+                              aria-label="Remove one item"
+                              onClick={() => handleRemoveFromCart(index)}
+                              size="small"
+                            >
+                              <RemoveIcon fontSize="small" />
+                            </IconButton>
+                
+                            <span className={classes.quantityBadge}>
+                              {item.quantity}
+                            </span>
+                
+                            <IconButton
+                              className={classes.buttonRemoveAll}
+                              aria-label="Remove all items"
+                              onClick={() => handleRemoveAllFromCart(index)}
+                              size="small"
+                            >
+                              <DeleteForeverIcon fontSize="small" />
+                            </IconButton>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <T variant="body2" noWrap>{item.name}</T>
+                        </TableCell>
+                        <TableCell align="right">
+                          <T variant="body2">${ensureNumber(item.price).toFixed(2)}</T>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
 
-      <Dialog
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        classes={{ paper: classes.dialog }}
-        sx={{
-          '& .MuiDialog-paper': {
-            backgroundColor: 'background.main',
-            color: 'primary.main',
-            borderRadius: '12px',
-            padding: '2rem',
-            textAlign: 'center'
-          }
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: 'bold', color: 'inherit' }}>
-        successful sale
-        </DialogTitle>
-        <DialogContent>
-          <T variant="body1" sx={{ color: 'inherit' }}>
-          The sale was completed successfully.
-          </T>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center' }}>
-          <Button
-            variant="contained"
-            color="green"
-            onClick={() => setOpenModal(false)}
+              <div className={classes.totalSection}>
+                <Table>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell sx={{ borderBottom: 'none' }}>
+                        <T variant="subtitle1" style={{ fontWeight: 'bold' }}>Total</T>
+                      </TableCell>
+                      <TableCell align="right" sx={{ borderBottom: 'none' }}>
+                        <T variant="subtitle1" style={{ fontWeight: 'bold' }}>
+                          ${total.toFixed(2)}
+                        </T>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className={classes.containerButtons}>
+                <IconButton
+                  className={cart.length === 0 ? classes.buttonDelete : classes.buttonDeleteDisabled}
+                  aria-label="delete"
+                  disabled={cart.length === 0} 
+                  variant="outlined"
+                  onClick={() => setCart([])}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                <Button
+                  className={cart.length === 0 ? classes.buttonSaleDisabled : classes.buttonSale}
+                  variant="contained"
+                  disabled={cart.length === 0}
+                  fullWidth
+                  onClick={handleSale}
+                >
+                  Sell Products
+                </Button>
+              </div>
+            </div>
+          </Paper>
+
+          <Dialog
+            open={openModal}
+            onClose={() => setOpenModal(false)}
+            classes={{ paper: classes.dialog }}
             sx={{
-              borderRadius: '50px',
-              fontWeight: 'bold',
-              color: 'background.main',
-              px: 4
+              '& .MuiDialog-paper': {
+                backgroundColor: 'background.main',
+                color: 'primary.main',
+                borderRadius: '12px',
+                padding: '2rem',
+                textAlign: 'center'
+              }
             }}
           >
-          OK
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <DialogTitle sx={{ fontWeight: 'bold', color: 'inherit' }}>
+            successful sale
+            </DialogTitle>
+            <DialogContent>
+              <T variant="body1" sx={{ color: 'inherit' }}>
+              The sale was completed successfully.
+              </T>
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: 'center' }}>
+              <Button
+                variant="contained"
+                color="green"
+                onClick={() => setOpenModal(false)}
+                sx={{
+                  borderRadius: '50px',
+                  fontWeight: 'bold',
+                  color: 'background.main',
+                  px: 4
+                }}
+              >
+              OK
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            open={openStockErrorModal}
+            onClose={() => setOpenStockErrorModal(false)}
+            classes={{ paper: classes.dialog }}
+            sx={{
+              '& .MuiDialog-paper': {
+                backgroundColor: 'background.main',
+                color: 'red.main',
+                borderRadius: '12px',
+                padding: '2rem',
+                textAlign: 'center',
+                maxWidth: '500px'
+              }
+            }}
+          >
+            <DialogTitle sx={{ fontWeight: 'bold', color: 'red.main' }}>
+              Insufficient Stock
+            </DialogTitle>
+            <DialogContent>
+              <T variant="body1" sx={{ color: 'primary.main', mb: 2 }}>
+                The following products don&apos;t have enough stock:
+              </T>
+              {stockErrors.map((error, index) => (
+                <T key={index} variant="body2" sx={{ color: 'primary.main', display: 'block', mb: 1 }}>
+                  <strong>{error.productName}:</strong> Requested {error.requested}, Available {error.available}
+                </T>
+              ))}
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: 'center' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setOpenStockErrorModal(false)}
+                sx={{
+                  borderRadius: '50px',
+                  fontWeight: 'bold',
+                  color: 'background.main',
+                  px: 4
+                }}
+              >
+                OK
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
     </Container>
   )
 }
 
 const Wrapper = () => {
-  const classes = getClassPrefixer('sales-page-wrapper')
-
-  return (
-    <div className={classes.wrapper}>
-      <PointOfSale />
-    </div>
-  )
+  return <PointOfSale />
 }
 
 export default Wrapper
