@@ -6,7 +6,10 @@ import {
   Tab,
   OutlinedInput,
   InputAdornment,
-  Button
+  Button,
+  Modal,
+  Snackbar,
+  Alert
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { styled } from '@mui/material/styles'
@@ -22,7 +25,7 @@ import Loading from '~/app/UI/Shared/Loading'
 import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
 import NotAvailable from '~/app/UI/Shared/NotAvailable'
 
-const displayName = 'Competitors'
+const displayName = 'AdminModule'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
@@ -39,6 +42,7 @@ const Container = styled('div')(({ theme }) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     width: '100%',
     gap: '1rem',
     '@media (max-width: 768px)': {
@@ -65,174 +69,196 @@ const Container = styled('div')(({ theme }) => ({
   [`& .${classes.addButton}`]: {
     alignSelf: 'center',
     marginLeft: 'auto',
-    backgroundColor: theme.palette.contrast.main,
+    backgroundColor: theme.palette.green.main,
     borderRadius: '2rem',
     color: theme.palette.background.main,
     height: '3rem',
-    textTransform: 'none',
     padding: '6px 16px',
     '&:hover': {
-      backgroundColor: theme.palette.contrast.main,
-      opacity: 0.9,
+      backgroundColor: theme.palette.green.dark,
     }
   }
 }))
 
-const handleCloseAdd = () => {
-  setAddOpen(false)
-}
+const AdminModule = ({
+  selectedCategory,
+  handleCategoryChange,
+  search,
+  handleSearchChange,
+  handleOpenAdd,
+  users,
+  storeData,
+  error,
+  loading,
+  fetchStoreData,
+  fetchUsers,
+  handleUserDeleted,
+  addOpen,
+  handleCloseAdd,
+  handleUserAdded,
+  snackbar,
+  setSnackbar
+}) => {
+  if (loading) return <Loading />
 
-const handleConfirmAdd = (newUser) => {
-  console.log('Nuevo usuario:', newUser)
-  // Aquí puedes agregar el usuario a tu lista (con estado o petición al backend)
-  handleCloseAdd()
-}
+  return (
+    <Container>
+      <div className={classes.containerTools}>
+        <Tabs
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="scrollable"
+        >
+          <Tab label="Users" value="User" />
+          <Tab label="Store Info" value="Store Info" />
+        </Tabs>
 
-return (
-  <Container>
-    <div className={classes.containerTools}>
-      <Tabs
-        value={selectedCategory}
-        onChange={handleCategoryChange}
-        indicatorColor="primary"
-        textColor="primary"
-      >
-        <Tab label="Users" value="User" />
-        <Tab label="Data" value="Data" />
-      </Tabs>
+        {selectedCategory === 'User' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginLeft: 'auto' }}>
+            <OutlinedInput
+              className={classes.searchInput}
+              placeholder="Search by name"
+              size="small"
+              value={search}
+              onChange={handleSearchChange}
+              startAdornment={
+                <InputAdornment position="start">
+                  <SearchIcon color="background" />
+                </InputAdornment>
+              }
+            />
+            <Button onClick={handleOpenAdd} className={classes.addButton}>
+              Add User
+            </Button>
+          </div>
+        )}
+      </div>
 
-      {selectedCategory === 'User' && (
-        <>
-          <Button onClick={handleOpenAdd} className={classes.addButton} sx={{ alignSelf: 'center', marginLeft: 'auto' }}>
-            Add User
-          </Button>
-          <OutlinedInput
-            className={classes.searchInput}
-            placeholder="Buscar por nombre"
-            size="small"
-            value={search}
-            onChange={handleSearchChange}
-            startAdornment={
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            }
+      <div className={classes.tableContainer}>
+        {selectedCategory !== 'User' ? (
+          <DataTable
+            data={storeData}
+            error={error}
+            loading={loading}
+            fetchStoreData={fetchStoreData}
           />
-        </>
-      )}
-    </div>
+        ) : (
+          <UsersTable
+            users={users}
+            search={search}
+            fetchUsers={fetchUsers}
+            onUserDeleted={handleUserDeleted}
+            snackbar={snackbar}
+            setSnackbar={setSnackbar}
+          />
+        )}
+      </div>
 
-    <div className={classes.tableContainer}>
-      {selectedCategory !== 'User' ? (
-        <DataTable />
-      ) : (
-        <UsersTable search={search} />
-      )}
-    </div>
+      <Modal open={addOpen} onClose={handleCloseAdd}>
+        <div>
+          <AddUserModal
+            open={addOpen}
+            onClose={handleCloseAdd}
+            onUserAdded={handleUserAdded}
+            setSnackbarMessage={setSnackbar}
+          />
+        </div>
+      </Modal>
 
-    <AddUserModal
-      open={addOpen}
-      onClose={handleCloseAdd}
-      onConfirm={handleConfirmAdd}
-    />
-  </Container>
-)
+      <Snackbar
+        open={Boolean(snackbar)}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert severity={snackbar?.severity}>
+          {snackbar?.message}
+        </Alert>
+      </Snackbar>
+    </Container>
+  )
 }
 
 const Wrapper = () => {
   const [selectedCategory, setSelectedCategory] = useState('User')
   const [search, setSearch] = useState('')
+  const [storeData, setStoreData] = useState([])
   const [users, setUsers] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
+  const [snackbar, setSnackbar] = useState(null)
   const { token } = useToken()
 
   const fetchUsers = async () => {
-    setIsLoading(true)
     const response = await apiFetch({
       url: '/api/user',
       token,
     })
-    if (!response.error) setUsers(response)
-    setIsLoading(false)
+    if (!response.error) {
+      setUsers(response)
+      setError(false)
+    } else {
+      setError(true)
+    }
+  }
+
+  const fetchStoreData = async () => {
+    try {
+      setLoading(true)
+      const response = await apiFetch({ url: '/api/storeInfo', method: 'GET', token })
+      if (response.error) {
+        setError(true)
+        setStoreData([])
+      } else {
+        setStoreData(response)
+        setError(false)
+      }
+    } catch (err) {
+      setError(true)
+      setStoreData([])
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
     fetchUsers()
+    fetchStoreData()
   }, [token])
 
   const handleCategoryChange = (_, newValue) => setSelectedCategory(newValue)
-  const handleSearchChange = (e) => setSearch(e.target.value)
+  const handleSearchChange = e => setSearch(e.target.value)
   const handleOpenAdd = () => setAddOpen(true)
   const handleCloseAdd = () => setAddOpen(false)
-
-  const handleUserAdded = () => {
-    fetchUsers()
-  }
-
-  const handleUserDeleted = () => {
-    fetchUsers()
-  }
-
-  if (isLoading) return <Loading />
+  const handleUserAdded = () => fetchUsers()
+  const handleUserDeleted = () => fetchUsers()
 
   return (
     <AuthWrapper Fallback={NotAvailable} roleRequired="ADMIN">
-      <Container>
-        <div className={classes.containerTools}>
-          <Tabs
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-            indicatorColor="primary"
-            textColor="primary"
-            variant="scrollable"
-          >
-            <Tab label="Users" value="User" />
-            <Tab label="Data" value="Data" />
-          </Tabs>
-
-          {selectedCategory === 'User' && (
-            <>
-              <Button onClick={handleOpenAdd} className={classes.addButton}>
-                Add User
-              </Button>
-              <OutlinedInput
-                className={classes.searchInput}
-                placeholder="Buscar por nombre"
-                size="small"
-                value={search}
-                onChange={handleSearchChange}
-                startAdornment={
-                  <InputAdornment position="start">
-                    <SearchIcon color="background" />
-                  </InputAdornment>
-                }
-              />
-            </>
-          )}
-        </div>
-
-        <div className={classes.tableContainer}>
-          {selectedCategory !== 'User' ? (
-            <DataTable />
-          ) : (
-            <UsersTable
-              users={users}
-              search={search}
-              fetchUsers={fetchUsers}
-              onUserDeleted={handleUserDeleted}
-            />
-          )}
-        </div>
-
-        <AddUserModal
-          open={addOpen}
-          onClose={handleCloseAdd}
-          onUserAdded={handleUserAdded}
-        />
-      </Container>
+      <AdminModule
+        selectedCategory={selectedCategory}
+        handleCategoryChange={handleCategoryChange}
+        search={search}
+        handleSearchChange={handleSearchChange}
+        handleOpenAdd={handleOpenAdd}
+        users={users}
+        storeData={storeData}
+        error={error}
+        loading={loading}
+        fetchStoreData={fetchStoreData}
+        fetchUsers={fetchUsers}
+        handleUserDeleted={handleUserDeleted}
+        addOpen={addOpen}
+        handleCloseAdd={handleCloseAdd}
+        handleUserAdded={handleUserAdded}
+        snackbar={snackbar}
+        setSnackbar={setSnackbar}
+      />
     </AuthWrapper>
   )
 }
 
-export default CompetitorPublicTable
+export default Wrapper
