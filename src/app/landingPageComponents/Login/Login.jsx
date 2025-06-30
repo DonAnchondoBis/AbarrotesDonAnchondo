@@ -7,7 +7,9 @@ import { Formik, Form, Field, useFormikContext } from 'formik'
 import TextField from '~/app/UI/Shared/FormikTextField'
 
 import { styled } from '@mui/material/styles'
-import { Button, Typography as T, Snackbar, Alert } from '@mui/material'
+import Image from 'next/image'
+import { whiteLogo } from '~/app/UI/Images'
+import { Button, Typography as T, Snackbar, Alert, Stack } from '@mui/material'
 import getClassPrefixer from '~/app/UI/classPrefixer'
 import { getUserLoginValidationSchema } from './utils'
 
@@ -55,11 +57,6 @@ const Container = styled('div')(({ theme }) => ({
       border: `1px solid ${theme.palette.background.muted}`,
     }
   },
-  [`& .${classes.title}`]: {
-    color: theme.palette.background.main,
-    fontWeight: 'bold',
-    fontStyle: 'italic',
-  },
 
   [`& .${classes.inputContainer}`]: {
     width: '80%',
@@ -95,9 +92,18 @@ const Login = ({
   return (
     <Container>
       <div className={classes.form}>
-        <T variant="h3" className={classes.title}>
-          Welcome
-        </T>
+        <Stack alignItems="center">
+          <Image
+            src={whiteLogo}
+            width={170}
+            height={170}
+            alt="Logo"
+            layout='intrinsic'
+          />
+          <T fontWeight="bold" variant='h4' color='background' textAlign="center">
+            Don Anchondo
+          </T>
+        </Stack>
         <div className={classes.inputContainer}>
           <Field
             className={classes.input}
