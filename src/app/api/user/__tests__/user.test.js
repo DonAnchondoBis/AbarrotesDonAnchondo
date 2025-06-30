@@ -6,30 +6,49 @@ vi.mock('~/app/api/Libs/prisma', () => {
   return {
     default: {
       user: {
-        findMany: () => ([
-          {
-            id: 1,
-            name: 'Admin User',
-            username: 'admin',
-            role: 'ADMIN',
-            createdAt: 'createdAt',
-            updatedAt: 'updatedAt',
-          },
-          {
-            id: 2,
-            name: 'Cashier User',
-            username: 'cashier',
-            role: 'CASHIER',
-            createdAt: 'createdAt',
-            updatedAt: 'updatedAt',
+        findMany: ({ where } = {}) => {
+          const allUsers = [
+            {
+              id: 1,
+              name: 'Admin User',
+              username: 'admin',
+              role: 'ADMIN',
+              active: true,
+              createdAt: 'createdAt',
+              updatedAt: 'updatedAt',
+            },
+            {
+              id: 2,
+              name: 'Cashier User',
+              username: 'cashier',
+              role: 'CASHIER',
+              active: true,
+              createdAt: 'createdAt',
+              updatedAt: 'updatedAt',
+            },
+            {
+              id: 3,
+              name: 'Inactive User',
+              username: 'inactive',
+              role: 'CASHIER',
+              active: false,
+              createdAt: 'createdAt',
+              updatedAt: 'updatedAt',
+            },
+          ]
+
+          if (where && where.active !== undefined) {
+            return allUsers.filter(user => user.active === where.active)
           }
-        ]),
+          return allUsers
+        },
         findUnique: () => null,
         create: ({ data }) => ({
           id: 1,
           name: data.name,
           username: data.username,
           role: data.role,
+          active: true,
           createdAt: 'createdAt',
           updatedAt: 'updatedAt',
         }),
@@ -53,14 +72,16 @@ describe('API User - GET', () => {
           name: 'Admin User',
           username: 'admin',
           role: 'ADMIN',
+          active: true,
         },
         {
           id: 2,
           name: 'Cashier User',
           username: 'cashier',
           role: 'CASHIER',
-        }
-      ]
+          active: true,
+        },
+      ],
     },
     {
       descr: 'Error has not permission',
@@ -116,6 +137,7 @@ describe('API User - POST', () => {
         name: 'New User',
         username: 'newuser',
         role: 'CASHIER',
+        active: true,
       }
     },
     {
@@ -140,7 +162,7 @@ describe('API User - POST', () => {
       },
       isNotAllowed: true,
       expectedStatus: 403,
-      expectedResponse: { error: 'Not allowed' }
+      expectedResponse: { error: 'Not allowed' },
     },
     {
       descr: 'Error invalid input',

@@ -2,20 +2,20 @@
 import { describe, it, expect, vi } from 'vitest'
 import { POST } from '~/app/api/user/login/route'
 
-
 vi.mock('bcrypt', () => {
   return {
     default: {
-      compare: (inputPassword, realPassword) => inputPassword === realPassword ? true : false 
-    }
+      compare: (inputPassword, realPassword) =>
+        inputPassword === realPassword ? true : false,
+    },
   }
 })
 
 vi.mock('jsonwebtoken', () => {
   return {
     default: {
-      sign: () => 'successful token'
-    }
+      sign: () => 'successful token',
+    },
   }
 })
 
@@ -28,12 +28,11 @@ vi.mock('~/app/api/Libs/prisma', () => ({
         password: 'password',
         createdAt: 'createdAt',
         updatedAt: 'updatedAt',
-        active: 'active'
+        active: true,
       })
     }
   }
 }))
-
 
 describe('API User Login - POST', () => {
   it.each([
@@ -82,6 +81,16 @@ describe('API User Login - POST', () => {
       expectedResponse: { error: 'Invalid fields' }
     },
     {
+      descr: 'Error inactive user',
+      request: {
+        username: 'inactive_user',
+        password: 'password',
+      },
+      isInactive: true,
+      expectedStatus: 403,
+      expectedResponse: { error: 'This user is not active, contact your administrator' },
+    },
+    {
       descr: 'Error in database operation',
       request: {
         username: 'admin',
@@ -91,7 +100,7 @@ describe('API User Login - POST', () => {
       expectedStatus: 500,
       expectedResponse: { error: 'Database error' }
     }
-  ])('$descr', async ({ request, expectedStatus, expectedResponse, mockImplementation, isEmpty }) => {
+  ])('$descr', async ({ request, expectedStatus, expectedResponse, mockImplementation, isEmpty, isInactive }) => {
     if (mockImplementation) {
       const prisma = await import('~/app/api/Libs/prisma')
       vi.spyOn(prisma.default.user, 'findUnique').mockRejectedValueOnce(mockImplementation)
@@ -99,6 +108,17 @@ describe('API User Login - POST', () => {
     if (isEmpty){
       const prisma = await import('~/app/api/Libs/prisma')
       vi.spyOn(prisma.default.user, 'findUnique').mockReturnValueOnce(null)
+    }
+    if (isInactive) {
+      const prisma = await import('~/app/api/Libs/prisma')
+      vi.spyOn(prisma.default.user, 'findUnique').mockReturnValueOnce({
+        id: 1,
+        username: request.username,
+        password: 'password',
+        createdAt: 'createdAt',
+        updatedAt: 'updatedAt',
+        active: false,
+      })
     }
     const mockRequest = {
       json: async () => request,

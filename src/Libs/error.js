@@ -13,6 +13,8 @@ const ERROR = {
   USER_ALREADY_EXISTS: () => { throw new CustomError({ message: 'User already exists', status: 409 }) },
   SERVICE_UNAVAILABLE: () => { throw new CustomError({ message: 'Service unavailable', status: 503 }) },
   PRODUCT_HAS_STOCK: () => { throw new CustomError({ message: 'Product has stock', status: 409 }) },
+  USER_INACTIVE: () => { throw new CustomError({ message:
+     'This user is not active, contact your administrator',status: 403 }) },
 }
 
 export default ERROR

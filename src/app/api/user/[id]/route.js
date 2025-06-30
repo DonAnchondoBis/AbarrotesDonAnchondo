@@ -88,8 +88,9 @@ export const DELETE = async (request, { params }) => {
     const { id } = params
     if (!Number(id)) return ERROR.INVALID_FIELDS()
 
-    const payload = await prisma.user.delete({
-      where: { id: Number(id) }
+    const payload = await prisma.user.update({
+      where: { id: Number(id) },
+      data: { active: false }
     })
     if (!payload) return ERROR.NOT_FOUND()
     const response = cleanerData({ payload })

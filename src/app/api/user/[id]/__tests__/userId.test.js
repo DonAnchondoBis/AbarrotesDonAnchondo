@@ -18,30 +18,30 @@ vi.mock('~/app/api/Libs/prisma', () => {
             }
             : null
         ),
-        update: vi.fn(({ where, data }) =>
-          where.id === 1
-            ? {
+        update: vi.fn(({ where, data }) => {
+          if (where.id === 1) {
+            if (data && data.active === false) {
+              return {
+                id: 1,
+                name: 'Admin User',
+                username: 'admin',
+                role: 'ADMIN',
+                active: false,
+                createdAt: 'createdAt',
+                updatedAt: 'updatedAt',
+              }
+            }
+            return {
               id: 1,
               ...data,
               createdAt: 'createdAt',
-              updatedAt: 'updatedAt'
+              updatedAt: 'updatedAt',
             }
-            : null
-        ),
-        delete: vi.fn(({ where }) =>
-          where.id === 1
-            ? {
-              id: 1,
-              name: 'Admin User',
-              username: 'admin',
-              role: 'ADMIN',
-              createdAt: 'createdAt',
-              updatedAt: 'updatedAt'
-            }
-            : null
-        ),
-      }
-    }
+          }
+          return null
+        }),
+      },
+    },
   }
 })
 
@@ -227,22 +227,23 @@ describe('API User [id] - PATCH', () => {
 describe('API User [id] - DELETE', () => {
   it.each([
     {
-      descr: 'Successful delete',
+      descr: 'Successful soft delete',
       params: { id: 1 },
       expectedStatus: 200,
       expectedResponse: {
         id: 1,
         name: 'Admin User',
         username: 'admin',
-        role: 'ADMIN'
-      }
+        role: 'ADMIN',
+        active: false,
+      },
     },
     {
       descr: 'Error has not permission',
       params: { id: 1 },
       isNotAllowed: true,
       expectedStatus: 403,
-      expectedResponse: { error: 'Not allowed' }
+      expectedResponse: { error: 'Not allowed' },
     },
     {
       descr: 'Error not found',

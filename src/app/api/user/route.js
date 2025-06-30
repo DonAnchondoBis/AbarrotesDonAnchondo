@@ -37,7 +37,9 @@ export const GET = async request => {
     const { role, userId } = authenticateToken(request) ?? {}
     if (role !== 'ADMIN' || !userId) return ERROR.FORBIDDEN()
 
-    const payloads = await prisma.user.findMany()
+    const payloads = await prisma.user.findMany({
+      where: { active: true },
+    })
     if (payloads.length === 0) return ERROR.NOT_FOUND()
     const response = payloads.map(payload => cleanerData({ payload }))
     return NextResponse.json(response, { status: 200 })
