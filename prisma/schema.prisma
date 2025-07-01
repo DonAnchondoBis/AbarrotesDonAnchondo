@@ -100,7 +100,6 @@ model User {
 enum InventoryLogType {
   INCREASE
   DECREASE
-  INCOME
   SHRINKAGE
 }
 
