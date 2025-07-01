@@ -30,6 +30,9 @@ import getClassPrefixer from '~/app/UI/classPrefixer'
 import apiFetch from '~/app/Lib/apiFetch'
 import Loading from '~/app/UI/Shared/Loading'
 
+import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
+import NotAvailable from '~/app/UI/Shared/NotAvailable'
+
 import { useToken } from '~/app/store/useToken'
 
 import Image from 'next/image'
@@ -352,6 +355,7 @@ const PointOfSale = () => {
   const [searchType, setSearchType] = useState('name')
   const [openModal, setOpenModal] = useState(false)
   const [openStockErrorModal, setOpenStockErrorModal] = useState(false)
+  const [openCartLimitModal, setOpenCartLimitModal] = useState(false)
   const [stockErrors, setStockErrors] = useState([])
   const [cart, setCart] = useState([])
   const [products, setProducts] = useState([])
@@ -394,8 +398,18 @@ const PointOfSale = () => {
       ...product,
       price: ensureNumber(product.price)
     }
+
+    const totalStock = product.lots?.reduce((sum, lot) => sum + (lot.currentAmount || 0), 0) || 0
+    
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === productWithNumberPrice.id)
+      const currentQuantityInCart = existingItem ? existingItem.quantity : 0
+      
+      if (currentQuantityInCart + 1 > totalStock) {
+        setOpenCartLimitModal(true)
+        return prevCart
+      }
+      
       if (existingItem) {
         return prevCart.map(item =>
           item.id === productWithNumberPrice.id
@@ -728,6 +742,45 @@ const PointOfSale = () => {
               </Button>
             </DialogActions>
           </Dialog>
+          <Dialog
+            open={openCartLimitModal}
+            onClose={() => setOpenCartLimitModal(false)}
+            classes={{ paper: classes.dialog }}
+            sx={{
+              '& .MuiDialog-paper': {
+                backgroundColor: 'background.main',
+                color: 'red.main',
+                borderRadius: '12px',
+                padding: '2rem',
+                textAlign: 'center',
+                maxWidth: '500px'
+              }
+            }}
+          >
+            <DialogTitle sx={{ fontWeight: 'bold', color: 'red.main' }}>
+              No more items available
+            </DialogTitle>
+            <DialogContent>
+              <T variant="body1" sx={{ color: 'primary.main', mb: 2 }}>
+                There are no more units available for this product.
+              </T>
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: 'center' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setOpenCartLimitModal(false)}
+                sx={{
+                  borderRadius: '50px',
+                  fontWeight: 'bold',
+                  color: 'background.main',
+                  px: 4
+                }}
+              >
+                OK
+              </Button>
+            </DialogActions>
+          </Dialog>
         </>
       )}
     </Container>
@@ -735,7 +788,11 @@ const PointOfSale = () => {
 }
 
 const Wrapper = () => {
-  return <PointOfSale />
+  return (
+    <AuthWrapper Fallback={NotAvailable} roleRequired="ADMIN">
+      <PointOfSale />
+    </AuthWrapper>
+  )
 }
 
 export default Wrapper

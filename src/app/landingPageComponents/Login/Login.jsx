@@ -20,7 +20,7 @@ const displayName = 'Login'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
-  padding: '8rem',
+  padding: '5rem',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
