@@ -71,7 +71,7 @@ const AdjustmentModal = ({ onClose, selectedProduct }) => {
       <div className={classes.modalContainer}>
         <div className={classes.header}>
           <T color="primary" variant="h5">
-            New Product
+            Adjustments
           </T>
           <IconButton onClick={onClose}>
             <CloseIcon color="primary" />
@@ -82,7 +82,7 @@ const AdjustmentModal = ({ onClose, selectedProduct }) => {
           <div className={classes.inputs}>
             <Field
               name="type"
-              label="Type"
+              label="Adjustment type"
               variant="outlined"
               type="text"
               component={SelectField}
@@ -90,7 +90,7 @@ const AdjustmentModal = ({ onClose, selectedProduct }) => {
             />
             <Field
               name="expirationDate"
-              label="Expiration Date"
+              label="Lot´s expiration Date"
               variant="outlined"
               type="text"
               component={SelectField}

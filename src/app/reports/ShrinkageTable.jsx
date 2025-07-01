@@ -92,7 +92,7 @@ const ShrinkageTable = ({ data = [], date = '' }) => {
               </TableCell>
               <TableCell align="center">
                 <T color="primary.main" fontWeight="bold">
-                  Date of Generation
+                   Date of registry
                 </T>
               </TableCell>
             </TableRow>
