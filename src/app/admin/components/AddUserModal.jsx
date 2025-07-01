@@ -25,16 +25,16 @@ const displayName = 'AddUserModal'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
   display: 'flex',
+  height: '100vh',
+  width: '100vw',
   justifyContent: 'center',
   alignItems: 'center',
   [`& .${classes.modalContainer}`]: {
-    width: '400px',
+    width: '30vw',
+    '@media (max-width: 768px)': {
+      width: '90vw',
+    },
     border: `solid 3px ${theme.palette.primary.main}`,
     background: theme.palette.background.main,
     borderRadius: '1rem',
@@ -96,7 +96,7 @@ const AddUserForm = ({ onClose, values, setFieldValue, isValid, dirty }) => {
               variant="outlined"
             />
             <FormControl fullWidth>
-              <InputLabel>Rol</InputLabel>
+              <InputLabel>Role</InputLabel>
               <Select
                 name="role"
                 value={values.role}
@@ -111,14 +111,14 @@ const AddUserForm = ({ onClose, values, setFieldValue, isValid, dirty }) => {
           </div>
 
           <div className={classes.buttonGroup}>
-            <Button onClick={onClose}>Cancelar</Button>
+            <Button onClick={onClose}>Cancel</Button>
             <Button
               type="submit"
               variant="contained"
               color="primary"
               disabled={!dirty || !isValid}
             >
-              Guardar
+              Save
             </Button>
           </div>
         </Form>

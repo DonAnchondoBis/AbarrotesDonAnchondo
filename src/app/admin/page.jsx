@@ -18,9 +18,9 @@ import getClassPrefixer from '~/app/UI/classPrefixer'
 import apiFetch from '~/app/Lib/apiFetch'
 import { useToken } from '~/app/store/useToken'
 
-import UsersTable from '~/app/AdminModule/componets/UsersTable'
-import AddUserModal from '~/app/AdminModule/componets/AddUserModal'
-import DataTable from '~/app/AdminModule/componets/DataTable'
+import UsersTable from '~/app/admin/components/UsersTable'
+import AddUserModal from '~/app/admin/components/AddUserModal'
+import DataTable from '~/app/admin/components/DataTable'
 import Loading from '~/app/UI/Shared/Loading'
 import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
 import NotAvailable from '~/app/UI/Shared/NotAvailable'
@@ -40,13 +40,14 @@ const Container = styled('div')(({ theme }) => ({
   },
   [`& .${classes.containerTools}`]: {
     display: 'flex',
+    alignItems: 'flex-end',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     width: '100%',
-    gap: '1rem',
+    marginBottom: '1ch',
+    justifyContent: 'space-between',
     '@media (max-width: 768px)': {
       flexDirection: 'column',
+      justifyContent: 'flex-start',
     },
   },
   [`& .${classes.tableContainer}`]: {
@@ -54,7 +55,6 @@ const Container = styled('div')(({ theme }) => ({
   },
   [`& .${classes.searchInput}`]: {
     minWidth: '150px',
-    height: '3rem',
     marginLeft: '1rem',
     backgroundColor: theme.palette.contrast.main,
     borderRadius: '2rem',
@@ -72,7 +72,6 @@ const Container = styled('div')(({ theme }) => ({
     backgroundColor: theme.palette.green.main,
     borderRadius: '2rem',
     color: theme.palette.background.main,
-    height: '3rem',
     padding: '6px 16px',
     '&:hover': {
       backgroundColor: theme.palette.green.dark,
@@ -109,7 +108,6 @@ const AdminModule = ({
           onChange={handleCategoryChange}
           indicatorColor="primary"
           textColor="primary"
-          variant="scrollable"
         >
           <Tab label="Users" value="User" />
           <Tab label="Store Info" value="Store Info" />

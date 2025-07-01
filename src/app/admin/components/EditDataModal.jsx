@@ -5,37 +5,33 @@ import {
   IconButton,
   Typography as T,
   Divider,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl
+  InputAdornment,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import CloseIcon from '@mui/icons-material/Close'
 import getClassPrefixer from '~/app/UI/classPrefixer'
-import { useFormikContext, Formik, Form, Field } from 'formik'
-import Loading from '~/app/UI/Shared/Loading'
-
 import TextField from '~/app/UI/Shared/FormikTextField'
-import apiFetch from '~/app/Lib/apiFetch'
+import { useFormikContext, Formik, Form, Field } from 'formik'
 import { useToken } from '~/app/store/useToken'
+import apiFetch from '~/app/Lib/apiFetch'
 import { useState } from 'react'
-import { getEditUserValidationSchema } from './utils'
+import Loading from '~/app/UI/Shared/Loading'
+import { getEditStorageValidationSchema } from './utils'
 
-const displayName = 'EditUserModal'
+const displayName = 'EditDataModal'
 const classes = getClassPrefixer(displayName)
 
 const Container = styled('div')(({ theme }) => ({
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
   display: 'flex',
+  height: '100vh',
+  width: '100vw',
   justifyContent: 'center',
   alignItems: 'center',
   [`& .${classes.modalContainer}`]: {
-    width: '400px',
+    width: '30vw',
+    '@media (max-width: 768px)': {
+      width: '90vw',
+    },
     border: `solid 3px ${theme.palette.primary.main}`,
     background: theme.palette.background.main,
     borderRadius: '1rem',
@@ -53,6 +49,10 @@ const Container = styled('div')(({ theme }) => ({
     gap: '2rem',
     marginTop: '2rem'
   },
+  [`& .${classes.currencyGroup}`]: {
+    display: 'flex',
+    gap: '1rem'
+  },
   [`& .${classes.buttonGroup}`]: {
     display: 'flex',
     justifyContent: 'flex-end',
@@ -61,68 +61,85 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-const EditUserForm = ({ onClose }) => {
+const EditForm = ({ onClose }) => {
   const { isValid, dirty } = useFormikContext()
-
   return (
     <Container>
       <div className={classes.modalContainer}>
         <div className={classes.header}>
           <T color="primary" variant="h5">
-            Edit User
+            Edit Store Information
           </T>
           <IconButton onClick={onClose}>
             <CloseIcon color="primary" />
           </IconButton>
         </div>
-        <Divider sx={{ mb: 3 }} />
+        <Divider sx={{ mb: 2 }} />
         <Form>
           <div className={classes.inputs}>
             <Field
-              name="name"
               component={TextField}
+              variant="outlined"
               label="Name"
-              variant="outlined"
+              name="name"
+              margin="normal"
+              fullWidth
             />
             <Field
-              name="username"
               component={TextField}
-              label="Username"
               variant="outlined"
+              label="Address"
+              name="address"
+              margin="normal"
+              fullWidth
             />
             <Field
-              name="password"
               component={TextField}
               variant="outlined"
-              label="Password"
-              type="password"
+              label="Phone Number"
+              name="phone"
+              margin="normal"
+              fullWidth
             />
-            <FormControl fullWidth>
-              <InputLabel>Role</InputLabel>
+            <div className={classes.currencyGroup}>
               <Field
-                name="role"
-                as={Select}
-                label="Role"
+                component={TextField}
                 variant="outlined"
-              >
-                <MenuItem value="ADMIN">ADMIN</MenuItem>
-                <MenuItem value="CASHIER">CASHIER</MenuItem>
-                <MenuItem value="WAREHOUSE">WAREHOUSE</MenuItem>
-              </Field>
-            </FormControl>
+                label="Dollar Rate"
+                name="dollarValue"
+                type="number"
+                margin="normal"
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">$</InputAdornment>
+                  ),
+                }}
+              />
+              <Field
+                component={TextField}
+                variant="outlined"
+                label="Yen Rate"
+                name="yenValue"
+                type="number"
+                margin="normal"
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">¥</InputAdornment>
+                  ),
+                }}
+              />
+            </div>
           </div>
 
           <div className={classes.buttonGroup}>
-            <Button
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
+            <Button onClick={onClose}>Cancel</Button>
             <Button
               type="submit"
               variant="contained"
               color="primary"
-              disabled={!dirty || !isValid}
+              disabled={!isValid || !dirty}
             >
               Save
             </Button>
@@ -133,51 +150,52 @@ const EditUserForm = ({ onClose }) => {
   )
 }
 
-const Wrapper = ({ onClose, user, setSnackbarMessage, refresh }) => {
+const Wrapper = ({ onClose, data, setSnackbarMessage, refresh }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { token } = useToken()
+
   const handleSubmit = async values => {
     setIsLoading(true)
     const payload = {
-      name: values.name,
-      username: values.username,
-      role: values.role,
-      active: values.active,
-      ...(values.password ? { password: values.password } : {}),
+      ...values,
+      dollarValue: Number(values.dollarValue),
+      yenValue: Number(values.yenValue),
     }
 
     const response = await apiFetch({
-      url: `/api/user/${user.id}`,
-      method: 'PATCH',
+      url: `/api/storeInfo/${data?.id}`,
+      method: 'PUT',
       payload,
-      token
+      token,
     })
 
     if (response.error) {
       setIsLoading(false)
       setSnackbarMessage({
-        message: 'Error updating user.',
+        message: 'Error editing the store info',
         severity: 'error'
       })
     } else {
       setSnackbarMessage({
-        message: 'User updated successfully.',
+        message: 'Storage information updated successfully',
         severity: 'success'
       })
       await refresh()
     }
     onClose()
     setIsLoading(false)
+
   }
 
-  const validationSchema = getEditUserValidationSchema()
+  const validationSchema = getEditStorageValidationSchema()
   const initialValues = {
-    name: user?.name || '',
-    username: user?.username || '',
-    role: user?.role || '',
-    active: user?.active ?? true,
-    password: ''
+    name: data?.name || '',
+    address: data?.address || '',
+    phone: data?.phone || '',
+    dollarValue: data?.dollarValue || 0,
+    yenValue: data?.yenValue || 0,
   }
+
   if (isLoading) return <Loading />
 
   return (
@@ -185,14 +203,10 @@ const Wrapper = ({ onClose, user, setSnackbarMessage, refresh }) => {
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
-      enableReinitialize
     >
-      <EditUserForm
-        onClose={onClose}
-      />
+      <EditForm onClose={onClose} />
     </Formik>
   )
 }
-
 
 export default Wrapper

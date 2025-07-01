@@ -113,7 +113,7 @@ const Dashboard = () => {
           </Link>
         )}
         {usePermitted({ roleRequired: 'ADMIN' }) && (
-          <Link href="/AdminModule">
+          <Link href="/admin">
             <IconButton className={classes.btn}>
               <PersonIcon className={classes.icon} />
               <T variant="h4" className={classes.text}>Admin</T>
