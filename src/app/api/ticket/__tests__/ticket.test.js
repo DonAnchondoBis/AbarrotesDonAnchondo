@@ -90,7 +90,7 @@ describe('API Ticket - POST', () => {
       expectedStatus: 201,
       expectedResponse: {
         id: 1,
-        products: { create: [{ connect: { productId: 1 }, quantityProduct: 2 }] },
+        products: { create: [{ productId: 1, quantityProduct: 2 }] },
         userId: 1,
         total: 100,
       }

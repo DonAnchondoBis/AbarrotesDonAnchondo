@@ -18,7 +18,7 @@ export const POST = async request => {
         data: {
           products: {
             create: data.products.map(product => ({
-              connect: { productId: product.productId },
+              productId: product.productId,
               quantityProduct: product.quantity
             }))
           },
