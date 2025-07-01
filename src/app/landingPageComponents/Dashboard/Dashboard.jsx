@@ -8,7 +8,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import PaidIcon from '@mui/icons-material/Paid'
 import DescriptionIcon from '@mui/icons-material/Description'
-import SettingsIcon from '@mui/icons-material/Settings'
+import PersonIcon from '@mui/icons-material/Person'
 import usePermitted from '~/app/Lib/Permissions/utils'
 
 const displayName = 'Dashboard'
@@ -113,10 +113,10 @@ const Dashboard = () => {
           </Link>
         )}
         {usePermitted({ roleRequired: 'ADMIN' }) && (
-          <Link href="/settings">
+          <Link href="/admin">
             <IconButton className={classes.btn}>
-              <SettingsIcon className={classes.icon} />
-              <T variant="h5" className={classes.text}>Settings</T>
+              <PersonIcon className={classes.icon} />
+              <T variant="h4" className={classes.text}>Admin</T>
             </IconButton>
           </Link>
         )}
