@@ -48,7 +48,8 @@ const Container = styled('div')(({ theme }) => ({
     alignItems: 'center',
     width: '100%',
     flexWrap: 'wrap',
-    gap: '1rem'
+    gap: '1rem',
+    marginBottom: '1ch'
   },
   [`& .${classes.searchGroup}`]: {
     display: 'flex',

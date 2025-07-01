@@ -3,7 +3,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import InventoryIcon from '@mui/icons-material/Inventory'
 import PaidIcon from '@mui/icons-material/Paid'
 import DescriptionIcon from '@mui/icons-material/Description'
-import SettingsIcon from '@mui/icons-material/Settings'
+import PersonIcon from '@mui/icons-material/Person'
 import usePermitted from '~/app/Lib/Permissions/utils'
 import HomeIcon from '@mui/icons-material/Home'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -55,9 +55,9 @@ export const useSideBarOpts = () => {
       status: (usePermitted({ roleRequired: 'ADMIN' }) ? 'available' : 'unavailable')
     },
     {
-      title: 'Settings',
-      path: '/settings',
-      Icon: props => <SettingsIcon {...props} />,
+      title: 'Admin',
+      path: '/admin',
+      Icon: props => <PersonIcon {...props} />,
       status: (usePermitted({ roleRequired: 'ADMIN' }) ? 'available' : 'unavailable')
     },
     {

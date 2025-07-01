@@ -30,6 +30,9 @@ import getClassPrefixer from '~/app/UI/classPrefixer'
 import apiFetch from '~/app/Lib/apiFetch'
 import Loading from '~/app/UI/Shared/Loading'
 
+import AuthWrapper from '~/app/Lib/Permissions/AuthWrapper'
+import NotAvailable from '~/app/UI/Shared/NotAvailable'
+
 import { useToken } from '~/app/store/useToken'
 
 import Image from 'next/image'
@@ -785,7 +788,11 @@ const PointOfSale = () => {
 }
 
 const Wrapper = () => {
-  return <PointOfSale />
+  return (
+    <AuthWrapper Fallback={NotAvailable} roleRequired="ADMIN">
+      <PointOfSale />
+    </AuthWrapper>
+  )
 }
 
 export default Wrapper
