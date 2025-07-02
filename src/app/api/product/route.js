@@ -60,6 +60,7 @@ export const POST = async request => {
     const response = cleanerData({ payload })
     return NextResponse.json(response, { status: 201 })
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: error.message }, { status: error.status || 500 })
   }
 }

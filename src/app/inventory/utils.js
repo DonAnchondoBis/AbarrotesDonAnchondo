@@ -8,7 +8,7 @@ export const getAddProductValidationSchema = () => Yup.object({
     .required('Price is required')
     .min(0, 'Price must be 0 or greater'),
   image: Yup.mixed()
-    .nullable()
+    .required('Image is required')
     .test(
       'fileFormat',
       'Unsupported file format. Please use JPEG, PNG, or WebP images.',
