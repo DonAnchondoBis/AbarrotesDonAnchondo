@@ -58,7 +58,7 @@ model StoreInfo {
 
 model Supplier {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String   @unique
   phone     String
   email     String
   active    Boolean  @default(true)

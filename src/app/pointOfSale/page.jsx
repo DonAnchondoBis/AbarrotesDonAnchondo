@@ -789,7 +789,7 @@ const PointOfSale = () => {
 
 const Wrapper = () => {
   return (
-    <AuthWrapper Fallback={NotAvailable} roleRequired="ADMIN">
+    <AuthWrapper Fallback={NotAvailable} roleRequired="CASHIER">
       <PointOfSale />
     </AuthWrapper>
   )

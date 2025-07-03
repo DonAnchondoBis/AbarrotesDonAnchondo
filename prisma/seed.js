@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcrypt'
+const { PrismaClient } = require('@prisma/client')
+const bcrypt = require('bcrypt')
 
 const prisma = new PrismaClient()
 async function main() {
@@ -19,7 +19,7 @@ async function main() {
       where: { username: 'arturo' },
       update: {},
       create: {
-        name: 'Arthuro',
+        name: 'Arturo',
         username: 'arturo',
         password: await bcrypt.hash('a', 12),
         role: 'ADMIN',
@@ -48,7 +48,7 @@ async function main() {
   ])
   
   //Products
-  const product = await Promise.all([
+  await Promise.all([
     prisma.product.upsert({
       where: { name: "Apple's" },
       update: {},
@@ -162,8 +162,9 @@ async function main() {
   ])
 
   //Lots
-  await Promise.all([
-    product.map(p=>
+  const product = await prisma.product.findMany()
+  await Promise.all(
+    product.map(p =>
       prisma.lot.create({
         data: {
           productId: p.id,
@@ -173,51 +174,75 @@ async function main() {
         },
       })
     )
-  ])
+  )
     
   //Suppliers
-  await prisma.supplier.upsert({
-    where: { name: 'Potato' },
-    update: {},
-    create: [
-      {
+  await Promise.all([
+    prisma.supplier.upsert({
+      where: { name: 'Nestlé México' },
+      update: {},
+      create: {
         name: 'Nestlé México',
         phone: '800-123-4567',
         email: 'ventas@nestle.com.mx',
       },
-      {
+    }),
+    prisma.supplier.upsert({
+      where: { name: 'Grupo Bimbo' },
+      update: {},
+      create: {
         name: 'Grupo Bimbo',
         phone: '800-123-0001',
         email: 'proveedores@bimbo.com',
       },
-      {
+    }),
+    prisma.supplier.upsert({
+      where: { name: 'La Moderna' },
+      update: {},
+      create: {
         name: 'La Moderna',
         phone: '800-456-7890',
         email: 'pedidos@lamoderna.com',
       },
-      {
+    }),
+    prisma.supplier.upsert({
+      where: { name: 'Sigma Alimentos' },
+      update: {},
+      create: {
         name: 'Sigma Alimentos',
         phone: '800-321-4321',
         email: 'contacto@sigmaalimentos.com',
       },
-      {
+    }),
+    prisma.supplier.upsert({
+      where: { name: 'Lala México' },
+      update: {},
+      create: {
         name: 'Lala México',
         phone: '800-000-5252',
         email: 'contacto@lala.com.mx',
       },
-      {
+    }),
+    prisma.supplier.upsert({
+      where: { name: 'Gamesa' },
+      update: {},
+      create: {
         name: 'Gamesa',
         phone: '800-555-2233',
         email: 'proveedor@gamesa.com.mx',
       },
-      {
+    }),
+    prisma.supplier.upsert({
+      where: { name: 'Herdez' },
+      update: {},
+      create: {
         name: 'Herdez',
         phone: '800-456-9999',
         email: 'ventas@herdez.com.mx',
       },
-    ],
-  })
-
+    }),
+  ])
+  
   //Store
   await prisma.storeInfo.create({
     data: {
