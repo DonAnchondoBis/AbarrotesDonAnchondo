@@ -3,15 +3,17 @@ import { useToken } from '~/app/store/useToken'
 
 const isValidRole = ({ role, roleRequired }) => {
   if (role === 'ADMIN') return true
-  if (role === roleRequired) return true
-  return false
+  if (Array.isArray(roleRequired)) {
+    return roleRequired.includes(role)
+  }
+  return role === roleRequired
 }
 
 const usePermitted = ({ roleRequired = 'ADMIN' }) => {
   const { token } = useToken()
   const { userId, role } = useData()
 
-  if (token && userId && isValidRole({ role, roleRequired }) ) return true
+  if (token && userId && isValidRole({ role, roleRequired })) return true
 
   return false
 }

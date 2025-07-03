@@ -11,7 +11,7 @@ const metadata = {
 
 
 const RootLayout = ({ children }) => {
-  const isLogged = usePermitted({ roleRequired: 'WAREHOUSE' })
+  const isLogged = usePermitted({ roleRequired: ['WAREHOUSE', 'CASHIER'] })
   return (
     <html lang="en">
       <head>

@@ -28,7 +28,7 @@ export const useSideBarOpts = () => {
       title: 'Home',
       path: '/',
       Icon: props => <HomeIcon {...props} />,
-      status: 'available'
+      status: (usePermitted({ roleRequired: ['ADMIN', 'WAREHOUSE'] }) ? 'available' : 'unavailable')
     },
     {
       title: 'Point of Sale',
